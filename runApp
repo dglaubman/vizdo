@@ -1,0 +1,2 @@
+coffee -o public/js/vizdo -c src/
+coffee app $1

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>Signaller</title>
+  <style type="text/css">
+    @import url("/css/style.css");
+    @import url("/css/tree.css");
+    @import url("/css/syntax.css");
+  </style>
+</head>
+
+<body>
+  <div class="body">
+
+    <div class="content">
+
+      <div class="topbar">
+	<a id="mainRef" href="#">Main</a>
+	<a id="knobsRef" href="#">Knobs</a>
+	<a id="viewAMQP" target="_blank" href="http://guest:guest@ec2-50-16-67-125.compute-1.amazonaws.com:55672">AMQP</a>
+      </div>
+
+      <div class="sidebar">
+	<a href="/"><h1>VizDO</h1></a>
+      </div>
+      <h1 id="page">Click on a signal to resend</h1>
+      
+      <div class='gallery' id='chart' height='1100' width='1000'>
+      </div>
+
+    <div class="knobs invisible">
+
+    </div>
+    
+    <div class="foot">
+      <div><h3>Log</h3><hr/>
+      <div id="console"></div>
+      <h3>Powered by <a href="http://mbostock.github.com/d3/" >d3.js</a></h3>
+    </div>
+
+  <script src="http://d3js.org/d3.v2.js"></script>
+  <script src="http://code.jquery.com/jquery-1.7.2.js"></script>
+  <script src="/js/AmqpClient.js"></script>
+  <script src="/js/vizdo/log.js"></script>
+  <script src="/js/vizdo/signalgraph.js"></script>
+  <script src="/js/vizdo/settings.js"></script>
+  <script src="/js/vizdo/signaller.js"></script>
+
+</body>
+
+</html>
