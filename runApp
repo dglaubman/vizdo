@@ -1,2 +1,4 @@
-coffee -o public/js/vizdo -c src/
+coffee --bare -o public/js  -c src/ 
+coffee --bare -o public/js/presets -c  src/presets/
+coffee --bare -o public/js/do -c  src/do/
 coffee app $1

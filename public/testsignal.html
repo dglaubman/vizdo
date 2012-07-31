@@ -27,9 +27,21 @@
 	<br/>
 	<br/>
 	<br/>
-<label for="dev1">Dev1</label>
-<label for="qa1">QA1</label>
-<input type="radio" name="cluster" id="dev1" value="dev1" /><input type="radio" name="cluster" id="qa1" value="qa1" />	
+<table>
+<tr><td>
+<label for="dev1">Dev1</label></td>
+<td>
+<input type="radio" name="cluster" id="dev1" value="dev1" />
+</td></tr>
+<tr>
+<td>
+<label for="qa1">Qa1&nbsp;</label>
+</td>
+<td>
+<input type="radio" name="cluster" id="qa1" value="qa1" />
+</td>
+</tr>
+</table>
 
 
       </div>
@@ -51,22 +63,12 @@
   <script src="http://d3js.org/d3.v2.js"></script>
   <script src="http://code.jquery.com/jquery-1.7.2.js"></script>
   <script src="/js/AmqpClient.js"></script>
-
   <script src="/js/do/do.js"></script>
   <script src="/js/do/log.js"></script>
-  <script src="/js/do/journal.js"></script>
   <script src="/js/do/signalsource.js"></script>
-
-  <script src="/js/presets/presets.js"></script>
-  <script src="/js/presets/test.js"></script>
-  <script src="/js/presets/qa1.js"></script>
-  <script src="/js/presets/dev1.js"></script>
-
-  <script src="/js/signalgraph.js"></script>
-  <!-- <script src="/js/refresh.js"></script> -->
-  <!-- <script src="/js/knobs.js"></script> -->
-  <script src="/js/vizdo.js"></script>
-
+  <script src="/js/do/testsettings.js"></script>
+  
 </body>
 
 </html>
+

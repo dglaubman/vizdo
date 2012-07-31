@@ -1,9 +1,5 @@
 /**
- * Copyright (c) 2007-2011, Kaazing Corporation. All rights reserved.
- * 
- * Licensed under the Kaazing Corporation Developer Agreement (2010-02-22), see:
- * 
- *   http://www.kaazing.com/license
+ * Copyright (c) 2007-2012, Kaazing Corporation. All rights reserved.
  */
 
 var browser=null;
@@ -15,6 +11,9 @@ browser="opera";
 }else{
 if(navigator.vendor.indexOf("Apple")!=-1){
 browser="safari";
+if(navigator.userAgent.indexOf("iPad")!=-1||navigator.userAgent.indexOf("iPhone")!=-1){
+browser.ios=true;
+}
 }else{
 if(navigator.vendor.indexOf("Google")!=-1){
 if(navigator.userAgent.indexOf("Android")!=-1){
@@ -982,21 +981,17 @@ _107.onprogress();
 }
 break;
 case 4:
-switch(Math.floor(_107.status/100)){
-case 0:
-case 5:
+if(_107.status<100||_107.status>=500){
 if(typeof (_107.onerror)!=="undefined"){
 _107.onerror();
 }
-break;
-default:
+}else{
 if(typeof (_107.onprogress)!=="undefined"){
 _107.onprogress();
 }
 if(typeof (_107.onload)!=="undefined"){
 _107.onload();
 }
-break;
 }
 break;
 }
@@ -2535,7 +2530,7 @@ return v;
 (function(){
 var _2ca=function(_2cb){
 var self=this;
-var _2cd=300;
+var _2cd=3000;
 var ID="Loader";
 var ie=false;
 var _2d0=-1;
@@ -2791,7 +2786,7 @@ return a.join("");
 })();
 var _30b=(function(){
 var _30c=function(_30d){
-this.immediate=false;
+this.reconnectImmediately=false;
 this.retry=3000;
 if(browser=="opera"||browser=="ie"){
 this.requiresEscaping=true;
@@ -2813,7 +2808,7 @@ this.xhr=null;
 this.reconnectTimer=null;
 var _310=this;
 setTimeout(function(){
-connect(_310,false);
+connect(_310);
 },0);
 };
 _25a=_30c.prototype;
@@ -2871,11 +2866,22 @@ _process(_317,_31b);
 xhr.onload=function(){
 _process(_317,_31b);
 if(_317.xhr==_31b.xhr&&_317.readyState!=2){
-_reconnect(_317);
+_317.xhr.onerror=function(){
+};
+_317.xhr.ontimeout=function(){
+};
+_317.xhr.onreadystatechange=function(){
+};
+if(_317.reconnectImmediately){
+_317.reconnectImmediately=false;
+connect(_317);
+}else{
+doError(_317);
+}
 }
 };
 xhr.onreadystatechange=function(){
-if(!_317.immediate&&xhr.readyStateChange>3){
+if(!_317.reconnectImmediately&&xhr.readyStateChange>3){
 _317.readyState=1;
 doOpen(_317);
 xhr.onreadystatechange=function(){
@@ -2883,19 +2889,18 @@ xhr.onreadystatechange=function(){
 }
 };
 xhr.ontimeout=function(){
-if(_317.readyState!=2){
-_317.disconnect();
-doError(_317);
-}
+doClose(_317);
 };
-xhr.onerror=xhr.ontimeout;
+xhr.onerror=function(){
+doClose(_317);
+};
 xhr.open("GET",_318.toString(),true);
 xhr.send("");
 if(_317.location.indexOf("&.ki=p")==-1){
 setTimeout(function(){
 if(xhr.readyState<3&&_317.readyState<2){
 _317.location+="&.ki=p";
-connect(_317,false);
+connect(_317);
 }
 },_316);
 }
@@ -2905,45 +2910,37 @@ if(this.readyState!==2){
 _disconnect(this);
 }
 };
-function _reconnect(_31c){
-if(_31c.immediate){
-_31c.immediate=false;
-connect(_31c);
-}else{
-doError(_31c);
+function _disconnect(_31c){
+if(_31c.reconnectTimer!==null){
+clearTimeout(_31c.reconnectTimer);
+_31c.reconnectTimer=null;
 }
+if(_31c.xhr!==null){
+_31c.xhr.onprogress=function(){
 };
-function _disconnect(_31d){
-if(_31d.reconnectTimer!==null){
-clearTimeout(_31d.reconnectTimer);
-_31d.reconnectTimer=null;
+_31c.xhr.onload=function(){
+};
+_31c.xhr.onerror=function(){
+};
+_31c.xhr.abort();
 }
-if(_31d.xhr!==null){
-_31d.xhr.onprogress=function(){
+_31c.lineQueue=[];
+_31c.lastEventId=null;
+_31c.location=null;
+_31c.readyState=2;
 };
-_31d.xhr.onload=function(){
-};
-_31d.xhr.onerror=function(){
-};
-_31d.xhr.abort();
-}
-_31d.lineQueue=[];
-_31d.lastEventId=null;
-_31d.location=null;
-_31d.readyState=2;
-};
-function _process(_31e,_31f){
-var _320=_31f.xhr.responseText;
-var _321=_320.slice(_31f.position);
-_31f.position=_320.length;
-var buf=_31e.buf;
-var _323=_2ee.toArray(_321,_31e.requiresEscaping);
-if(_323.hasRemainder){
-_31f.position--;
+function _process(_31d,_31e){
+var _31f=_31e.xhr.responseText;
+var _320=_31f.slice(_31e.position);
+_31e.position=_31f.length;
+var buf=_31d.buf;
+var _322=_2ee.toArray(_320,_31d.requiresEscaping);
+if(_322.hasRemainder){
+_31e.position--;
 }
 buf.position=buf.limit;
-buf.putBytes(_323);
-buf.position=_31e.nextMessageAt;
+buf.putBytes(_322);
+buf.position=_31d.nextMessageAt;
 buf.mark();
 parse:
 while(true){
@@ -2953,44 +2950,44 @@ break;
 var type=buf.getUnsigned();
 switch(type&128){
 case _311:
-var _325=buf.indexOf(_312);
-if(_325==-1){
+var _324=buf.indexOf(_312);
+if(_324==-1){
 break parse;
 }
-var _326=buf.array.slice(buf.position,_325);
-var data=new ByteBuffer(_326);
-var _328=_325-buf.position;
-buf.skip(_328+1);
+var _325=buf.array.slice(buf.position,_324);
+var data=new ByteBuffer(_325);
+var _327=_324-buf.position;
+buf.skip(_327+1);
 buf.mark();
 if(type==_313){
-handleCommandFrame(_31e,data);
+handleCommandFrame(_31d,data);
 }else{
-dispatchText(_31e,data);
+dispatchText(_31d,data);
 }
 break;
 case _314:
-var _329=0;
-var _32a=false;
+var _328=0;
+var _329=false;
 while(buf.hasRemaining()){
 var b=buf.getUnsigned();
-_329=_329<<7;
-_329|=(b&127);
+_328=_328<<7;
+_328|=(b&127);
 if((b&128)!=128){
-_32a=true;
+_329=true;
 break;
 }
 }
-if(!_32a){
+if(!_329){
 break parse;
 }
-if(buf.remaining()<_329){
+if(buf.remaining()<_328){
 break parse;
 }
-var _32c=buf.array.slice(buf.position,buf.position+_329);
-var _32d=new ByteBuffer(_32c);
-buf.skip(_329);
+var _32b=buf.array.slice(buf.position,buf.position+_328);
+var _32c=new ByteBuffer(_32b);
+buf.skip(_328);
 buf.mark();
-dispatchBytes(_31e,_32d);
+dispatchBytes(_31d,_32c);
 break;
 default:
 throw new Error("Emulation protocol error. Unknown frame type: "+type);
@@ -3000,32 +2997,32 @@ buf.reset();
 buf.compact();
 nextMessageAt=buf.position;
 };
-function handleCommandFrame(_32e,data){
+function handleCommandFrame(_32d,data){
 while(data.remaining()){
-var _330=String.fromCharCode(data.getUnsigned());
-switch(_330){
+var _32f=String.fromCharCode(data.getUnsigned());
+switch(_32f){
 case "0":
 break;
 case "1":
-_32e.immediate=true;
+_32d.reconnectImmediately=true;
 break;
 default:
-throw new Error("Protocol decode error. Unknown command: "+_330);
+throw new Error("Protocol decode error. Unknown command: "+_32f);
 }
 }
 };
-function dispatchBytes(_331,buf){
+function dispatchBytes(_330,buf){
 var e=document.createEvent("Events");
 e.initEvent("message",true,true);
-e.lastEventId=_331.lastEventId;
+e.lastEventId=_330.lastEventId;
 e.data=_24f(buf);
 e.decoder=_240;
-e.origin=_331.origin;
+e.origin=_330.origin;
 if(e.source!==null){
 e.source=null;
 }
-if(typeof (_331.onmessage)==="function"){
-_331.onmessage(e);
+if(typeof (_330.onmessage)==="function"){
+_330.onmessage(e);
 }
 };
 function dispatchText(data){
@@ -3041,9 +3038,15 @@ if(typeof ($this.onmessage)==="function"){
 $this.onmessage(e);
 }
 };
-function doOpen(_336){
-if(typeof (_336.onopen)==="function"){
-_336.onopen();
+function doOpen(_335){
+if(typeof (_335.onopen)==="function"){
+_335.onopen();
+}
+};
+function doClose(_336){
+if(_336.readyState!=2){
+_336.disconnect();
+doError(_336);
 }
 };
 function doError(_337){
@@ -3183,6 +3186,9 @@ _353+="?";
 _353+="&";
 }
 _353+=".kn="+String(Math.random()).substring(2);
+if(browser=="android"||browser.ios){
+_353+="&.kkt=30";
+}
 var _355=new XMLHttpRequest0();
 var _356=false;
 _355.open("GET",_353,true);
@@ -3340,29 +3346,33 @@ fallbackNext(this);
 };
 function pickStrategies(){
 switch(browser){
-case "chrome":
-case "safari":
-return [_367,_369,_36b,_36d,_368,_36a,_36c,_36e];
 case "android":
 case "opera":
 return [_367,_369,_368,_36a];
 case "ie":
+var _37c=navigator.appVersion;
+if(_37c.indexOf("MSIE 6.0")>=0||_37c.indexOf("MSIE 7.0")>=0){
 return [_367,_36b,_369,_368,_36c,_36a];
+}else{
+return [_367,_369,_36b,_368,_36a,_36c];
+}
 case "firefox":
+case "chrome":
+case "safari":
 default:
 return [_367,_369,_36b,_368,_36a,_36c];
 }
 };
 window.WebSocket.connectionStrategies=pickStrategies();
 window.WebSocket.__impls__=_36f;
-var _37c=WebSocket.prototype;
+var _37d=WebSocket.prototype;
 function splitScheme(url){
-var _37e=url.split("://");
-var _37f=_37e.shift();
-var _380=_37e.shift();
-return [_37f,_380];
+var _37f=url.split("://");
+var _380=_37f.shift();
+var _381=_37f.shift();
+return [_380,_381];
 };
-_37c.send=function(data){
+_37d.send=function(data){
 switch(this.readyState){
 case 0:
 throw new Error("INVALID_STATE_ERR");
@@ -3371,7 +3381,7 @@ if(data===null){
 throw new Error("data is null");
 }
 this._delegate.send(data);
-_382(this);
+_383(this);
 return true;
 case 2:
 return false;
@@ -3379,17 +3389,17 @@ default:
 throw new Error("INVALID_STATE_ERR");
 }
 };
-var _382=function(_383){
-_383.bufferedAmount=_383._delegate.bufferedAmount;
-if(_383.bufferedAmount!=0){
+var _383=function(_384){
+_384.bufferedAmount=_384._delegate.bufferedAmount;
+if(_384.bufferedAmount!=0){
 setTimeout(function(){
-_382(_383);
+_383(_384);
 },1000);
 }
 };
-_37c.postMessage=_37c.send;
-_37c.disconnect=_37c.close;
-_37c.close=function(){
+_37d.postMessage=_37d.send;
+_37d.disconnect=_37d.close;
+_37d.close=function(){
 switch(this.readyState){
 case 1:
 case 2:
@@ -3397,27 +3407,27 @@ this._delegate.close();
 break;
 }
 };
-function initDelegate(_384,_385){
-if(typeof (_384._subprotocol)!=="undefined"){
-_384._delegate=new _385(_384.URL,_384._subprotocol);
+function initDelegate(_385,_386){
+if(typeof (_385._subprotocol)!=="undefined"){
+_385._delegate=new _386(_385.URL,_385._subprotocol);
 }else{
-_384._delegate=new _385(_384.URL);
+_385._delegate=new _386(_385.URL);
 }
-bindHandlers(_384);
+bindHandlers(_385);
 };
-function fallbackNext(_386){
-var _387=_386._connectionStrategies.shift();
-var _388=_36f[_387];
-if(_388){
-initDelegate(_386,_388);
+function fallbackNext(_387){
+var _388=_387._connectionStrategies.shift();
+var _389=_36f[_388];
+if(_389){
+initDelegate(_387,_389);
 }else{
-doClose(_386);
+doClose(_387);
 }
 };
-function doOpen(_389,ev){
-if(_389.readyState<1){
-_389.readyState=1;
-if(typeof (_389.onopen)!=="undefined"){
+function doOpen(_38a,ev){
+if(_38a.readyState<1){
+_38a.readyState=1;
+if(typeof (_38a.onopen)!=="undefined"){
 if(!ev){
 try{
 ev=document.createEvent("Events");
@@ -3428,17 +3438,17 @@ ev={type:"open",bubbles:true,cancelable:true};
 }
 }
 try{
-_389.onopen(ev);
+_38a.onopen(ev);
 }
 catch(e){
 }
 }
 }
 };
-function doClose(_38b,ev){
-if(_38b.readyState<2){
-_38b.readyState=2;
-if(typeof (_38b.onclose)!=="undefined"){
+function doClose(_38c,ev){
+if(_38c.readyState<2){
+_38c.readyState=2;
+if(typeof (_38c.onclose)!=="undefined"){
 setTimeout(function(){
 if(!ev){
 try{
@@ -3450,7 +3460,7 @@ ev={type:"close",bubbles:true,cancelable:true};
 }
 }
 try{
-_38b.onclose(ev);
+_38c.onclose(ev);
 }
 catch(e){
 }
@@ -3458,43 +3468,43 @@ catch(e){
 }
 }
 };
-function errorHandler(_38d,ev){
-unbindHandlers(_38d);
-fallbackNext(_38d);
+function errorHandler(_38e,ev){
+unbindHandlers(_38e);
+fallbackNext(_38e);
 };
-function openHandler(_38f,ev){
-switch(_38f.readyState){
+function openHandler(_390,ev){
+switch(_390.readyState){
 case 0:
-doOpen(_38f,ev);
+doOpen(_390,ev);
 break;
 case 1:
 case 2:
-var _391=(ev?" from "+ev.target:"");
-throw new Error("Invalid readyState for open event"+_391);
+var _392=(ev?" from "+ev.target:"");
+throw new Error("Invalid readyState for open event"+_392);
 default:
-throw new Error("Socket has invalid readyState: "+_38f.readyState);
+throw new Error("Socket has invalid readyState: "+_390.readyState);
 }
 };
-function closeHandler(_392,ev){
-switch(_392.readyState){
+function closeHandler(_393,ev){
+switch(_393.readyState){
 case 0:
-unbindHandlers(_392);
-fallbackNext(_392);
+unbindHandlers(_393);
+fallbackNext(_393);
 break;
 case 1:
-doClose(_392,ev);
+doClose(_393,ev);
 break;
 case 2:
-var _394=(ev?" from "+ev.target:"");
-throw new Error("Invalid readyState for close event"+_394);
+var _395=(ev?" from "+ev.target:"");
+throw new Error("Invalid readyState for close event"+_395);
 break;
 default:
-throw new Error("Socket has invalid readyState: "+_392.readyState);
+throw new Error("Socket has invalid readyState: "+_393.readyState);
 }
 };
-function bindHandlers(_395){
-var _396=_395._delegate;
-_396.onmessage=function(e){
+function bindHandlers(_396){
+var _397=_396._delegate;
+_397.onmessage=function(e){
 if(e.decoder){
 var e2;
 try{
@@ -3506,94 +3516,94 @@ e2={type:"message",bubbles:true,cancelable:true};
 }
 e2.data=e.decoder(e.data);
 e2.origin=e.origin;
-e2.source=_395;
-_395.onmessage(e2);
+e2.source=_396;
+_396.onmessage(e2);
 }else{
-_395.onmessage(e);
+_396.onmessage(e);
 }
 };
-_396.onclose=function(e){
-closeHandler(_395,e);
+_397.onclose=function(e){
+closeHandler(_396,e);
 };
-_396.onopen=function(e){
-openHandler(_395,e);
+_397.onopen=function(e){
+openHandler(_396,e);
 };
-_396.onerror=function(e){
-errorHandler(_395,e);
+_397.onerror=function(e){
+errorHandler(_396,e);
 };
 };
-function unbindHandlers(_39c){
-var _39d=_39c._delegate;
-if(_39d){
-_39d.onerror=undefined;
-_39d.onmessage=undefined;
-_39d.onclose=undefined;
-_39d.onopen=undefined;
+function unbindHandlers(_39d){
+var _39e=_39d._delegate;
+if(_39e){
+_39e.onerror=undefined;
+_39e.onmessage=undefined;
+_39e.onclose=undefined;
+_39e.onopen=undefined;
 }
 };
 }());
 (function(){
-var _39e="javascript:ws";
-var _39f="javascript:wss";
-var _3a0="javascript:wse";
-var _3a1="javascript:wse+ssl";
-var _3a2="flash:wse";
-var _3a3="flash:wse+ssl";
-var _3a4="flash:wsr";
-var _3a5="flash:wsr+ssl";
-var _3a6={};
-_3a6[_39e]=_275;
-_3a6[_39f]=_275;
-_3a6[_3a0]=_339;
-_3a6[_3a1]=_339;
-_3a6[_3a2]=_279;
-_3a6[_3a3]=_279;
-_3a6[_3a4]=_28e;
-_3a6[_3a5]=_28e;
-window.ByteSocket=function(url,_3a8){
-var _3a9=new URI(url);
-if(_3a9.port===undefined){
-var _3aa=_3a9.scheme;
-_3a9.port=((_3aa.indexOf("wss")==-1)&&(_3aa.indexOf("ssl")==-1))?80:443;
+var _39f="javascript:ws";
+var _3a0="javascript:wss";
+var _3a1="javascript:wse";
+var _3a2="javascript:wse+ssl";
+var _3a3="flash:wse";
+var _3a4="flash:wse+ssl";
+var _3a5="flash:wsr";
+var _3a6="flash:wsr+ssl";
+var _3a7={};
+_3a7[_39f]=_275;
+_3a7[_3a0]=_275;
+_3a7[_3a1]=_339;
+_3a7[_3a2]=_339;
+_3a7[_3a3]=_279;
+_3a7[_3a4]=_279;
+_3a7[_3a5]=_28e;
+_3a7[_3a6]=_28e;
+window.ByteSocket=function(url,_3a9){
+var _3aa=new URI(url);
+if(_3aa.port===undefined){
+var _3ab=_3aa.scheme;
+_3aa.port=((_3ab.indexOf("wss")==-1)&&(_3ab.indexOf("ssl")==-1))?80:443;
 }
-url=_3a9.toString();
-this.URL=_3a9.toString();
+url=_3aa.toString();
+this.URL=_3aa.toString();
 this.readyState=0;
-this._subprotocol=_3a8;
-var _3ab=splitScheme(url);
-var _3ac=_3ab.shift();
-this._urlRemainder=_3ab.shift();
-if(_3ac=="ws"||_3ac=="wse"||_3ac=="wss"||_3ac=="wse+ssl"){
-var _3ad=_22d("kaazing:ByteSocketConnectionStrategies");
-var _3ae=null;
-if(_3ad){
-_3ae=_3ad.split(" ");
+this._subprotocol=_3a9;
+var _3ac=splitScheme(url);
+var _3ad=_3ac.shift();
+this._urlRemainder=_3ac.shift();
+if(_3ad=="ws"||_3ad=="wse"||_3ad=="wss"||_3ad=="wse+ssl"){
+var _3ae=_22d("kaazing:ByteSocketConnectionStrategies");
+var _3af=null;
+if(_3ae){
+_3af=_3ae.split(" ");
 }
-if(!_3ae){
-if(_3ac=="ws"){
-this._connectionStrategies=_236(ByteSocket.connectionStrategies,function(_3af){
-return !(_3af.match("wss")||_3af.match("ssl"));
-});
-}else{
-if(_3ac=="wss"){
+if(!_3af){
+if(_3ad=="ws"){
 this._connectionStrategies=_236(ByteSocket.connectionStrategies,function(_3b0){
-return (_3b0.match("wss")||_3b0.match("ssl"));
+return !(_3b0.match("wss")||_3b0.match("ssl"));
 });
 }else{
-if(_3ac.match("wse")){
-var _3b1=function(s){
+if(_3ad=="wss"){
+this._connectionStrategies=_236(ByteSocket.connectionStrategies,function(_3b1){
+return (_3b1.match("wss")||_3b1.match("ssl"));
+});
+}else{
+if(_3ad.match("wse")){
+var _3b2=function(s){
 return s.match("wse");
 };
-this._connectionStrategies=_236(ByteSocket.connectionStrategies,_3b1);
+this._connectionStrategies=_236(ByteSocket.connectionStrategies,_3b2);
 }
 }
 }
 }
 }else{
-if(_3a6[_3ac]){
-this._connectionStrategies=[_3ac];
+if(_3a7[_3ad]){
+this._connectionStrategies=[_3ad];
 }else{
-throw new Error("Unsupported composite scheme: "+_3ac);
+throw new Error("Unsupported composite scheme: "+_3ad);
 }
 }
 this.URL=url.replace("flash:","").replace("javascript:","").replace("wse+ssl:","wss:").replace("wse:","ws:").replace("wsr+ssl:","wss:").replace("wsr:","ws:");
@@ -3601,29 +3611,33 @@ fallbackNext(this);
 };
 function pickStrategies(){
 switch(browser){
-case "chrome":
-case "safari":
-return [_39e,_3a0,_3a2,_3a4,_39f,_3a1,_3a3,_3a5];
 case "android":
 case "opera":
-return [_39e,_3a0,_39f,_3a1];
+return [_39f,_3a1,_3a0,_3a2];
 case "ie":
-return [_39e,_3a2,_3a0,_39f,_3a3,_3a1];
+var _3b4=navigator.appVersion;
+if(_3b4.indexOf("MSIE 6.0")>=0||_3b4.indexOf("MSIE 7.0")>=0){
+return [_39f,_3a3,_3a1,_3a0,_3a4,_3a2];
+}else{
+return [_39f,_3a1,_3a3,_3a0,_3a2,_3a4];
+}
 case "firefox":
+case "chrome":
+case "safari":
 default:
-return [_39e,_3a0,_3a2,_39f,_3a1,_3a3];
+return [_39f,_3a1,_3a3,_3a0,_3a2,_3a4];
 }
 };
 window.ByteSocket.connectionStrategies=pickStrategies();
-window.ByteSocket.__impls__=_3a6;
-var _3b3=ByteSocket.prototype;
+window.ByteSocket.__impls__=_3a7;
+var _3b5=ByteSocket.prototype;
 function splitScheme(url){
-var _3b5=url.split("://");
-var _3b6=_3b5.shift();
-var _3b7=_3b5.shift();
-return [_3b6,_3b7];
+var _3b7=url.split("://");
+var _3b8=_3b7.shift();
+var _3b9=_3b7.shift();
+return [_3b8,_3b9];
 };
-_3b3.send=function(data){
+_3b5.send=function(data){
 if(data.constructor!=window.ByteBuffer){
 throw new Error("ByteSocket.send must be called with a ByteBuffer argument");
 }
@@ -3635,7 +3649,7 @@ if(data===null){
 throw new Error("data is null");
 }
 this._delegate.send(data);
-_3b9(this);
+_3bb(this);
 return true;
 case 2:
 return false;
@@ -3643,17 +3657,17 @@ default:
 throw new Error("INVALID_STATE_ERR");
 }
 };
-var _3b9=function(_3ba){
-_3ba.bufferedAmount=_3ba._delegate.bufferedAmount;
-if(_3ba.bufferedAmount!=0){
+var _3bb=function(_3bc){
+_3bc.bufferedAmount=_3bc._delegate.bufferedAmount;
+if(_3bc.bufferedAmount!=0){
 setTimeout(function(){
-_3b9(_3ba);
+_3bb(_3bc);
 },1000);
 }
 };
-_3b3.postMessage=_3b3.send;
-_3b3.disconnect=_3b3.close;
-_3b3.close=function(){
+_3b5.postMessage=_3b5.send;
+_3b5.disconnect=_3b5.close;
+_3b5.close=function(){
 switch(this.readyState){
 case 1:
 case 2:
@@ -3661,70 +3675,70 @@ this._delegate.close();
 break;
 }
 };
-function initDelegate(_3bb,_3bc){
-if(typeof (_3bb._subprotocol)!=="undefined"){
-_3bb._delegate=new _3bc(_3bb.URL,_3bb._subprotocol);
+function initDelegate(_3bd,_3be){
+if(typeof (_3bd._subprotocol)!=="undefined"){
+_3bd._delegate=new _3be(_3bd.URL,_3bd._subprotocol);
 }else{
-_3bb._delegate=new _3bc(_3bb.URL);
+_3bd._delegate=new _3be(_3bd.URL);
 }
-bindHandlers(_3bb);
+bindHandlers(_3bd);
 };
-function fallbackNext(_3bd){
-var _3be=_3bd._connectionStrategies.shift();
-var _3bf=_3a6[_3be];
-if(_3bf){
-initDelegate(_3bd,_3bf);
+function fallbackNext(_3bf){
+var _3c0=_3bf._connectionStrategies.shift();
+var _3c1=_3a7[_3c0];
+if(_3c1){
+initDelegate(_3bf,_3c1);
 }else{
-doClose(_3bd);
+doClose(_3bf);
 }
 };
-function doClose(_3c0){
-if(typeof (_3c0.onclose)!=="undefined"){
-_3c0.onclose();
+function doClose(_3c2){
+if(typeof (_3c2.onclose)!=="undefined"){
+_3c2.onclose();
 }
 };
-function errorHandler(_3c1,e){
-unbindHandlers(_3c1);
-fallbackNext(_3c1);
+function errorHandler(_3c3,e){
+unbindHandlers(_3c3);
+fallbackNext(_3c3);
 };
-function openHandler(_3c3,e){
-switch(_3c3.readyState){
+function openHandler(_3c5,e){
+switch(_3c5.readyState){
 case 0:
-_3c3.readyState=1;
-_3c3.onopen(e);
+_3c5.readyState=1;
+_3c5.onopen(e);
 break;
 case 1:
 case 2:
-var _3c5=(e?" from "+e.target:"");
-throw new Error("Invalid readyState for open event"+_3c5);
+var _3c7=(e?" from "+e.target:"");
+throw new Error("Invalid readyState for open event"+_3c7);
 break;
 default:
-throw new Error("Socket has invalid readyState: "+_3c3.readyState);
+throw new Error("Socket has invalid readyState: "+_3c5.readyState);
 }
 };
-function closeHandler(_3c6,e){
-switch(_3c6.readyState){
+function closeHandler(_3c8,e){
+switch(_3c8.readyState){
 case 0:
-unbindHandlers(_3c6);
-fallbackNext(_3c6);
+unbindHandlers(_3c8);
+fallbackNext(_3c8);
 break;
 case 1:
-_3c6.readyState=2;
+_3c8.readyState=2;
 setTimeout(function(){
-doClose(_3c6);
+doClose(_3c8);
 },0);
 break;
 case 2:
-var _3c8=(e?" from "+e.target:"");
-throw new Error("Invalid readyState for close event"+_3c8);
+var _3ca=(e?" from "+e.target:"");
+throw new Error("Invalid readyState for close event"+_3ca);
 break;
 default:
-throw new Error("Socket has invalid readyState: "+_3c6.readyState);
+throw new Error("Socket has invalid readyState: "+_3c8.readyState);
 }
 };
-function bindHandlers(_3c9){
-var _3ca=_3c9._delegate;
-_3ca.onmessage=function(e){
+function bindHandlers(_3cb){
+var _3cc=_3cb._delegate;
+_3cc.onmessage=function(e){
 var a=[];
 for(var i=0;i<e.data.length;i++){
 a.push(e.data.charCodeAt(i)&255);
@@ -3739,26 +3753,26 @@ e2={type:"message",bubbles:true,cancelable:true};
 }
 e2.data=new ByteBuffer(a);
 e2.origin=e.origin;
-e2.source=_3c9;
-_3c9.onmessage(e2);
+e2.source=_3cb;
+_3cb.onmessage(e2);
 };
-_3ca.onclose=function(e){
-closeHandler(_3c9,e);
+_3cc.onclose=function(e){
+closeHandler(_3cb,e);
 };
-_3ca.onopen=function(e){
-openHandler(_3c9,e);
+_3cc.onopen=function(e){
+openHandler(_3cb,e);
 };
-_3ca.onerror=function(e){
-errorHandler(_3c9,e);
+_3cc.onerror=function(e){
+errorHandler(_3cb,e);
 };
 };
-function unbindHandlers(_3d2){
-var _3d3=_3d2._delegate;
-if(_3d3){
-_3d3.onerror=undefined;
-_3d3.onmessage=undefined;
-_3d3.onclose=undefined;
-_3d3.onopen=undefined;
+function unbindHandlers(_3d4){
+var _3d5=_3d4._delegate;
+if(_3d5){
+_3d5.onerror=undefined;
+_3d5.onmessage=undefined;
+_3d5.onclose=undefined;
+_3d5.onopen=undefined;
 }
 };
 }());
@@ -3768,39 +3782,39 @@ window.___Loader=new _2ca(_201);
 var EventDispatcher=function(){
 };
 (function(){
-var _3d4=EventDispatcher.prototype;
-_3d4._initEventDispatcher=function(){
+var _3d6=EventDispatcher.prototype;
+_3d6._initEventDispatcher=function(){
 this._eventListeners={};
 };
-_3d4.addEventListener=function(type,_3d6){
-var _3d7=this._eventListeners[type];
-if(_3d7){
-_3d7.push(_3d6);
+_3d6.addEventListener=function(type,_3d8){
+var _3d9=this._eventListeners[type];
+if(_3d9){
+_3d9.push(_3d8);
 }else{
-this._eventListeners[type]=[_3d6];
+this._eventListeners[type]=[_3d8];
 }
 };
-_3d4.removeEventListener=function(type,_3d9){
-var _3da=this._eventListeners[type];
-if(_3da){
-var _3db=[];
-for(var i=0;i<_3da.length;i++){
-if(_3da[i]!==_3d9){
-_3db.push(_3da[i]);
+_3d6.removeEventListener=function(type,_3db){
+var _3dc=this._eventListeners[type];
+if(_3dc){
+var _3dd=[];
+for(var i=0;i<_3dc.length;i++){
+if(_3dc[i]!==_3db){
+_3dd.push(_3dc[i]);
 }
 }
 this._eventListeners[type]=new Listeners;
 }
 };
-_3d4.hasEventListener=function(type){
-var _3de=this._eventListeners[type];
-return Boolean(_3de);
+_3d6.hasEventListener=function(type){
+var _3e0=this._eventListeners[type];
+return Boolean(_3e0);
 };
-_3d4.dispatchEvent=function(e){
-var _3e0=this._eventListeners[e.type];
-if(_3e0){
-for(var i=0;i<_3e0.length;i++){
-_3e0[i](e);
+_3d6.dispatchEvent=function(e){
+var _3e2=this._eventListeners[e.type];
+if(_3e2){
+for(var i=0;i<_3e2.length;i++){
+_3e2[i](e);
 }
 }
 if(this["on"+e.type]){
@@ -3810,57 +3824,55 @@ this["on"+e.type](e);
 })();
 var AmqpClient=function(){
 this._options={};
-this._options.autoReconnect=true;
 this._readyState=0;
 this._init();
-this._reconnectHandlers=new Array();
 };
 (function(){
-var _3e2=function(_3e3){
-this.context=_3e3;
+var _3e4=function(_3e5){
+this.context=_3e5;
 this.states={};
 };
 (function(){
-var _3e4=_3e2.prototype;
-var _3e5=function _3e5(){
+var _3e6=_3e4.prototype;
+var _3e7=function _3e7(){
 };
-_3e4.enterState=function(_3e6,_3e7,args){
+_3e6.enterState=function(_3e8,_3e9,args){
 if(this.currentState){
-this.currentState.exitBehavior(this.context,_3e7,args,_3e6);
+this.currentState.exitBehavior(this.context,_3e9,args,_3e8);
 }
-var _3e9=this.states[_3e6];
-this.currentState=_3e9;
+var _3eb=this.states[_3e8];
+this.currentState=_3eb;
 try{
-_3e9.entryBehavior(this.context,_3e7,args,_3e6);
+_3eb.entryBehavior(this.context,_3e9,args,_3e8);
 }
 catch(e){
-var _3ea=new Error("Could not call behavior for state "+_3e9.stateName+"\n\n"+e.message);
-_3ea.innerException=e;
-throw (_3ea);
+var _3ec=new Error("Could not call behavior for state "+_3eb.stateName+"\n\n"+e.message);
+_3ec.innerException=e;
+throw (_3ec);
 }
 };
-_3e4.addState=function(_3eb,_3ec,_3ed,_3ee){
-var _3ef={};
-_3ef.stateName=_3eb;
-_3ef.entryBehavior=_3ed||_3e5;
-_3ef.exitBehavior=_3ee||_3e5;
-this.states[_3eb]=(_3ef);
-_3ef.rules={};
-var _3f0=_3ec||[];
-for(var i=0;i<_3f0.length;i++){
-var rule=_3f0[i];
+_3e6.addState=function(_3ed,_3ee,_3ef,_3f0){
+var _3f1={};
+_3f1.stateName=_3ed;
+_3f1.entryBehavior=_3ef||_3e7;
+_3f1.exitBehavior=_3f0||_3e7;
+this.states[_3ed]=(_3f1);
+_3f1.rules={};
+var _3f2=_3ee||[];
+for(var i=0;i<_3f2.length;i++){
+var rule=_3f2[i];
 for(var j=0;j<rule.inputs.length;j++){
-var _3f4=rule.inputs[j];
-_3ef.rules[_3f4]=rule.targetState;
+var _3f6=rule.inputs[j];
+_3f1.rules[_3f6]=rule.targetState;
 }
 }
 };
-_3e4.feedInput=function(_3f5,args){
-var _3f7=this.currentState;
-if(_3f7.rules[_3f5]){
+_3e6.feedInput=function(_3f7,args){
+var _3f9=this.currentState;
+if(_3f9.rules[_3f7]){
 var sm=this;
 var func=function(){
-sm.enterState(_3f7.rules[_3f5],_3f5,args);
+sm.enterState(_3f9.rules[_3f7],_3f7,args);
 };
 func();
 return true;
@@ -3869,844 +3881,846 @@ return false;
 }
 };
 })();
-var _3fa=function(){
+var _3fc=function(){
 };
 (function(){
-_3fa.prototype=new EventDispatcher();
-var _3fb=_3fa.prototype;
-var _3fc=function _3fc(){
+_3fc.prototype=new EventDispatcher();
+var _3fd=_3fc.prototype;
+var _3fe=function _3fe(){
 };
-var _3fd=function _3fd(ex){
+var _3ff=function _3ff(ex){
 throw ex;
 };
-_3fb._stateMachine=null;
-_3fb.onerror=function(e){
+_3fd._stateMachine=null;
+_3fd.onerror=function(e){
 };
-_3fb._actions=[];
-_3fb._processActions=function _processActions(){
+_3fd._actions=[];
+_3fd._processActions=function _processActions(){
 if(!this._actions.length){
 return;
 }
-var _400=this._actions[0];
-var _401=this._stateMachine.feedInput(_400.actionName+"Action",_400);
-if(_401){
-var _402=this;
+var _402=this._actions[0];
+var _403=this._stateMachine.feedInput(_402.actionName+"Action",_402);
+if(_403){
+var _404=this;
 setTimeout(function(){
 try{
-_400.func.apply(_402,_400.args);
+_402.func.apply(_404,_402.args);
 }
 catch(ex1){
-_400.error(ex1);
+_402.error(ex1);
 }
 },0);
 this._actions.shift();
 }
 };
-_3fb._enqueueAction=function _enqueueAction(_403,func,args,_406,_407){
-var _408={};
-_408.actionName=_403||"";
-_408.func=func||_3fc;
-_408.args=args||null;
-_408.continuation=_406||_3fc;
-_408.error=_407||_3fd;
-this._actions.push(_408);
-var _409=this;
+_3fd._enqueueAction=function _enqueueAction(_405,func,args,_408,_409){
+var _40a={};
+_40a.actionName=_405||"";
+_40a.func=func||_3fe;
+_40a.args=args||null;
+_40a.continuation=_408||_3fe;
+_40a.error=_409||_3ff;
+this._actions.push(_40a);
+var _40b=this;
 var func=function(){
-_409._processActions();
+_40b._processActions();
 };
 setTimeout(func,0);
 };
-_3fb._initAsyncClient=function(){
+_3fd._initAsyncClient=function(){
 this._initEventDispatcher();
-this._stateMachine=new _3e2(this);
+this._stateMachine=new _3e4(this);
 this._actions=[];
 this._buffer=null;
 this._socket=null;
 };
-_3fb._send=null;
-_3fb._readHandler=null;
+_3fd._send=null;
+_3fd._readHandler=null;
 })();
-var _40a={};
-_40a.FRAME_METHOD={"value":1,"message":""};
-_40a.FRAME_HEADER={"value":2,"message":""};
-_40a.FRAME_BODY={"value":3,"message":""};
-_40a.FRAME_HEARTBEAT={"value":8,"message":""};
-_40a.FRAME_MIN_SIZE={"value":4096,"message":""};
-_40a.FRAME_END={"value":206,"message":""};
-_40a.REPLY_SUCCESS={"value":200,"message":"Indicates that the method completed successfully. This reply code is reserved for future use - the current protocol design does not use positive confirmation and reply codes are sent only in case of an error."};
-_40a.CONTENT_TOO_LARGE={"value":311,"message":"The client attempted to transfer content larger than the server could accept at the present time. The client may retry at a later time."};
-_40a.NO_CONSUMERS={"value":313,"message":"When the exchange cannot deliver to a consumer when the immediate flag is set. As a result of pending data on the queue or the absence of any consumers of the queue."};
-_40a.CONNECTION_FORCED={"value":320,"message":"An operator intervened to close the connection for some reason. The client may retry at some later date."};
-_40a.INVALID_PATH={"value":402,"message":"The client tried to work with an unknown virtual host."};
-_40a.ACCESS_REFUSED={"value":403,"message":"The client attempted to work with a server entity to which it has no access due to security settings."};
-_40a.NOT_FOUND={"value":404,"message":"The client attempted to work with a server entity that does not exist."};
-_40a.RESOURCE_LOCKED={"value":405,"message":"The client attempted to work with a server entity to which it has no access because another client is working with it."};
-_40a.PRECONDITION_FAILED={"value":406,"message":"The client requested a method that was not allowed because some precondition failed."};
-_40a.FRAME_ERROR={"value":501,"message":"The sender sent a malformed frame that the recipient could not decode. This strongly implies a programming error in the sending peer."};
-_40a.SYNTAX_ERROR={"value":502,"message":"The sender sent a frame that contained illegal values for one or more fields. This strongly implies a programming error in the sending peer."};
-_40a.COMMAND_INVALID={"value":503,"message":"The client sent an invalid sequence of frames, attempting to perform an operation that was considered invalid by the server. This usually implies a programming error in the client."};
-_40a.CHANNEL_ERROR={"value":504,"message":"The client attempted to work with a channel that had not been correctly opened. This most likely indicates a fault in the client layer."};
-_40a.UNEXPECTED_FRAME={"value":505,"message":"The peer sent a frame that was not expected, usually in the context of a content header and body.  This strongly indicates a fault in the peer's content processing."};
-_40a.RESOURCE_ERROR={"value":506,"message":"The server could not complete the method because it lacked sufficient resources. This may be due to the client creating too many of some type of entity."};
-_40a.NOT_ALLOWED={"value":530,"message":"The client tried to work with some entity in a manner that is prohibited by the server, due to security settings or by some other criteria."};
-_40a.NOT_IMPLEMENTED={"value":540,"message":"The client tried to use functionality that is not implemented in the server."};
-_40a.INTERNAL_ERROR={"value":541,"message":"The server could not complete the method because of an internal error. The server may require intervention by an operator in order to resume normal operations."};
-var _40b={"ClassId":{"type":"short","asserts":[]},"ConsumerTag":{"type":"shortstr","asserts":[]},"DeliveryTag":{"type":"longlong","asserts":[]},"ExchangeName":{"type":"shortstr","asserts":[]},"MethodId":{"type":"short","asserts":[]},"NoAck":{"type":"bit","asserts":[]},"NoLocal":{"type":"bit","asserts":[]},"NoWait":{"type":"bit","asserts":[]},"Path":{"type":"shortstr","asserts":[]},"PeerProperties":{"type":"table","asserts":[]},"QueueName":{"type":"shortstr","asserts":[]},"Redelivered":{"type":"bit","asserts":[]},"MessageCount":{"type":"long","asserts":[]},"ReplyCode":{"type":"short","asserts":[]},"ReplyText":{"type":"shortstr","asserts":[]},"Bit":{"type":"bit","asserts":[]},"Octet":{"type":"octet","asserts":[]},"Short":{"type":"short","asserts":[]},"Long":{"type":"long","asserts":[]},"Longlong":{"type":"longlong","asserts":[]},"Shortstr":{"type":"shortstr","asserts":[]},"Longstr":{"type":"longstr","asserts":[]},"Timestamp":{"type":"timestamp","asserts":[]},"Table":{"type":"table","asserts":[]}};
 var _40c={};
-_40c.Connection={};
-_40c.Connection.startConnection={};
-_40c.Connection.startConnection.allParameters=[{"name":"versionMajor","type":"Octet"},{"name":"versionMinor","type":"Octet"},{"name":"serverProperties","type":"PeerProperties"},{"name":"mechanisms","type":"Longstr"},{"name":"locales","type":"Longstr"}];
-_40c.Connection.startConnection.returnType="StartOkConnection";
-_40c.Connection.startConnection.index=10;
-_40c.Connection.startConnection.classIndex=10;
-_40c.Connection.startConnection.synchronous=true;
-_40c.Connection.startConnection.hasContent=false;
-_40c.Connection.startOkConnection={};
-_40c.Connection.startOkConnection.allParameters=[{"name":"clientProperties","type":"PeerProperties"},{"name":"mechanism","type":"Shortstr"},{"name":"response","type":"Longstr"},{"name":"locale","type":"Shortstr"}];
-_40c.Connection.startOkConnection.returnType="voidConnection";
-_40c.Connection.startOkConnection.index=11;
-_40c.Connection.startOkConnection.classIndex=10;
-_40c.Connection.startOkConnection.synchronous=true;
-_40c.Connection.startOkConnection.hasContent=false;
-_40c.Connection.secureConnection={};
-_40c.Connection.secureConnection.allParameters=[{"name":"challenge","type":"Longstr"}];
-_40c.Connection.secureConnection.returnType="SecureOkConnection";
-_40c.Connection.secureConnection.index=20;
-_40c.Connection.secureConnection.classIndex=10;
-_40c.Connection.secureConnection.synchronous=true;
-_40c.Connection.secureConnection.hasContent=false;
-_40c.Connection.secureOkConnection={};
-_40c.Connection.secureOkConnection.allParameters=[{"name":"response","type":"Longstr"}];
-_40c.Connection.secureOkConnection.returnType="voidConnection";
-_40c.Connection.secureOkConnection.index=21;
-_40c.Connection.secureOkConnection.classIndex=10;
-_40c.Connection.secureOkConnection.synchronous=true;
-_40c.Connection.secureOkConnection.hasContent=false;
-_40c.Connection.tuneConnection={};
-_40c.Connection.tuneConnection.allParameters=[{"name":"channelMax","type":"Short"},{"name":"frameMax","type":"Long"},{"name":"heartbeat","type":"Short"}];
-_40c.Connection.tuneConnection.returnType="TuneOkConnection";
-_40c.Connection.tuneConnection.index=30;
-_40c.Connection.tuneConnection.classIndex=10;
-_40c.Connection.tuneConnection.synchronous=true;
-_40c.Connection.tuneConnection.hasContent=false;
-_40c.Connection.tuneOkConnection={};
-_40c.Connection.tuneOkConnection.allParameters=[{"name":"channelMax","type":"Short"},{"name":"frameMax","type":"Long"},{"name":"heartbeat","type":"Short"}];
-_40c.Connection.tuneOkConnection.returnType="voidConnection";
-_40c.Connection.tuneOkConnection.index=31;
-_40c.Connection.tuneOkConnection.classIndex=10;
-_40c.Connection.tuneOkConnection.synchronous=true;
-_40c.Connection.tuneOkConnection.hasContent=false;
-_40c.Connection.openConnection={};
-_40c.Connection.openConnection.allParameters=[{"name":"virtualHost","type":"Path"},{"name":"reserved1","type":"Shortstr"},{"name":"reserved2","type":"Bit"}];
-_40c.Connection.openConnection.returnType="OpenOkConnection";
-_40c.Connection.openConnection.index=40;
-_40c.Connection.openConnection.classIndex=10;
-_40c.Connection.openConnection.synchronous=true;
-_40c.Connection.openConnection.hasContent=false;
-_40c.Connection.openOkConnection={};
-_40c.Connection.openOkConnection.allParameters=[{"name":"reserved1","type":"Shortstr"}];
-_40c.Connection.openOkConnection.returnType="voidConnection";
-_40c.Connection.openOkConnection.index=41;
-_40c.Connection.openOkConnection.classIndex=10;
-_40c.Connection.openOkConnection.synchronous=true;
-_40c.Connection.openOkConnection.hasContent=false;
-_40c.Connection.closeConnection={};
-_40c.Connection.closeConnection.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"classId","type":"ClassId"},{"name":"methodId","type":"MethodId"}];
-_40c.Connection.closeConnection.returnType="CloseOkConnection";
-_40c.Connection.closeConnection.index=50;
-_40c.Connection.closeConnection.classIndex=10;
-_40c.Connection.closeConnection.synchronous=true;
-_40c.Connection.closeConnection.hasContent=false;
-_40c.Connection.closeOkConnection={};
-_40c.Connection.closeOkConnection.allParameters=[];
-_40c.Connection.closeOkConnection.returnType="voidConnection";
-_40c.Connection.closeOkConnection.index=51;
-_40c.Connection.closeOkConnection.classIndex=10;
-_40c.Connection.closeOkConnection.synchronous=true;
-_40c.Connection.closeOkConnection.hasContent=false;
-_40c.Connection.methodLookup={10:"startConnection",11:"startOkConnection",20:"secureConnection",21:"secureOkConnection",30:"tuneConnection",31:"tuneOkConnection",40:"openConnection",41:"openOkConnection",50:"closeConnection",51:"closeOkConnection"};
-_40c.Connection.className="Connection";
-_40c.Channel={};
-_40c.Channel.openChannel={};
-_40c.Channel.openChannel.allParameters=[{"name":"reserved1","type":"Shortstr"}];
-_40c.Channel.openChannel.returnType="OpenOkChannel";
-_40c.Channel.openChannel.index=10;
-_40c.Channel.openChannel.classIndex=20;
-_40c.Channel.openChannel.synchronous=true;
-_40c.Channel.openChannel.hasContent=false;
-_40c.Channel.openOkChannel={};
-_40c.Channel.openOkChannel.allParameters=[{"name":"reserved1","type":"Longstr"}];
-_40c.Channel.openOkChannel.returnType="voidChannel";
-_40c.Channel.openOkChannel.index=11;
-_40c.Channel.openOkChannel.classIndex=20;
-_40c.Channel.openOkChannel.synchronous=true;
-_40c.Channel.openOkChannel.hasContent=false;
-_40c.Channel.flowChannel={};
-_40c.Channel.flowChannel.allParameters=[{"name":"active","type":"Bit"}];
-_40c.Channel.flowChannel.returnType="FlowOkChannel";
-_40c.Channel.flowChannel.index=20;
-_40c.Channel.flowChannel.classIndex=20;
-_40c.Channel.flowChannel.synchronous=true;
-_40c.Channel.flowChannel.hasContent=false;
-_40c.Channel.flowOkChannel={};
-_40c.Channel.flowOkChannel.allParameters=[{"name":"active","type":"Bit"}];
-_40c.Channel.flowOkChannel.returnType="voidChannel";
-_40c.Channel.flowOkChannel.index=21;
-_40c.Channel.flowOkChannel.classIndex=20;
-_40c.Channel.flowOkChannel.synchronous=false;
-_40c.Channel.flowOkChannel.hasContent=false;
-_40c.Channel.closeChannel={};
-_40c.Channel.closeChannel.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"classId","type":"ClassId"},{"name":"methodId","type":"MethodId"}];
-_40c.Channel.closeChannel.returnType="CloseOkChannel";
-_40c.Channel.closeChannel.index=40;
-_40c.Channel.closeChannel.classIndex=20;
-_40c.Channel.closeChannel.synchronous=true;
-_40c.Channel.closeChannel.hasContent=false;
-_40c.Channel.closeOkChannel={};
-_40c.Channel.closeOkChannel.allParameters=[];
-_40c.Channel.closeOkChannel.returnType="voidChannel";
-_40c.Channel.closeOkChannel.index=41;
-_40c.Channel.closeOkChannel.classIndex=20;
-_40c.Channel.closeOkChannel.synchronous=true;
-_40c.Channel.closeOkChannel.hasContent=false;
-_40c.Channel.methodLookup={10:"openChannel",11:"openOkChannel",20:"flowChannel",21:"flowOkChannel",40:"closeChannel",41:"closeOkChannel"};
-_40c.Channel.className="Channel";
-_40c.Exchange={};
-_40c.Exchange.declareExchange={};
-_40c.Exchange.declareExchange.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"type","type":"Shortstr"},{"name":"passive","type":"Bit"},{"name":"durable","type":"Bit"},{"name":"reserved2","type":"Bit"},{"name":"reserved3","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
-_40c.Exchange.declareExchange.returnType="DeclareOkExchange";
-_40c.Exchange.declareExchange.index=10;
-_40c.Exchange.declareExchange.classIndex=40;
-_40c.Exchange.declareExchange.synchronous=true;
-_40c.Exchange.declareExchange.hasContent=false;
-_40c.Exchange.declareOkExchange={};
-_40c.Exchange.declareOkExchange.allParameters=[];
-_40c.Exchange.declareOkExchange.returnType="voidExchange";
-_40c.Exchange.declareOkExchange.index=11;
-_40c.Exchange.declareOkExchange.classIndex=40;
-_40c.Exchange.declareOkExchange.synchronous=true;
-_40c.Exchange.declareOkExchange.hasContent=false;
-_40c.Exchange.deleteExchange={};
-_40c.Exchange.deleteExchange.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"ifUnused","type":"Bit"},{"name":"noWait","type":"NoWait"}];
-_40c.Exchange.deleteExchange.returnType="DeleteOkExchange";
-_40c.Exchange.deleteExchange.index=20;
-_40c.Exchange.deleteExchange.classIndex=40;
-_40c.Exchange.deleteExchange.synchronous=true;
-_40c.Exchange.deleteExchange.hasContent=false;
-_40c.Exchange.deleteOkExchange={};
-_40c.Exchange.deleteOkExchange.allParameters=[];
-_40c.Exchange.deleteOkExchange.returnType="voidExchange";
-_40c.Exchange.deleteOkExchange.index=21;
-_40c.Exchange.deleteOkExchange.classIndex=40;
-_40c.Exchange.deleteOkExchange.synchronous=true;
-_40c.Exchange.deleteOkExchange.hasContent=false;
-_40c.Exchange.methodLookup={10:"declareExchange",11:"declareOkExchange",20:"deleteExchange",21:"deleteOkExchange"};
-_40c.Exchange.className="Exchange";
-_40c.Queue={};
-_40c.Queue.declareQueue={};
-_40c.Queue.declareQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"passive","type":"Bit"},{"name":"durable","type":"Bit"},{"name":"exclusive","type":"Bit"},{"name":"autoDelete","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
-_40c.Queue.declareQueue.returnType="DeclareOkQueue";
-_40c.Queue.declareQueue.index=10;
-_40c.Queue.declareQueue.classIndex=50;
-_40c.Queue.declareQueue.synchronous=true;
-_40c.Queue.declareQueue.hasContent=false;
-_40c.Queue.declareOkQueue={};
-_40c.Queue.declareOkQueue.allParameters=[{"name":"queue","type":"QueueName"},{"name":"messageCount","type":"MessageCount"},{"name":"consumerCount","type":"Long"}];
-_40c.Queue.declareOkQueue.returnType="voidQueue";
-_40c.Queue.declareOkQueue.index=11;
-_40c.Queue.declareOkQueue.classIndex=50;
-_40c.Queue.declareOkQueue.synchronous=true;
-_40c.Queue.declareOkQueue.hasContent=false;
-_40c.Queue.bindQueue={};
-_40c.Queue.bindQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
-_40c.Queue.bindQueue.returnType="BindOkQueue";
-_40c.Queue.bindQueue.index=20;
-_40c.Queue.bindQueue.classIndex=50;
-_40c.Queue.bindQueue.synchronous=true;
-_40c.Queue.bindQueue.hasContent=false;
-_40c.Queue.bindOkQueue={};
-_40c.Queue.bindOkQueue.allParameters=[];
-_40c.Queue.bindOkQueue.returnType="voidQueue";
-_40c.Queue.bindOkQueue.index=21;
-_40c.Queue.bindOkQueue.classIndex=50;
-_40c.Queue.bindOkQueue.synchronous=true;
-_40c.Queue.bindOkQueue.hasContent=false;
-_40c.Queue.unbindQueue={};
-_40c.Queue.unbindQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"arguments","type":"Table"}];
-_40c.Queue.unbindQueue.returnType="UnbindOkQueue";
-_40c.Queue.unbindQueue.index=50;
-_40c.Queue.unbindQueue.classIndex=50;
-_40c.Queue.unbindQueue.synchronous=true;
-_40c.Queue.unbindQueue.hasContent=false;
-_40c.Queue.unbindOkQueue={};
-_40c.Queue.unbindOkQueue.allParameters=[];
-_40c.Queue.unbindOkQueue.returnType="voidQueue";
-_40c.Queue.unbindOkQueue.index=51;
-_40c.Queue.unbindOkQueue.classIndex=50;
-_40c.Queue.unbindOkQueue.synchronous=true;
-_40c.Queue.unbindOkQueue.hasContent=false;
-_40c.Queue.purgeQueue={};
-_40c.Queue.purgeQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"noWait","type":"NoWait"}];
-_40c.Queue.purgeQueue.returnType="PurgeOkQueue";
-_40c.Queue.purgeQueue.index=30;
-_40c.Queue.purgeQueue.classIndex=50;
-_40c.Queue.purgeQueue.synchronous=true;
-_40c.Queue.purgeQueue.hasContent=false;
-_40c.Queue.purgeOkQueue={};
-_40c.Queue.purgeOkQueue.allParameters=[{"name":"messageCount","type":"MessageCount"}];
-_40c.Queue.purgeOkQueue.returnType="voidQueue";
-_40c.Queue.purgeOkQueue.index=31;
-_40c.Queue.purgeOkQueue.classIndex=50;
-_40c.Queue.purgeOkQueue.synchronous=true;
-_40c.Queue.purgeOkQueue.hasContent=false;
-_40c.Queue.deleteQueue={};
-_40c.Queue.deleteQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"ifUnused","type":"Bit"},{"name":"ifEmpty","type":"Bit"},{"name":"noWait","type":"NoWait"}];
-_40c.Queue.deleteQueue.returnType="DeleteOkQueue";
-_40c.Queue.deleteQueue.index=40;
-_40c.Queue.deleteQueue.classIndex=50;
-_40c.Queue.deleteQueue.synchronous=true;
-_40c.Queue.deleteQueue.hasContent=false;
-_40c.Queue.deleteOkQueue={};
-_40c.Queue.deleteOkQueue.allParameters=[{"name":"messageCount","type":"MessageCount"}];
-_40c.Queue.deleteOkQueue.returnType="voidQueue";
-_40c.Queue.deleteOkQueue.index=41;
-_40c.Queue.deleteOkQueue.classIndex=50;
-_40c.Queue.deleteOkQueue.synchronous=true;
-_40c.Queue.deleteOkQueue.hasContent=false;
-_40c.Queue.methodLookup={10:"declareQueue",11:"declareOkQueue",20:"bindQueue",21:"bindOkQueue",50:"unbindQueue",51:"unbindOkQueue",30:"purgeQueue",31:"purgeOkQueue",40:"deleteQueue",41:"deleteOkQueue"};
-_40c.Queue.className="Queue";
-_40c.Basic={};
-_40c.Basic.qosBasic={};
-_40c.Basic.qosBasic.allParameters=[{"name":"prefetchSize","type":"Long"},{"name":"prefetchCount","type":"Short"},{"name":"global","type":"Bit"}];
-_40c.Basic.qosBasic.returnType="QosOkBasic";
-_40c.Basic.qosBasic.index=10;
-_40c.Basic.qosBasic.classIndex=60;
-_40c.Basic.qosBasic.synchronous=true;
-_40c.Basic.qosBasic.hasContent=false;
-_40c.Basic.qosOkBasic={};
-_40c.Basic.qosOkBasic.allParameters=[];
-_40c.Basic.qosOkBasic.returnType="voidBasic";
-_40c.Basic.qosOkBasic.index=11;
-_40c.Basic.qosOkBasic.classIndex=60;
-_40c.Basic.qosOkBasic.synchronous=true;
-_40c.Basic.qosOkBasic.hasContent=false;
-_40c.Basic.consumeBasic={};
-_40c.Basic.consumeBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"consumerTag","type":"ConsumerTag"},{"name":"noLocal","type":"NoLocal"},{"name":"noAck","type":"NoAck"},{"name":"exclusive","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
-_40c.Basic.consumeBasic.returnType="ConsumeOkBasic";
-_40c.Basic.consumeBasic.index=20;
-_40c.Basic.consumeBasic.classIndex=60;
-_40c.Basic.consumeBasic.synchronous=true;
-_40c.Basic.consumeBasic.hasContent=false;
-_40c.Basic.consumeOkBasic={};
-_40c.Basic.consumeOkBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"}];
-_40c.Basic.consumeOkBasic.returnType="voidBasic";
-_40c.Basic.consumeOkBasic.index=21;
-_40c.Basic.consumeOkBasic.classIndex=60;
-_40c.Basic.consumeOkBasic.synchronous=true;
-_40c.Basic.consumeOkBasic.hasContent=false;
-_40c.Basic.cancelBasic={};
-_40c.Basic.cancelBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"},{"name":"noWait","type":"NoWait"}];
-_40c.Basic.cancelBasic.returnType="CancelOkBasic";
-_40c.Basic.cancelBasic.index=30;
-_40c.Basic.cancelBasic.classIndex=60;
-_40c.Basic.cancelBasic.synchronous=true;
-_40c.Basic.cancelBasic.hasContent=false;
-_40c.Basic.cancelOkBasic={};
-_40c.Basic.cancelOkBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"}];
-_40c.Basic.cancelOkBasic.returnType="voidBasic";
-_40c.Basic.cancelOkBasic.index=31;
-_40c.Basic.cancelOkBasic.classIndex=60;
-_40c.Basic.cancelOkBasic.synchronous=true;
-_40c.Basic.cancelOkBasic.hasContent=false;
-_40c.Basic.publishBasic={};
-_40c.Basic.publishBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"mandatory","type":"Bit"},{"name":"immediate","type":"Bit"}];
-_40c.Basic.publishBasic.returnType="voidBasic";
-_40c.Basic.publishBasic.index=40;
-_40c.Basic.publishBasic.classIndex=60;
-_40c.Basic.publishBasic.synchronous=false;
-_40c.Basic.publishBasic.hasContent=true;
-_40c.Basic.returnBasic={};
-_40c.Basic.returnBasic.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"}];
-_40c.Basic.returnBasic.returnType="voidBasic";
-_40c.Basic.returnBasic.index=50;
-_40c.Basic.returnBasic.classIndex=60;
-_40c.Basic.returnBasic.synchronous=false;
-_40c.Basic.returnBasic.hasContent=true;
-_40c.Basic.deliverBasic={};
-_40c.Basic.deliverBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"},{"name":"deliveryTag","type":"DeliveryTag"},{"name":"redelivered","type":"Redelivered"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"}];
-_40c.Basic.deliverBasic.returnType="voidBasic";
-_40c.Basic.deliverBasic.index=60;
-_40c.Basic.deliverBasic.classIndex=60;
-_40c.Basic.deliverBasic.synchronous=false;
-_40c.Basic.deliverBasic.hasContent=true;
-_40c.Basic.getBasic={};
-_40c.Basic.getBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"noAck","type":"NoAck"}];
-_40c.Basic.getBasic.returnType="GetOkBasic";
-_40c.Basic.getBasic.index=70;
-_40c.Basic.getBasic.classIndex=60;
-_40c.Basic.getBasic.synchronous=true;
-_40c.Basic.getBasic.hasContent=false;
-_40c.Basic.getOkBasic={};
-_40c.Basic.getOkBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"redelivered","type":"Redelivered"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"messageCount","type":"MessageCount"}];
-_40c.Basic.getOkBasic.returnType="voidBasic";
-_40c.Basic.getOkBasic.index=71;
-_40c.Basic.getOkBasic.classIndex=60;
-_40c.Basic.getOkBasic.synchronous=true;
-_40c.Basic.getOkBasic.hasContent=true;
-_40c.Basic.getEmptyBasic={};
-_40c.Basic.getEmptyBasic.allParameters=[{"name":"reserved1","type":"Shortstr"}];
-_40c.Basic.getEmptyBasic.returnType="voidBasic";
-_40c.Basic.getEmptyBasic.index=72;
-_40c.Basic.getEmptyBasic.classIndex=60;
-_40c.Basic.getEmptyBasic.synchronous=true;
-_40c.Basic.getEmptyBasic.hasContent=false;
-_40c.Basic.ackBasic={};
-_40c.Basic.ackBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"multiple","type":"Bit"}];
-_40c.Basic.ackBasic.returnType="voidBasic";
-_40c.Basic.ackBasic.index=80;
-_40c.Basic.ackBasic.classIndex=60;
-_40c.Basic.ackBasic.synchronous=false;
-_40c.Basic.ackBasic.hasContent=false;
-_40c.Basic.rejectBasic={};
-_40c.Basic.rejectBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"requeue","type":"Bit"}];
-_40c.Basic.rejectBasic.returnType="voidBasic";
-_40c.Basic.rejectBasic.index=90;
-_40c.Basic.rejectBasic.classIndex=60;
-_40c.Basic.rejectBasic.synchronous=false;
-_40c.Basic.rejectBasic.hasContent=false;
-_40c.Basic.recoverAsyncBasic={};
-_40c.Basic.recoverAsyncBasic.allParameters=[{"name":"requeue","type":"Bit"}];
-_40c.Basic.recoverAsyncBasic.returnType="voidBasic";
-_40c.Basic.recoverAsyncBasic.index=100;
-_40c.Basic.recoverAsyncBasic.classIndex=60;
-_40c.Basic.recoverAsyncBasic.synchronous=false;
-_40c.Basic.recoverAsyncBasic.hasContent=false;
-_40c.Basic.recoverBasic={};
-_40c.Basic.recoverBasic.allParameters=[{"name":"requeue","type":"Bit"}];
-_40c.Basic.recoverBasic.returnType="voidBasic";
-_40c.Basic.recoverBasic.index=110;
-_40c.Basic.recoverBasic.classIndex=60;
-_40c.Basic.recoverBasic.synchronous=false;
-_40c.Basic.recoverBasic.hasContent=false;
-_40c.Basic.recoverOkBasic={};
-_40c.Basic.recoverOkBasic.allParameters=[];
-_40c.Basic.recoverOkBasic.returnType="voidBasic";
-_40c.Basic.recoverOkBasic.index=111;
-_40c.Basic.recoverOkBasic.classIndex=60;
-_40c.Basic.recoverOkBasic.synchronous=true;
-_40c.Basic.recoverOkBasic.hasContent=false;
-_40c.Basic.methodLookup={10:"qosBasic",11:"qosOkBasic",20:"consumeBasic",21:"consumeOkBasic",30:"cancelBasic",31:"cancelOkBasic",40:"publishBasic",50:"returnBasic",60:"deliverBasic",70:"getBasic",71:"getOkBasic",72:"getEmptyBasic",80:"ackBasic",90:"rejectBasic",100:"recoverAsyncBasic",110:"recoverBasic",111:"recoverOkBasic"};
-_40c.Basic.className="Basic";
-_40c.Tx={};
-_40c.Tx.selectTx={};
-_40c.Tx.selectTx.allParameters=[];
-_40c.Tx.selectTx.returnType="SelectOkTx";
-_40c.Tx.selectTx.index=10;
-_40c.Tx.selectTx.classIndex=90;
-_40c.Tx.selectTx.synchronous=true;
-_40c.Tx.selectTx.hasContent=false;
-_40c.Tx.selectOkTx={};
-_40c.Tx.selectOkTx.allParameters=[];
-_40c.Tx.selectOkTx.returnType="voidTx";
-_40c.Tx.selectOkTx.index=11;
-_40c.Tx.selectOkTx.classIndex=90;
-_40c.Tx.selectOkTx.synchronous=true;
-_40c.Tx.selectOkTx.hasContent=false;
-_40c.Tx.commitTx={};
-_40c.Tx.commitTx.allParameters=[];
-_40c.Tx.commitTx.returnType="CommitOkTx";
-_40c.Tx.commitTx.index=20;
-_40c.Tx.commitTx.classIndex=90;
-_40c.Tx.commitTx.synchronous=true;
-_40c.Tx.commitTx.hasContent=false;
-_40c.Tx.commitOkTx={};
-_40c.Tx.commitOkTx.allParameters=[];
-_40c.Tx.commitOkTx.returnType="voidTx";
-_40c.Tx.commitOkTx.index=21;
-_40c.Tx.commitOkTx.classIndex=90;
-_40c.Tx.commitOkTx.synchronous=true;
-_40c.Tx.commitOkTx.hasContent=false;
-_40c.Tx.rollbackTx={};
-_40c.Tx.rollbackTx.allParameters=[];
-_40c.Tx.rollbackTx.returnType="RollbackOkTx";
-_40c.Tx.rollbackTx.index=30;
-_40c.Tx.rollbackTx.classIndex=90;
-_40c.Tx.rollbackTx.synchronous=true;
-_40c.Tx.rollbackTx.hasContent=false;
-_40c.Tx.rollbackOkTx={};
-_40c.Tx.rollbackOkTx.allParameters=[];
-_40c.Tx.rollbackOkTx.returnType="voidTx";
-_40c.Tx.rollbackOkTx.index=31;
-_40c.Tx.rollbackOkTx.classIndex=90;
-_40c.Tx.rollbackOkTx.synchronous=true;
-_40c.Tx.rollbackOkTx.hasContent=false;
-_40c.Tx.methodLookup={10:"selectTx",11:"selectOkTx",20:"commitTx",21:"commitOkTx",30:"rollbackTx",31:"rollbackOkTx"};
-_40c.Tx.className="Tx";
-var _40d={10:_40c.Connection,20:_40c.Channel,40:_40c.Exchange,50:_40c.Queue,60:_40c.Basic,90:_40c.Tx};
-var _40e={"startConnection":_40c.Connection.startConnection,"startOkConnection":_40c.Connection.startOkConnection,"secureConnection":_40c.Connection.secureConnection,"secureOkConnection":_40c.Connection.secureOkConnection,"tuneConnection":_40c.Connection.tuneConnection,"tuneOkConnection":_40c.Connection.tuneOkConnection,"openConnection":_40c.Connection.openConnection,"openOkConnection":_40c.Connection.openOkConnection,"closeConnection":_40c.Connection.closeConnection,"closeOkConnection":_40c.Connection.closeOkConnection,"openChannel":_40c.Channel.openChannel,"openOkChannel":_40c.Channel.openOkChannel,"flowChannel":_40c.Channel.flowChannel,"flowOkChannel":_40c.Channel.flowOkChannel,"closeChannel":_40c.Channel.closeChannel,"closeOkChannel":_40c.Channel.closeOkChannel,"declareExchange":_40c.Exchange.declareExchange,"declareOkExchange":_40c.Exchange.declareOkExchange,"deleteExchange":_40c.Exchange.deleteExchange,"deleteOkExchange":_40c.Exchange.deleteOkExchange,"declareQueue":_40c.Queue.declareQueue,"declareOkQueue":_40c.Queue.declareOkQueue,"bindQueue":_40c.Queue.bindQueue,"bindOkQueue":_40c.Queue.bindOkQueue,"unbindQueue":_40c.Queue.unbindQueue,"unbindOkQueue":_40c.Queue.unbindOkQueue,"purgeQueue":_40c.Queue.purgeQueue,"purgeOkQueue":_40c.Queue.purgeOkQueue,"deleteQueue":_40c.Queue.deleteQueue,"deleteOkQueue":_40c.Queue.deleteOkQueue,"qosBasic":_40c.Basic.qosBasic,"qosOkBasic":_40c.Basic.qosOkBasic,"consumeBasic":_40c.Basic.consumeBasic,"consumeOkBasic":_40c.Basic.consumeOkBasic,"cancelBasic":_40c.Basic.cancelBasic,"cancelOkBasic":_40c.Basic.cancelOkBasic,"publishBasic":_40c.Basic.publishBasic,"returnBasic":_40c.Basic.returnBasic,"deliverBasic":_40c.Basic.deliverBasic,"getBasic":_40c.Basic.getBasic,"getOkBasic":_40c.Basic.getOkBasic,"getEmptyBasic":_40c.Basic.getEmptyBasic,"ackBasic":_40c.Basic.ackBasic,"rejectBasic":_40c.Basic.rejectBasic,"recoverAsyncBasic":_40c.Basic.recoverAsyncBasic,"recoverBasic":_40c.Basic.recoverBasic,"recoverOkBasic":_40c.Basic.recoverOkBasic,"selectTx":_40c.Tx.selectTx,"selectOkTx":_40c.Tx.selectOkTx,"commitTx":_40c.Tx.commitTx,"commitOkTx":_40c.Tx.commitOkTx,"rollbackTx":_40c.Tx.rollbackTx,"rollbackOkTx":_40c.Tx.rollbackOkTx};
-var _40f=function(_410){
-this.array=_410||[];
+_40c.FRAME_METHOD={"value":1,"message":""};
+_40c.FRAME_HEADER={"value":2,"message":""};
+_40c.FRAME_BODY={"value":3,"message":""};
+_40c.FRAME_HEARTBEAT={"value":8,"message":""};
+_40c.FRAME_MIN_SIZE={"value":4096,"message":""};
+_40c.FRAME_END={"value":206,"message":""};
+_40c.REPLY_SUCCESS={"value":200,"message":"Indicates that the method completed successfully. This reply code is reserved for future use - the current protocol design does not use positive confirmation and reply codes are sent only in case of an error."};
+_40c.CONTENT_TOO_LARGE={"value":311,"message":"The client attempted to transfer content larger than the server could accept at the present time. The client may retry at a later time."};
+_40c.NO_CONSUMERS={"value":313,"message":"When the exchange cannot deliver to a consumer when the immediate flag is set. As a result of pending data on the queue or the absence of any consumers of the queue."};
+_40c.CONNECTION_FORCED={"value":320,"message":"An operator intervened to close the connection for some reason. The client may retry at some later date."};
+_40c.INVALID_PATH={"value":402,"message":"The client tried to work with an unknown virtual host."};
+_40c.ACCESS_REFUSED={"value":403,"message":"The client attempted to work with a server entity to which it has no access due to security settings."};
+_40c.NOT_FOUND={"value":404,"message":"The client attempted to work with a server entity that does not exist."};
+_40c.RESOURCE_LOCKED={"value":405,"message":"The client attempted to work with a server entity to which it has no access because another client is working with it."};
+_40c.PRECONDITION_FAILED={"value":406,"message":"The client requested a method that was not allowed because some precondition failed."};
+_40c.FRAME_ERROR={"value":501,"message":"The sender sent a malformed frame that the recipient could not decode. This strongly implies a programming error in the sending peer."};
+_40c.SYNTAX_ERROR={"value":502,"message":"The sender sent a frame that contained illegal values for one or more fields. This strongly implies a programming error in the sending peer."};
+_40c.COMMAND_INVALID={"value":503,"message":"The client sent an invalid sequence of frames, attempting to perform an operation that was considered invalid by the server. This usually implies a programming error in the client."};
+_40c.CHANNEL_ERROR={"value":504,"message":"The client attempted to work with a channel that had not been correctly opened. This most likely indicates a fault in the client layer."};
+_40c.UNEXPECTED_FRAME={"value":505,"message":"The peer sent a frame that was not expected, usually in the context of a content header and body.  This strongly indicates a fault in the peer's content processing."};
+_40c.RESOURCE_ERROR={"value":506,"message":"The server could not complete the method because it lacked sufficient resources. This may be due to the client creating too many of some type of entity."};
+_40c.NOT_ALLOWED={"value":530,"message":"The client tried to work with some entity in a manner that is prohibited by the server, due to security settings or by some other criteria."};
+_40c.NOT_IMPLEMENTED={"value":540,"message":"The client tried to use functionality that is not implemented in the server."};
+_40c.INTERNAL_ERROR={"value":541,"message":"The server could not complete the method because of an internal error. The server may require intervention by an operator in order to resume normal operations."};
+var _40d={"ClassId":{"type":"short","asserts":[]},"ConsumerTag":{"type":"shortstr","asserts":[]},"DeliveryTag":{"type":"longlong","asserts":[]},"ExchangeName":{"type":"shortstr","asserts":[]},"MethodId":{"type":"short","asserts":[]},"NoAck":{"type":"bit","asserts":[]},"NoLocal":{"type":"bit","asserts":[]},"NoWait":{"type":"bit","asserts":[]},"Path":{"type":"shortstr","asserts":[]},"PeerProperties":{"type":"table","asserts":[]},"QueueName":{"type":"shortstr","asserts":[]},"Redelivered":{"type":"bit","asserts":[]},"MessageCount":{"type":"long","asserts":[]},"ReplyCode":{"type":"short","asserts":[]},"ReplyText":{"type":"shortstr","asserts":[]},"Bit":{"type":"bit","asserts":[]},"Octet":{"type":"octet","asserts":[]},"Short":{"type":"short","asserts":[]},"Long":{"type":"long","asserts":[]},"Longlong":{"type":"longlong","asserts":[]},"Shortstr":{"type":"shortstr","asserts":[]},"Longstr":{"type":"longstr","asserts":[]},"Timestamp":{"type":"timestamp","asserts":[]},"Table":{"type":"table","asserts":[]}};
+var _40e={};
+_40e.Connection={};
+_40e.Connection.startConnection={};
+_40e.Connection.startConnection.allParameters=[{"name":"versionMajor","type":"Octet"},{"name":"versionMinor","type":"Octet"},{"name":"serverProperties","type":"PeerProperties"},{"name":"mechanisms","type":"Longstr"},{"name":"locales","type":"Longstr"}];
+_40e.Connection.startConnection.returnType="StartOkConnection";
+_40e.Connection.startConnection.index=10;
+_40e.Connection.startConnection.classIndex=10;
+_40e.Connection.startConnection.synchronous=true;
+_40e.Connection.startConnection.hasContent=false;
+_40e.Connection.startOkConnection={};
+_40e.Connection.startOkConnection.allParameters=[{"name":"clientProperties","type":"PeerProperties"},{"name":"mechanism","type":"Shortstr"},{"name":"response","type":"Longstr"},{"name":"locale","type":"Shortstr"}];
+_40e.Connection.startOkConnection.returnType="voidConnection";
+_40e.Connection.startOkConnection.index=11;
+_40e.Connection.startOkConnection.classIndex=10;
+_40e.Connection.startOkConnection.synchronous=true;
+_40e.Connection.startOkConnection.hasContent=false;
+_40e.Connection.secureConnection={};
+_40e.Connection.secureConnection.allParameters=[{"name":"challenge","type":"Longstr"}];
+_40e.Connection.secureConnection.returnType="SecureOkConnection";
+_40e.Connection.secureConnection.index=20;
+_40e.Connection.secureConnection.classIndex=10;
+_40e.Connection.secureConnection.synchronous=true;
+_40e.Connection.secureConnection.hasContent=false;
+_40e.Connection.secureOkConnection={};
+_40e.Connection.secureOkConnection.allParameters=[{"name":"response","type":"Longstr"}];
+_40e.Connection.secureOkConnection.returnType="voidConnection";
+_40e.Connection.secureOkConnection.index=21;
+_40e.Connection.secureOkConnection.classIndex=10;
+_40e.Connection.secureOkConnection.synchronous=true;
+_40e.Connection.secureOkConnection.hasContent=false;
+_40e.Connection.tuneConnection={};
+_40e.Connection.tuneConnection.allParameters=[{"name":"channelMax","type":"Short"},{"name":"frameMax","type":"Long"},{"name":"heartbeat","type":"Short"}];
+_40e.Connection.tuneConnection.returnType="TuneOkConnection";
+_40e.Connection.tuneConnection.index=30;
+_40e.Connection.tuneConnection.classIndex=10;
+_40e.Connection.tuneConnection.synchronous=true;
+_40e.Connection.tuneConnection.hasContent=false;
+_40e.Connection.tuneOkConnection={};
+_40e.Connection.tuneOkConnection.allParameters=[{"name":"channelMax","type":"Short"},{"name":"frameMax","type":"Long"},{"name":"heartbeat","type":"Short"}];
+_40e.Connection.tuneOkConnection.returnType="voidConnection";
+_40e.Connection.tuneOkConnection.index=31;
+_40e.Connection.tuneOkConnection.classIndex=10;
+_40e.Connection.tuneOkConnection.synchronous=true;
+_40e.Connection.tuneOkConnection.hasContent=false;
+_40e.Connection.openConnection={};
+_40e.Connection.openConnection.allParameters=[{"name":"virtualHost","type":"Path"},{"name":"reserved1","type":"Shortstr"},{"name":"reserved2","type":"Bit"}];
+_40e.Connection.openConnection.returnType="OpenOkConnection";
+_40e.Connection.openConnection.index=40;
+_40e.Connection.openConnection.classIndex=10;
+_40e.Connection.openConnection.synchronous=true;
+_40e.Connection.openConnection.hasContent=false;
+_40e.Connection.openOkConnection={};
+_40e.Connection.openOkConnection.allParameters=[{"name":"reserved1","type":"Shortstr"}];
+_40e.Connection.openOkConnection.returnType="voidConnection";
+_40e.Connection.openOkConnection.index=41;
+_40e.Connection.openOkConnection.classIndex=10;
+_40e.Connection.openOkConnection.synchronous=true;
+_40e.Connection.openOkConnection.hasContent=false;
+_40e.Connection.closeConnection={};
+_40e.Connection.closeConnection.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"classId","type":"ClassId"},{"name":"methodId","type":"MethodId"}];
+_40e.Connection.closeConnection.returnType="CloseOkConnection";
+_40e.Connection.closeConnection.index=50;
+_40e.Connection.closeConnection.classIndex=10;
+_40e.Connection.closeConnection.synchronous=true;
+_40e.Connection.closeConnection.hasContent=false;
+_40e.Connection.closeOkConnection={};
+_40e.Connection.closeOkConnection.allParameters=[];
+_40e.Connection.closeOkConnection.returnType="voidConnection";
+_40e.Connection.closeOkConnection.index=51;
+_40e.Connection.closeOkConnection.classIndex=10;
+_40e.Connection.closeOkConnection.synchronous=true;
+_40e.Connection.closeOkConnection.hasContent=false;
+_40e.Connection.methodLookup={10:"startConnection",11:"startOkConnection",20:"secureConnection",21:"secureOkConnection",30:"tuneConnection",31:"tuneOkConnection",40:"openConnection",41:"openOkConnection",50:"closeConnection",51:"closeOkConnection"};
+_40e.Connection.className="Connection";
+_40e.Channel={};
+_40e.Channel.openChannel={};
+_40e.Channel.openChannel.allParameters=[{"name":"reserved1","type":"Shortstr"}];
+_40e.Channel.openChannel.returnType="OpenOkChannel";
+_40e.Channel.openChannel.index=10;
+_40e.Channel.openChannel.classIndex=20;
+_40e.Channel.openChannel.synchronous=true;
+_40e.Channel.openChannel.hasContent=false;
+_40e.Channel.openOkChannel={};
+_40e.Channel.openOkChannel.allParameters=[{"name":"reserved1","type":"Longstr"}];
+_40e.Channel.openOkChannel.returnType="voidChannel";
+_40e.Channel.openOkChannel.index=11;
+_40e.Channel.openOkChannel.classIndex=20;
+_40e.Channel.openOkChannel.synchronous=true;
+_40e.Channel.openOkChannel.hasContent=false;
+_40e.Channel.flowChannel={};
+_40e.Channel.flowChannel.allParameters=[{"name":"active","type":"Bit"}];
+_40e.Channel.flowChannel.returnType="FlowOkChannel";
+_40e.Channel.flowChannel.index=20;
+_40e.Channel.flowChannel.classIndex=20;
+_40e.Channel.flowChannel.synchronous=true;
+_40e.Channel.flowChannel.hasContent=false;
+_40e.Channel.flowOkChannel={};
+_40e.Channel.flowOkChannel.allParameters=[{"name":"active","type":"Bit"}];
+_40e.Channel.flowOkChannel.returnType="voidChannel";
+_40e.Channel.flowOkChannel.index=21;
+_40e.Channel.flowOkChannel.classIndex=20;
+_40e.Channel.flowOkChannel.synchronous=false;
+_40e.Channel.flowOkChannel.hasContent=false;
+_40e.Channel.closeChannel={};
+_40e.Channel.closeChannel.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"classId","type":"ClassId"},{"name":"methodId","type":"MethodId"}];
+_40e.Channel.closeChannel.returnType="CloseOkChannel";
+_40e.Channel.closeChannel.index=40;
+_40e.Channel.closeChannel.classIndex=20;
+_40e.Channel.closeChannel.synchronous=true;
+_40e.Channel.closeChannel.hasContent=false;
+_40e.Channel.closeOkChannel={};
+_40e.Channel.closeOkChannel.allParameters=[];
+_40e.Channel.closeOkChannel.returnType="voidChannel";
+_40e.Channel.closeOkChannel.index=41;
+_40e.Channel.closeOkChannel.classIndex=20;
+_40e.Channel.closeOkChannel.synchronous=true;
+_40e.Channel.closeOkChannel.hasContent=false;
+_40e.Channel.methodLookup={10:"openChannel",11:"openOkChannel",20:"flowChannel",21:"flowOkChannel",40:"closeChannel",41:"closeOkChannel"};
+_40e.Channel.className="Channel";
+_40e.Exchange={};
+_40e.Exchange.declareExchange={};
+_40e.Exchange.declareExchange.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"type","type":"Shortstr"},{"name":"passive","type":"Bit"},{"name":"durable","type":"Bit"},{"name":"reserved2","type":"Bit"},{"name":"reserved3","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
+_40e.Exchange.declareExchange.returnType="DeclareOkExchange";
+_40e.Exchange.declareExchange.index=10;
+_40e.Exchange.declareExchange.classIndex=40;
+_40e.Exchange.declareExchange.synchronous=true;
+_40e.Exchange.declareExchange.hasContent=false;
+_40e.Exchange.declareOkExchange={};
+_40e.Exchange.declareOkExchange.allParameters=[];
+_40e.Exchange.declareOkExchange.returnType="voidExchange";
+_40e.Exchange.declareOkExchange.index=11;
+_40e.Exchange.declareOkExchange.classIndex=40;
+_40e.Exchange.declareOkExchange.synchronous=true;
+_40e.Exchange.declareOkExchange.hasContent=false;
+_40e.Exchange.deleteExchange={};
+_40e.Exchange.deleteExchange.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"ifUnused","type":"Bit"},{"name":"noWait","type":"NoWait"}];
+_40e.Exchange.deleteExchange.returnType="DeleteOkExchange";
+_40e.Exchange.deleteExchange.index=20;
+_40e.Exchange.deleteExchange.classIndex=40;
+_40e.Exchange.deleteExchange.synchronous=true;
+_40e.Exchange.deleteExchange.hasContent=false;
+_40e.Exchange.deleteOkExchange={};
+_40e.Exchange.deleteOkExchange.allParameters=[];
+_40e.Exchange.deleteOkExchange.returnType="voidExchange";
+_40e.Exchange.deleteOkExchange.index=21;
+_40e.Exchange.deleteOkExchange.classIndex=40;
+_40e.Exchange.deleteOkExchange.synchronous=true;
+_40e.Exchange.deleteOkExchange.hasContent=false;
+_40e.Exchange.methodLookup={10:"declareExchange",11:"declareOkExchange",20:"deleteExchange",21:"deleteOkExchange"};
+_40e.Exchange.className="Exchange";
+_40e.Queue={};
+_40e.Queue.declareQueue={};
+_40e.Queue.declareQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"passive","type":"Bit"},{"name":"durable","type":"Bit"},{"name":"exclusive","type":"Bit"},{"name":"autoDelete","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
+_40e.Queue.declareQueue.returnType="DeclareOkQueue";
+_40e.Queue.declareQueue.index=10;
+_40e.Queue.declareQueue.classIndex=50;
+_40e.Queue.declareQueue.synchronous=true;
+_40e.Queue.declareQueue.hasContent=false;
+_40e.Queue.declareOkQueue={};
+_40e.Queue.declareOkQueue.allParameters=[{"name":"queue","type":"QueueName"},{"name":"messageCount","type":"MessageCount"},{"name":"consumerCount","type":"Long"}];
+_40e.Queue.declareOkQueue.returnType="voidQueue";
+_40e.Queue.declareOkQueue.index=11;
+_40e.Queue.declareOkQueue.classIndex=50;
+_40e.Queue.declareOkQueue.synchronous=true;
+_40e.Queue.declareOkQueue.hasContent=false;
+_40e.Queue.bindQueue={};
+_40e.Queue.bindQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
+_40e.Queue.bindQueue.returnType="BindOkQueue";
+_40e.Queue.bindQueue.index=20;
+_40e.Queue.bindQueue.classIndex=50;
+_40e.Queue.bindQueue.synchronous=true;
+_40e.Queue.bindQueue.hasContent=false;
+_40e.Queue.bindOkQueue={};
+_40e.Queue.bindOkQueue.allParameters=[];
+_40e.Queue.bindOkQueue.returnType="voidQueue";
+_40e.Queue.bindOkQueue.index=21;
+_40e.Queue.bindOkQueue.classIndex=50;
+_40e.Queue.bindOkQueue.synchronous=true;
+_40e.Queue.bindOkQueue.hasContent=false;
+_40e.Queue.unbindQueue={};
+_40e.Queue.unbindQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"arguments","type":"Table"}];
+_40e.Queue.unbindQueue.returnType="UnbindOkQueue";
+_40e.Queue.unbindQueue.index=50;
+_40e.Queue.unbindQueue.classIndex=50;
+_40e.Queue.unbindQueue.synchronous=true;
+_40e.Queue.unbindQueue.hasContent=false;
+_40e.Queue.unbindOkQueue={};
+_40e.Queue.unbindOkQueue.allParameters=[];
+_40e.Queue.unbindOkQueue.returnType="voidQueue";
+_40e.Queue.unbindOkQueue.index=51;
+_40e.Queue.unbindOkQueue.classIndex=50;
+_40e.Queue.unbindOkQueue.synchronous=true;
+_40e.Queue.unbindOkQueue.hasContent=false;
+_40e.Queue.purgeQueue={};
+_40e.Queue.purgeQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"noWait","type":"NoWait"}];
+_40e.Queue.purgeQueue.returnType="PurgeOkQueue";
+_40e.Queue.purgeQueue.index=30;
+_40e.Queue.purgeQueue.classIndex=50;
+_40e.Queue.purgeQueue.synchronous=true;
+_40e.Queue.purgeQueue.hasContent=false;
+_40e.Queue.purgeOkQueue={};
+_40e.Queue.purgeOkQueue.allParameters=[{"name":"messageCount","type":"MessageCount"}];
+_40e.Queue.purgeOkQueue.returnType="voidQueue";
+_40e.Queue.purgeOkQueue.index=31;
+_40e.Queue.purgeOkQueue.classIndex=50;
+_40e.Queue.purgeOkQueue.synchronous=true;
+_40e.Queue.purgeOkQueue.hasContent=false;
+_40e.Queue.deleteQueue={};
+_40e.Queue.deleteQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"ifUnused","type":"Bit"},{"name":"ifEmpty","type":"Bit"},{"name":"noWait","type":"NoWait"}];
+_40e.Queue.deleteQueue.returnType="DeleteOkQueue";
+_40e.Queue.deleteQueue.index=40;
+_40e.Queue.deleteQueue.classIndex=50;
+_40e.Queue.deleteQueue.synchronous=true;
+_40e.Queue.deleteQueue.hasContent=false;
+_40e.Queue.deleteOkQueue={};
+_40e.Queue.deleteOkQueue.allParameters=[{"name":"messageCount","type":"MessageCount"}];
+_40e.Queue.deleteOkQueue.returnType="voidQueue";
+_40e.Queue.deleteOkQueue.index=41;
+_40e.Queue.deleteOkQueue.classIndex=50;
+_40e.Queue.deleteOkQueue.synchronous=true;
+_40e.Queue.deleteOkQueue.hasContent=false;
+_40e.Queue.methodLookup={10:"declareQueue",11:"declareOkQueue",20:"bindQueue",21:"bindOkQueue",50:"unbindQueue",51:"unbindOkQueue",30:"purgeQueue",31:"purgeOkQueue",40:"deleteQueue",41:"deleteOkQueue"};
+_40e.Queue.className="Queue";
+_40e.Basic={};
+_40e.Basic.qosBasic={};
+_40e.Basic.qosBasic.allParameters=[{"name":"prefetchSize","type":"Long"},{"name":"prefetchCount","type":"Short"},{"name":"global","type":"Bit"}];
+_40e.Basic.qosBasic.returnType="QosOkBasic";
+_40e.Basic.qosBasic.index=10;
+_40e.Basic.qosBasic.classIndex=60;
+_40e.Basic.qosBasic.synchronous=true;
+_40e.Basic.qosBasic.hasContent=false;
+_40e.Basic.qosOkBasic={};
+_40e.Basic.qosOkBasic.allParameters=[];
+_40e.Basic.qosOkBasic.returnType="voidBasic";
+_40e.Basic.qosOkBasic.index=11;
+_40e.Basic.qosOkBasic.classIndex=60;
+_40e.Basic.qosOkBasic.synchronous=true;
+_40e.Basic.qosOkBasic.hasContent=false;
+_40e.Basic.consumeBasic={};
+_40e.Basic.consumeBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"consumerTag","type":"ConsumerTag"},{"name":"noLocal","type":"NoLocal"},{"name":"noAck","type":"NoAck"},{"name":"exclusive","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
+_40e.Basic.consumeBasic.returnType="ConsumeOkBasic";
+_40e.Basic.consumeBasic.index=20;
+_40e.Basic.consumeBasic.classIndex=60;
+_40e.Basic.consumeBasic.synchronous=true;
+_40e.Basic.consumeBasic.hasContent=false;
+_40e.Basic.consumeOkBasic={};
+_40e.Basic.consumeOkBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"}];
+_40e.Basic.consumeOkBasic.returnType="voidBasic";
+_40e.Basic.consumeOkBasic.index=21;
+_40e.Basic.consumeOkBasic.classIndex=60;
+_40e.Basic.consumeOkBasic.synchronous=true;
+_40e.Basic.consumeOkBasic.hasContent=false;
+_40e.Basic.cancelBasic={};
+_40e.Basic.cancelBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"},{"name":"noWait","type":"NoWait"}];
+_40e.Basic.cancelBasic.returnType="CancelOkBasic";
+_40e.Basic.cancelBasic.index=30;
+_40e.Basic.cancelBasic.classIndex=60;
+_40e.Basic.cancelBasic.synchronous=true;
+_40e.Basic.cancelBasic.hasContent=false;
+_40e.Basic.cancelOkBasic={};
+_40e.Basic.cancelOkBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"}];
+_40e.Basic.cancelOkBasic.returnType="voidBasic";
+_40e.Basic.cancelOkBasic.index=31;
+_40e.Basic.cancelOkBasic.classIndex=60;
+_40e.Basic.cancelOkBasic.synchronous=true;
+_40e.Basic.cancelOkBasic.hasContent=false;
+_40e.Basic.publishBasic={};
+_40e.Basic.publishBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"mandatory","type":"Bit"},{"name":"immediate","type":"Bit"}];
+_40e.Basic.publishBasic.returnType="voidBasic";
+_40e.Basic.publishBasic.index=40;
+_40e.Basic.publishBasic.classIndex=60;
+_40e.Basic.publishBasic.synchronous=false;
+_40e.Basic.publishBasic.hasContent=true;
+_40e.Basic.returnBasic={};
+_40e.Basic.returnBasic.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"}];
+_40e.Basic.returnBasic.returnType="voidBasic";
+_40e.Basic.returnBasic.index=50;
+_40e.Basic.returnBasic.classIndex=60;
+_40e.Basic.returnBasic.synchronous=false;
+_40e.Basic.returnBasic.hasContent=true;
+_40e.Basic.deliverBasic={};
+_40e.Basic.deliverBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"},{"name":"deliveryTag","type":"DeliveryTag"},{"name":"redelivered","type":"Redelivered"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"}];
+_40e.Basic.deliverBasic.returnType="voidBasic";
+_40e.Basic.deliverBasic.index=60;
+_40e.Basic.deliverBasic.classIndex=60;
+_40e.Basic.deliverBasic.synchronous=false;
+_40e.Basic.deliverBasic.hasContent=true;
+_40e.Basic.getBasic={};
+_40e.Basic.getBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"noAck","type":"NoAck"}];
+_40e.Basic.getBasic.returnType="GetOkBasic";
+_40e.Basic.getBasic.index=70;
+_40e.Basic.getBasic.classIndex=60;
+_40e.Basic.getBasic.synchronous=true;
+_40e.Basic.getBasic.hasContent=false;
+_40e.Basic.getOkBasic={};
+_40e.Basic.getOkBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"redelivered","type":"Redelivered"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"messageCount","type":"MessageCount"}];
+_40e.Basic.getOkBasic.returnType="voidBasic";
+_40e.Basic.getOkBasic.index=71;
+_40e.Basic.getOkBasic.classIndex=60;
+_40e.Basic.getOkBasic.synchronous=true;
+_40e.Basic.getOkBasic.hasContent=true;
+_40e.Basic.getEmptyBasic={};
+_40e.Basic.getEmptyBasic.allParameters=[{"name":"reserved1","type":"Shortstr"}];
+_40e.Basic.getEmptyBasic.returnType="voidBasic";
+_40e.Basic.getEmptyBasic.index=72;
+_40e.Basic.getEmptyBasic.classIndex=60;
+_40e.Basic.getEmptyBasic.synchronous=true;
+_40e.Basic.getEmptyBasic.hasContent=false;
+_40e.Basic.ackBasic={};
+_40e.Basic.ackBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"multiple","type":"Bit"}];
+_40e.Basic.ackBasic.returnType="voidBasic";
+_40e.Basic.ackBasic.index=80;
+_40e.Basic.ackBasic.classIndex=60;
+_40e.Basic.ackBasic.synchronous=false;
+_40e.Basic.ackBasic.hasContent=false;
+_40e.Basic.rejectBasic={};
+_40e.Basic.rejectBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"requeue","type":"Bit"}];
+_40e.Basic.rejectBasic.returnType="voidBasic";
+_40e.Basic.rejectBasic.index=90;
+_40e.Basic.rejectBasic.classIndex=60;
+_40e.Basic.rejectBasic.synchronous=false;
+_40e.Basic.rejectBasic.hasContent=false;
+_40e.Basic.recoverAsyncBasic={};
+_40e.Basic.recoverAsyncBasic.allParameters=[{"name":"requeue","type":"Bit"}];
+_40e.Basic.recoverAsyncBasic.returnType="voidBasic";
+_40e.Basic.recoverAsyncBasic.index=100;
+_40e.Basic.recoverAsyncBasic.classIndex=60;
+_40e.Basic.recoverAsyncBasic.synchronous=false;
+_40e.Basic.recoverAsyncBasic.hasContent=false;
+_40e.Basic.recoverBasic={};
+_40e.Basic.recoverBasic.allParameters=[{"name":"requeue","type":"Bit"}];
+_40e.Basic.recoverBasic.returnType="voidBasic";
+_40e.Basic.recoverBasic.index=110;
+_40e.Basic.recoverBasic.classIndex=60;
+_40e.Basic.recoverBasic.synchronous=false;
+_40e.Basic.recoverBasic.hasContent=false;
+_40e.Basic.recoverOkBasic={};
+_40e.Basic.recoverOkBasic.allParameters=[];
+_40e.Basic.recoverOkBasic.returnType="voidBasic";
+_40e.Basic.recoverOkBasic.index=111;
+_40e.Basic.recoverOkBasic.classIndex=60;
+_40e.Basic.recoverOkBasic.synchronous=true;
+_40e.Basic.recoverOkBasic.hasContent=false;
+_40e.Basic.methodLookup={10:"qosBasic",11:"qosOkBasic",20:"consumeBasic",21:"consumeOkBasic",30:"cancelBasic",31:"cancelOkBasic",40:"publishBasic",50:"returnBasic",60:"deliverBasic",70:"getBasic",71:"getOkBasic",72:"getEmptyBasic",80:"ackBasic",90:"rejectBasic",100:"recoverAsyncBasic",110:"recoverBasic",111:"recoverOkBasic"};
+_40e.Basic.className="Basic";
+_40e.Tx={};
+_40e.Tx.selectTx={};
+_40e.Tx.selectTx.allParameters=[];
+_40e.Tx.selectTx.returnType="SelectOkTx";
+_40e.Tx.selectTx.index=10;
+_40e.Tx.selectTx.classIndex=90;
+_40e.Tx.selectTx.synchronous=true;
+_40e.Tx.selectTx.hasContent=false;
+_40e.Tx.selectOkTx={};
+_40e.Tx.selectOkTx.allParameters=[];
+_40e.Tx.selectOkTx.returnType="voidTx";
+_40e.Tx.selectOkTx.index=11;
+_40e.Tx.selectOkTx.classIndex=90;
+_40e.Tx.selectOkTx.synchronous=true;
+_40e.Tx.selectOkTx.hasContent=false;
+_40e.Tx.commitTx={};
+_40e.Tx.commitTx.allParameters=[];
+_40e.Tx.commitTx.returnType="CommitOkTx";
+_40e.Tx.commitTx.index=20;
+_40e.Tx.commitTx.classIndex=90;
+_40e.Tx.commitTx.synchronous=true;
+_40e.Tx.commitTx.hasContent=false;
+_40e.Tx.commitOkTx={};
+_40e.Tx.commitOkTx.allParameters=[];
+_40e.Tx.commitOkTx.returnType="voidTx";
+_40e.Tx.commitOkTx.index=21;
+_40e.Tx.commitOkTx.classIndex=90;
+_40e.Tx.commitOkTx.synchronous=true;
+_40e.Tx.commitOkTx.hasContent=false;
+_40e.Tx.rollbackTx={};
+_40e.Tx.rollbackTx.allParameters=[];
+_40e.Tx.rollbackTx.returnType="RollbackOkTx";
+_40e.Tx.rollbackTx.index=30;
+_40e.Tx.rollbackTx.classIndex=90;
+_40e.Tx.rollbackTx.synchronous=true;
+_40e.Tx.rollbackTx.hasContent=false;
+_40e.Tx.rollbackOkTx={};
+_40e.Tx.rollbackOkTx.allParameters=[];
+_40e.Tx.rollbackOkTx.returnType="voidTx";
+_40e.Tx.rollbackOkTx.index=31;
+_40e.Tx.rollbackOkTx.classIndex=90;
+_40e.Tx.rollbackOkTx.synchronous=true;
+_40e.Tx.rollbackOkTx.hasContent=false;
+_40e.Tx.methodLookup={10:"selectTx",11:"selectOkTx",20:"commitTx",21:"commitOkTx",30:"rollbackTx",31:"rollbackOkTx"};
+_40e.Tx.className="Tx";
+var _40f={10:_40e.Connection,20:_40e.Channel,40:_40e.Exchange,50:_40e.Queue,60:_40e.Basic,90:_40e.Tx};
+var _410={"startConnection":_40e.Connection.startConnection,"startOkConnection":_40e.Connection.startOkConnection,"secureConnection":_40e.Connection.secureConnection,"secureOkConnection":_40e.Connection.secureOkConnection,"tuneConnection":_40e.Connection.tuneConnection,"tuneOkConnection":_40e.Connection.tuneOkConnection,"openConnection":_40e.Connection.openConnection,"openOkConnection":_40e.Connection.openOkConnection,"closeConnection":_40e.Connection.closeConnection,"closeOkConnection":_40e.Connection.closeOkConnection,"openChannel":_40e.Channel.openChannel,"openOkChannel":_40e.Channel.openOkChannel,"flowChannel":_40e.Channel.flowChannel,"flowOkChannel":_40e.Channel.flowOkChannel,"closeChannel":_40e.Channel.closeChannel,"closeOkChannel":_40e.Channel.closeOkChannel,"declareExchange":_40e.Exchange.declareExchange,"declareOkExchange":_40e.Exchange.declareOkExchange,"deleteExchange":_40e.Exchange.deleteExchange,"deleteOkExchange":_40e.Exchange.deleteOkExchange,"declareQueue":_40e.Queue.declareQueue,"declareOkQueue":_40e.Queue.declareOkQueue,"bindQueue":_40e.Queue.bindQueue,"bindOkQueue":_40e.Queue.bindOkQueue,"unbindQueue":_40e.Queue.unbindQueue,"unbindOkQueue":_40e.Queue.unbindOkQueue,"purgeQueue":_40e.Queue.purgeQueue,"purgeOkQueue":_40e.Queue.purgeOkQueue,"deleteQueue":_40e.Queue.deleteQueue,"deleteOkQueue":_40e.Queue.deleteOkQueue,"qosBasic":_40e.Basic.qosBasic,"qosOkBasic":_40e.Basic.qosOkBasic,"consumeBasic":_40e.Basic.consumeBasic,"consumeOkBasic":_40e.Basic.consumeOkBasic,"cancelBasic":_40e.Basic.cancelBasic,"cancelOkBasic":_40e.Basic.cancelOkBasic,"publishBasic":_40e.Basic.publishBasic,"returnBasic":_40e.Basic.returnBasic,"deliverBasic":_40e.Basic.deliverBasic,"getBasic":_40e.Basic.getBasic,"getOkBasic":_40e.Basic.getOkBasic,"getEmptyBasic":_40e.Basic.getEmptyBasic,"ackBasic":_40e.Basic.ackBasic,"rejectBasic":_40e.Basic.rejectBasic,"recoverAsyncBasic":_40e.Basic.recoverAsyncBasic,"recoverBasic":_40e.Basic.recoverBasic,"recoverOkBasic":_40e.Basic.recoverOkBasic,"selectTx":_40e.Tx.selectTx,"selectOkTx":_40e.Tx.selectOkTx,"commitTx":_40e.Tx.commitTx,"commitOkTx":_40e.Tx.commitOkTx,"rollbackTx":_40e.Tx.rollbackTx,"rollbackOkTx":_40e.Tx.rollbackOkTx};
+var _411=function(_412){
+this.array=_412||[];
 this._mark=-1;
 this.limit=this.capacity=this.array.length;
 this.order=ByteOrder.BIG_ENDIAN;
 this.bitCount=0;
 };
-_40f.prototype=new ByteBuffer();
-var _411=function(_412,_413){
-if(!_412){
-throw (new Error(_413));
+_411.prototype=new ByteBuffer();
+var _413=function(_414,_415){
+if(!_414){
+throw (new Error(_415));
 }
 };
-var _414={"octet":"Unsigned","short":"UnsignedShort","long":"UnsignedInt","longlong":"UnsignedLong","int":"Int","table":"Table","longstr":"LongString","shortstr":"ShortString","bit":"Bit","fieldtable":"FieldTable"};
-var _415={"F":"fieldtable","S":"longstr","I":"int"};
-var _416={"longstr":"S","int":"I"};
-var _417=function(_418,_419){
-var _41a=new _40f();
-_41a.putShortString("LOGIN");
-_41a.putTypeIdentifier("longstr");
-_41a.putLongString(_418);
-_41a.putShortString("PASSWORD");
-_41a.putTypeIdentifier("longstr");
-_41a.putLongString(_419);
-_41a.rewind();
-var len=_41a.remaining();
-var _41c=[];
+var _416={"octet":"Unsigned","short":"UnsignedShort","long":"UnsignedInt","longlong":"UnsignedLong","int":"Int","table":"Table","longstr":"LongString","shortstr":"ShortString","bit":"Bit","fieldtable":"FieldTable"};
+var _417={"F":"fieldtable","S":"longstr","I":"int"};
+var _418={"longstr":"S","int":"I"};
+var _419=function(_41a,_41b){
+var _41c=new _411();
+_41c.putShortString("LOGIN");
+_41c.putTypeIdentifier("longstr");
+_41c.putLongString(_41a);
+_41c.putShortString("PASSWORD");
+_41c.putTypeIdentifier("longstr");
+_41c.putLongString(_41b);
+_41c.rewind();
+var len=_41c.remaining();
+var _41e=[];
 for(var i=0;i<len;i++){
-_41c.push(String.fromCharCode(_41a.getUnsigned()));
+_41e.push(String.fromCharCode(_41c.getUnsigned()));
 }
-return _41c.join("");
+return _41e.join("");
 };
-var _41e=function(_41f,_420){
+var _420=function(_421,_422){
 throw (new Error("not implemented"));
 };
-_40f.prototype.getLongString=function(){
+_411.prototype.getLongString=function(){
 var len=this.getUnsignedInt();
-var _422=[];
+var _424=[];
 for(var i=0;i<len;i++){
-_422.push(String.fromCharCode(this.getUnsigned()));
+_424.push(String.fromCharCode(this.getUnsigned()));
 }
-return _422.join("");
+return _424.join("");
 };
-_40f.prototype.getShortString=function(){
+_411.prototype.getShortString=function(){
 var len=this.getUnsigned();
-var _425=[];
+var _427=[];
 for(var i=0;i<len;i++){
-_425.push(String.fromCharCode(this.getUnsigned()));
+_427.push(String.fromCharCode(this.getUnsigned()));
 }
-return _425.join("");
+return _427.join("");
 };
-_40f.prototype.getTypeIdentifier=function(){
+_411.prototype.getTypeIdentifier=function(){
 var i=this.getUnsigned();
-return _415[String.fromCharCode(i)];
+return _417[String.fromCharCode(i)];
 };
-_40f.prototype.putTypeIdentifier=function(type){
-var ti=_416[type];
+_411.prototype.putTypeIdentifier=function(type){
+var ti=_418[type];
 this.putUnsigned(ti.charCodeAt(0));
 };
-_40f.prototype.getFieldValue=function(){
-var _42a=this.getUnsigned();
-switch(String.fromCharCode(_42a)){
+_411.prototype.getFieldValue=function(){
+var _42c=this.getUnsigned();
+switch(String.fromCharCode(_42c)){
 case "t":
 return !!this.getUnsigned();
 default:
 throw new Error("Decoding Error in AmqpBuffer: cannot decode field value");
 }
 };
-_40f.prototype.getFieldTable=function(){
+_411.prototype.getFieldTable=function(){
 var l=this.getUnsignedInt();
 var ft={};
-var _42d=this.position;
-while(l>(this.position-_42d)){
+var _42f=this.position;
+while(l>(this.position-_42f)){
 var key=this.getShortString();
-var _42f=this.getFieldValue();
-ft[key]=_42f;
+var _431=this.getFieldValue();
+ft[key]=_431;
 }
 return ft;
 };
-_40f.prototype.getTable=function(){
-var _430=[];
+_411.prototype.getTable=function(){
+var _432=[];
 var len=this.getUnsignedInt();
-var _432=new _40f(this.array.slice(this.position,this.position+len));
+var _434=new _411(this.array.slice(this.position,this.position+len));
 this.position+=len;
-while(_432.remaining()){
+while(_434.remaining()){
 var kv={};
-kv.key=_432.getShortString();
-var ti=_432.getTypeIdentifier();
-kv.value=_432["get"+_414[ti]]();
-_430.push(kv);
+kv.key=_434.getShortString();
+var ti=_434.getTypeIdentifier();
+kv.value=_434["get"+_416[ti]]();
+_432.push(kv);
 }
-return _430;
+return _432;
 };
-_40f.prototype.getBit=function(_435){
+_411.prototype.getBit=function(_437){
 return this.getUnsigned();
 };
-_40f.prototype.putBit=function(v){
+_411.prototype.putBit=function(v){
 if(this.bitCount>0){
-var _437=this.array[this.position-1];
-_437=v<<this.bitCount|_437;
-this.array[this.position-1]=_437;
+var _439=this.array[this.position-1];
+_439=v<<this.bitCount|_439;
+this.array[this.position-1]=_439;
 }else{
 this.putUnsigned(v);
 }
 };
-_40f.prototype.putUnsignedLong=function(v){
+_411.prototype.putUnsignedLong=function(v){
 this.putInt(0);
 return this.putUnsignedInt(v);
 };
-_40f.prototype.getUnsignedLong=function(v){
+_411.prototype.getUnsignedLong=function(v){
 this.getInt();
 return this.getUnsignedInt();
 };
-_40f.prototype.putLongString=function(s){
+_411.prototype.putLongString=function(s){
 this.putUnsignedInt(s.length);
 for(var i=0;i<s.length;i++){
 this.putUnsigned(s.charCodeAt(i));
 }
 };
-_40f.prototype.putShortString=function(s){
+_411.prototype.putShortString=function(s){
 this.putUnsigned(s.length);
 for(var i=0;i<s.length;i++){
 this.putUnsigned(s.charCodeAt(i));
 }
 };
-_40f.prototype.putTable=function(_43e){
-if(!_43e){
+_411.prototype.putTable=function(_440){
+if(!_440){
 this.putUnsignedInt(0);
 return this;
 }
-var _43f=new _40f();
-for(var i=0;i<_43e.length;i++){
-var _441=_43e[i];
-_43f.putShortString(_441.key);
-_43f.putTypeIdentifier(_441.type);
-_43f["put"+_414[_441.type]](_441.value);
+var _441=new _411();
+for(var i=0;i<_440.length;i++){
+var _443=_440[i];
+_441.putShortString(_443.key);
+_441.putTypeIdentifier(_443.type);
+_441["put"+_416[_443.type]](_443.value);
 }
-_43f.rewind();
-this.putUnsignedInt(_43f.remaining());
-this.putBuffer(_43f);
+_441.rewind();
+this.putUnsignedInt(_441.remaining());
+this.putBuffer(_441);
 return this;
 };
-_40f.prototype.getFrameHeader=function(){
-var _442=this.getUnsigned();
-var _443=this.getUnsignedShort();
+_411.prototype.getFrameHeader=function(){
+var _444=this.getUnsigned();
+var _445=this.getUnsignedShort();
 var size=this.getUnsignedInt();
-var _445={};
-_445.type=_442;
-_445.size=size;
-_445.channel=_443;
-return _445;
-};
-_40f.prototype.getFrame=function(){
-var pos=this.position;
 var _447={};
+_447.type=_444;
+_447.size=size;
+_447.channel=_445;
+return _447;
+};
+_411.prototype.getFrame=function(){
+var pos=this.position;
+var _449={};
 if(this.remaining()>7){
-_447.header=this.getFrameHeader();
-_447.channel=_447.header.channel;
-_447.type=_447.header.type;
-if(this.remaining()>=_447.header.size+1){
-switch(_447.type){
-case _40a.FRAME_BODY.value:
-var body=new _40f(this.array.slice(this.position,this.position+_447.header.size));
-this.position+=_447.header.size;
-_447.body=body;
-_447.methodName="body";
+_449.header=this.getFrameHeader();
+_449.channel=_449.header.channel;
+_449.type=_449.header.type;
+if(this.remaining()>=_449.header.size+1){
+switch(_449.type){
+case _40c.FRAME_BODY.value:
+var body=new _411(this.array.slice(this.position,this.position+_449.header.size));
+this.position+=_449.header.size;
+_449.body=body;
+_449.methodName="body";
 break;
-case _40a.FRAME_HEADER.value:
-var _449=this.getUnsignedShort();
-var _44a=this.getUnsignedShort();
-var _44b=this.getUnsignedLong();
-_447.contentProperties=this.getContentProperties();
-_447.methodName="header";
-break;
-case _40a.FRAME_METHOD.value:
-var _449=this.getUnsignedShort();
+case _40c.FRAME_HEADER.value:
+var _44b=this.getUnsignedShort();
 var _44c=this.getUnsignedShort();
-var _44d=_40d[_449].className;
-var _44e=_40d[_449].methodLookup[_44c];
-var _44f=_40d[_449][_44e];
-var _450=_40d[_449][_44e].allParameters;
-_447.methodName=_44e;
-_447.args=this.getMethodArguments(_450);
+var _44d=this.getUnsignedLong();
+_449.contentProperties=this.getContentProperties();
+_449.methodName="header";
+break;
+case _40c.FRAME_METHOD.value:
+var _44b=this.getUnsignedShort();
+var _44e=this.getUnsignedShort();
+var _44f=_40f[_44b].className;
+var _450=_40f[_44b].methodLookup[_44e];
+var _451=_40f[_44b][_450];
+var _452=_40f[_44b][_450].allParameters;
+_449.methodName=_450;
+_449.args=this.getMethodArguments(_452);
 break;
 default:
 throw (new Error("getFrame: This AMQP frame type is unknown or has not been implemented"));
 }
-_411((this.getUnsigned()===_40a.FRAME_END.value),"AMQP: Frame terminator missing");
+_413((this.getUnsigned()===_40c.FRAME_END.value),"AMQP: Frame terminator missing");
 }else{
 this.position=pos;
 return null;
 }
-return _447;
+return _449;
 }
 return null;
 };
-_40f.prototype.putFrame=function(type,_452,_453){
+_411.prototype.putFrame=function(type,_454,_455){
 this.putUnsigned(type);
-this.putUnsignedShort(_452);
-var size=_453.remaining();
+this.putUnsignedShort(_454);
+var size=_455.remaining();
 this.putUnsignedInt(size);
-this.putBuffer(_453);
-this.putUnsigned(_40a.FRAME_END.value);
+this.putBuffer(_455);
+this.putUnsigned(_40c.FRAME_END.value);
 return this;
 };
-_40f.prototype.putMethodFrame=function(_455,_456,args){
-var _458=new _40f();
-_458.putUnsignedShort(_455.classIndex);
-_458.putUnsignedShort(_455.index);
-_458.putMethodArguments(args,_455.allParameters);
-_458.flip();
-return this.putFrame(_40a.FRAME_METHOD.value,_456,_458);
+_411.prototype.putMethodFrame=function(_457,_458,args){
+var _45a=new _411();
+_45a.putUnsignedShort(_457.classIndex);
+_45a.putUnsignedShort(_457.index);
+_45a.putMethodArguments(args,_457.allParameters);
+_45a.flip();
+return this.putFrame(_40c.FRAME_METHOD.value,_458,_45a);
 };
-_40f.prototype.putHeaderFrame=function(_459,_45a,_45b,_45c,_45d){
-var _45e=new _40f();
-_45e.putUnsignedShort(_45a);
-_45e.putUnsignedShort(_45b);
-_45e.putUnsignedLong(_45c);
-_45e.putContentProperties(_45d);
-_45e.flip();
-return this.putFrame(_40a.FRAME_HEADER.value,_459,_45e);
+_411.prototype.putHeaderFrame=function(_45b,_45c,_45d,_45e,_45f){
+var _460=new _411();
+_460.putUnsignedShort(_45c);
+_460.putUnsignedShort(_45d);
+_460.putUnsignedLong(_45e);
+_460.putContentProperties(_45f);
+_460.flip();
+return this.putFrame(_40c.FRAME_HEADER.value,_45b,_460);
 };
-_40f.prototype.putBodyFrame=function(_45f,_460){
-return this.putFrame(_40a.FRAME_BODY.value,_45f,_460);
+_411.prototype.putBodyFrame=function(_461,_462){
+return this.putFrame(_40c.FRAME_BODY.value,_461,_462);
 };
-_40f.prototype.putHeartbeat=function(){
+_411.prototype.putHeartbeat=function(){
 throw (new Error("not implemented"));
 };
-_40f.prototype.putMethodArguments=function(args,_462){
-for(var i=0;i<_462.length;i++){
-var p=_462[i];
-var _465=p.type;
-var _466=_40b[_465];
-if(_466){
-var type=_466.type;
+_411.prototype.putMethodArguments=function(args,_464){
+for(var i=0;i<_464.length;i++){
+var p=_464[i];
+var _467=p.type;
+var _468=_40d[_467];
+if(_468){
+var type=_468.type;
 }else{
-throw (new Error("Unknown AMQP domain "+_465));
+throw (new Error("Unknown AMQP domain "+_467));
 }
-this["put"+_414[type]](args[i]);
+this["put"+_416[type]](args[i]);
 this.bitCount=(type==="bit")?this.bitCount+1:0;
 }
 return this;
 };
-_40f.prototype.getMethodArguments=function(_468){
-var _469=[];
-for(var i=0;i<_468.length;i++){
-var p=_468[i];
-var _46c=p.type;
-var type=_40b[_46c].type;
+_411.prototype.getMethodArguments=function(_46a){
+var _46b=[];
+for(var i=0;i<_46a.length;i++){
+var p=_46a[i];
+var _46e=p.type;
+var type=_40d[_46e].type;
 var arg={};
 arg.type=type;
 arg.name=p.name;
 try{
-var v=this["get"+_414[type]]();
+var v=this["get"+_416[type]]();
 }
 catch(e){
-throw (new Error("type codec failed for type "+type+" for domain "+_46c));
+throw (new Error("type codec failed for type "+type+" for domain "+_46e));
 }
 this.bitCount=(type==="bit")?this.bitCount+1:0;
 arg.value=v;
-_469.push(arg);
+_46b.push(arg);
 }
-return _469;
+return _46b;
 };
-_40f.prototype.putArgument=function(_470,arg){
-var _472=_40b[_470];
-if(_472){
-var type=_472.type;
+_411.prototype.putArgument=function(_472,arg){
+var _474=_40d[_472];
+if(_474){
+var type=_474.type;
 }else{
 throw (new Error("Unknown AMQP domain "+dtype));
 }
-this["put"+_414[type]](arg);
+this["put"+_416[type]](arg);
 };
-_40f.prototype.getArgument=function(type){
+_411.prototype.getArgument=function(type){
 try{
-return this["get"+_414[type]]();
+return this["get"+_416[type]]();
 }
 catch(e){
 throw (new Error("type codec failed for type "+type+" for domain "+dtype));
 }
 };
-_40f.prototype.getContentProperties=function(){
-var _475={};
-var _476=[];
-var _477=this.getUnsignedShort();
+_411.prototype.getContentProperties=function(){
+var _477={};
+var _478=[];
+var _479=this.getUnsignedShort();
 for(var i=0;i<=16;i++){
-var bit=(_477>>(i))&1;
+var bit=(_479>>(i))&1;
 if(bit){
-_476.unshift(i+1);
+_478.unshift(i+1);
 }
 }
-for(var i=0;i<_476.length;i++){
-var k=16-_476[i];
-var _47b=_basicProperties[k].name;
-var _47c=_basicProperties[k].domain;
-var _47d=_40b[_47c];
-_475[_47b]=this.getArgument(_47d.type);
+for(var i=0;i<_478.length;i++){
+var k=16-_478[i];
+var _47d=_basicProperties[k].name;
+var _47e=_basicProperties[k].domain;
+var _47f=_40d[_47e];
+_477[_47d]=this.getArgument(_47f.type);
 }
-return _475;
+return _477;
 };
-_40f.prototype.putContentProperties=function(_47e){
-if(!_47e){
+_411.prototype.putContentProperties=function(_480){
+if(!_480){
 return this.putUnsignedShort(0);
 }
-var _47f=0;
-var _480=[];
+var _481=0;
+var _482=[];
 for(var i=0;i<_basicProperties.length;i++){
-var _482=_basicProperties[i].name;
-var _483=_basicProperties[i].domain;
-var _484=_47e[_482];
-if(typeof (_484)!=="undefined"){
-_480.push({"propertyName":_482,"propertyValue":_484,"domain":_483});
-_47f=_47f<<1|1;
+var _484=_basicProperties[i].name;
+var _485=_basicProperties[i].domain;
+var _486=_480[_484];
+if(typeof (_486)!=="undefined"){
+_482.push({"propertyName":_484,"propertyValue":_486,"domain":_485});
+_481=_481<<1|1;
 }else{
-_47f=_47f<<1;
+_481=_481<<1;
 }
 }
-_47f=_47f<<2;
-this.putUnsignedShort(_47f);
-for(var i=0;i<_480.length;i++){
-var _485=_480[i];
-var _486=_485.domain;
-this.putArgument(_486,_485.propertyValue);
+_481=_481<<2;
+this.putUnsignedShort(_481);
+for(var i=0;i<_482.length;i++){
+var _487=_482[i];
+var _488=_487.domain;
+this.putArgument(_488,_487.propertyValue);
 }
 return this;
 };
-AmqpClient.prototype=new _3fa();
-var _487=AmqpClient.prototype;
-_487.CLOSED=0;
-_487.OPEN=1;
-_487.CONNECTING=2;
-_487.getReadyState=function(){
+AmqpClient.prototype=new _3fc();
+var _489=AmqpClient.prototype;
+_489.CLOSED=0;
+_489.OPEN=1;
+_489.CONNECTING=2;
+_489.getReadyState=function(){
 return this._readyState;
 };
-_487.setReadyState=function(_488){
-this._readyState=_488;
+_489.setReadyState=function(_48a){
+this._readyState=_48a;
 };
-_487.onopen=function(e){
+_489.onopen=function(e){
 };
-_487.onclose=function(e){
+_489.onclose=function(e){
 };
-var _411=function(_48b,_48c){
-if(!_48b){
-throw (new Error(_48c));
+_489.onerror=function(e){
+};
+var _413=function(_48e,_48f){
+if(!_48e){
+throw (new Error(_48f));
 }
 };
-_487._init=function(){
+_489._init=function(){
 this._initAsyncClient();
-this._buffer=new _40f();
+this._buffer=new _411();
 this._channels={};
 this._channelCount=0;
-this._stateMachine.addState("handshaking",[{"inputs":["startConnectionFrame"],"targetState":"starting"},{"inputs":["closeConnectionFrame"],"targetState":"closing"}],_48d);
-this._stateMachine.addState("starting",[{"inputs":["startOkConnectionAction"],"targetState":"started"}],_48e);
+this._stateMachine.addState("handshaking",[{"inputs":["startConnectionFrame"],"targetState":"starting"},{"inputs":["closeConnectionFrame"],"targetState":"closing"}],_490);
+this._stateMachine.addState("starting",[{"inputs":["startOkConnectionAction"],"targetState":"started"}],_491);
 this._stateMachine.addState("started",[{"inputs":["tuneConnectionFrame"],"targetState":"tuning"}]);
-this._stateMachine.addState("tuning",[{"inputs":["tuneOkConnectionAction"],"targetState":"tuned"}],_48f,_490);
+this._stateMachine.addState("tuning",[{"inputs":["tuneOkConnectionAction"],"targetState":"tuned"}],_492,_493);
 this._stateMachine.addState("tuned",[{"inputs":["openConnectionAction"],"targetState":"opening"}]);
-this._stateMachine.addState("opening",[{"inputs":["openOkConnectionFrame"],"targetState":"ready"}],_491,_492);
-this._stateMachine.addState("ready",[{"inputs":["openOkChannelFrame","closeChannelFrame","closeOkChannelFrame","flowOkChannelFrame","flowChannelFrame","declareOkExchangeFrame","declareOkQueueFrame","bindOkQueueFrame","unbindOkQueueFrame","deleteOkQueueFrame","deleteOkExchangeFrame","commitOkTxFrame","rollbackOkTxFrame","selectOkTxFrame","purgeOkQueueFrame","cancelOkBasicFrame","getOkBasicFrame","getEmptyBasicFrame","consumeOkBasicFrame","recoverOkBasicFrame","rejectOkBasicFrame","deliverBasicFrame","bodyFrame","headerFrame"],"targetState":"ready"},{"inputs":["closeConnectionFrame","closeConnectionAction"],"targetState":"closing"}],_493);
-this._stateMachine.addState("closing",[{"inputs":["closeOkConnectionFrame","closeOkConnectionAction"],"targetState":"closed"}],null,null);
-this._stateMachine.addState("closed",[],_494,null);
+this._stateMachine.addState("opening",[{"inputs":["openOkConnectionFrame"],"targetState":"ready"}],_494,_495);
+this._stateMachine.addState("ready",[{"inputs":["openOkChannelFrame","closeChannelFrame","closeOkChannelFrame","flowOkChannelFrame","flowChannelFrame","declareOkExchangeFrame","declareOkQueueFrame","bindOkQueueFrame","unbindOkQueueFrame","deleteOkQueueFrame","deleteOkExchangeFrame","commitOkTxFrame","rollbackOkTxFrame","selectOkTxFrame","purgeOkQueueFrame","cancelOkBasicFrame","getOkBasicFrame","getEmptyBasicFrame","consumeOkBasicFrame","recoverOkBasicFrame","rejectOkBasicFrame","deliverBasicFrame","bodyFrame","headerFrame"],"targetState":"ready"},{"inputs":["closeConnectionFrame","closeConnectionAction"],"targetState":"closing"}],_496);
+this._stateMachine.addState("closing",[{"inputs":["closeOkConnectionFrame","closeOkConnectionAction"],"targetState":"closed"}],_495,null);
+this._stateMachine.addState("closed",[],_497,null);
 };
-var _495={"0-9-1":[65,77,81,80,0,0,9,1]};
-_487.connect=function connect(url,_497,_498,_499,cb,_49b){
+var _498={"0-9-1":[65,77,81,80,0,0,9,1]};
+_489.connect=function connect(url,_49a,_49b,_49c){
 if(this._socket){
 throw (new Error("AmqpClient already connected."));
 }
@@ -4717,609 +4731,580 @@ url0=[url];
 url0=url;
 }
 this.setReadyState(this.CONNECTING);
-var args={"url":url0[0],"virtualHost":_497,"credentials":_498};
-this._openContinuation=cb;
-this._openErrorCb=_49b;
-this._version=_499||"0-9-1";
+var args={"url":url0[0],"virtualHost":_49a,"credentials":_49b};
+this._openContinuation=_49c;
 this._hasNegotiated=false;
-if(typeof (_495[this._version])==="undefined"){
-throw new Error("AMQP version "+_499+" not available. Available versions are '0-9-1'");
-}
-if(this._options.autoReconnect){
-this._session={};
-this._session.lastFailoverLocationIndex=1;
-this._session.failoverLocations=url0;
-this._session.url=url0;
-this._session.virtualHost=_497;
-this._session.credentials=_498;
-this._session.replay=false;
-this._session.reconnectMode=false;
-this._session.replayActionList=new _49e();
-this._session.replayActionsCount=0;
-this._session.retryAttemptNumber=0;
-}
-_reconnect(this,url0[0],_497,_498);
+_reconnect(this,url0[0],_49a,_49b);
 };
-_487.disconnect=function disconnect(){
-if(this._options.autoReconnect){
-this._session.terminated=true;
+var _49f=_489.connect;
+_489.connect=function(_4a0,_4a1){
+if(typeof _4a0=="object"){
+myConfig=_4a0||{};
+var url=myConfig.url;
+var _4a3=myConfig.virtualHost;
+var _4a4=myConfig.credentials;
+if(!url||typeof url!="string"){
+throw new Error("AmqpClient.connect(): Parameter 'url' is required");
 }
+if(!_4a3||typeof url!="string"){
+throw new Error("AmqpClient.connect(): Parameter 'virtualHost' is required");
+}
+if(!_4a4||!_4a4.username||!_4a4.password||typeof _4a4.username!="string"||typeof _4a4.password!="string"){
+throw new Error("AmqpClient.connect(): credentials are required");
+}
+_49f.call(this,url,_4a3,_4a4,_4a1);
+}else{
+_49f.apply(this,arguments);
+}
+};
+_489.disconnect=function disconnect(){
 if(this.getReadyState()==this.OPEN){
-_49f(this,0,"",0,0);
+_4a5(this,0,"",0,0);
 }
 if(this.getReadyState()==this.CONNECTING){
-var _4a0={};
-_4a0.methodName="closeConnection";
-_4a0.type="closeConnection";
-_4a0.args="";
-var e=new AmqpEvent(this,_4a0);
+var _4a6={};
+_4a6.methodName="closeConnection";
+_4a6.type="closeConnection";
+_4a6.args="";
+var e=new AmqpEvent(this,_4a6);
 this.dispatchEvent(e);
 }
 this.setReadyState(this.CLOSED);
 };
-_487.openChannel=function _4a2(cb,_4a4){
+_489.openChannel=function _4a8(_4a9){
 var id=++this._channelCount;
-var _4a6=new _4a7();
-_4a8(_4a6,id,this,cb,_4a4);
-this._channels[id]=_4a6;
-return _4a6;
+var _4ab=new _4ac();
+_4ad(_4ab,id,this,_4a9);
+this._channels[id]=_4ab;
+return _4ab;
 };
-var _4a9=function(_4aa){
-var _4ab=new ByteBuffer(_495[_4aa._version]);
-_4aa._socket.send(_4ab);
+var _4ae=function(_4af){
+var _4b0=new ByteBuffer(_498["0-9-1"]);
+_4af._socket.send(_4b0);
 };
-var _4ac=function(_4ad){
-_494(_4ad);
+var _4b1=function(_4b2){
+_497(_4b2);
 };
-var _4ae=function(s,b){
+var _4b3=function(s,b){
 if(b.remaining()<s.length){
 return false;
 }else{
 var lim=b.limit;
 b.limit=s.length;
-var _4b2=b.getString(Charset.UTF8);
+var _4b7=b.getString(Charset.UTF8);
 b.limit=lim;
-return s===_4b2;
+return s===_4b7;
 }
 };
-var _4b3=function(_4b4,e){
-var buf=_4b4._buffer;
+var _4b8=function(_4b9,e){
+var buf=_4b9._buffer;
 buf.mark();
 buf.position=buf.limit;
 buf.putBuffer(e.data);
 buf.reset();
-if(!_4b4._hasNegotiated&&buf.remaining()>7){
-if(_4ae("AMQP",buf)){
-var _4b7=[buf.get(),buf.get(),buf.get(),buf.get()];
-var _4b8={"args":[{"name":"replyText","value":"Server does not support AMQP protocol versions after "+_4b7[2]+"-"+_4b7[3]}],"methodName":"closeOkConnection"};
-_494(_4b4,"",_4b8);
+if(!_4b9._hasNegotiated&&buf.remaining()>7){
+if(_4b3("AMQP",buf)){
+var _4bc=[buf.get(),buf.get(),buf.get(),buf.get()];
+var _4bd={"args":[{"name":"replyText","value":"Server does not support AMQP protocol versions after "+_4bc[2]+"-"+_4bc[3]}],"methodName":"closeOkConnection"};
+var _4be={};
+_4be.methodName="error";
+_4be.args=_4bd.args;
+_4b9.dispatchEvent(new AmqpEvent(_4b9,_4be));
+_497(_4b9,"",_4bd);
+return;
 }else{
 buf.reset();
-_4b4._hasNegotiated=true;
+_4b9._hasNegotiated=true;
 }
 }
-var _4b9=null;
-while(_4b9=buf.getFrame()){
-var f=_4b9;
-_4b4._stateMachine.feedInput(f.methodName+"Frame",f);
+var _4bf=null;
+while(_4bf=buf.getFrame()){
+var f=_4bf;
+_4b9._stateMachine.feedInput(f.methodName+"Frame",f);
 }
 buf.compact();
 };
-var _4bb=function(_4bc,_4bd){
-_4bc._socket.send(_4bd);
+var _4c1=function(_4c2,_4c3){
+_4c2._socket.send(_4c3);
 };
-var _4be=function write(_4bf,_4c0,_4c1,args){
-var buf=new _40f();
-var _4c4=_4c0.classIndex;
-buf.putMethodFrame(_4c0,_4c1,args);
+var _4c4=function write(_4c5,_4c6,_4c7,args){
+var buf=new _411();
+var _4ca=_4c6.classIndex;
+buf.putMethodFrame(_4c6,_4c7,args);
 buf.flip();
-_4bb(_4bf,buf);
+_4c1(_4c5,buf);
 };
-var _48d=function _48d(_4c5,_4c6,args,_4c8){
-var _4c9=new ByteSocket(args.url);
-_4c9.onopen=function(){
-_4a9(_4c5);
+var _490=function _490(_4cb,_4cc,args,_4ce){
+var _4cf=new ByteSocket(args.url);
+_4cf.onopen=function(){
+_4ae(_4cb);
 };
-_4c9.onclose=function(){
-_4ac(_4c5);
+_4cf.onclose=function(){
+_4b1(_4cb);
 };
-_4c9.onmessage=function(e){
-_4b3(_4c5,e);
+_4cf.onmessage=function(e){
+_4b8(_4cb,e);
 };
-_4c5._socket=_4c9;
-_4c5._virtualHost=args.virtualHost;
-_4c5._credentialsOrKey=args.credentials;
+_4cb._socket=_4cf;
+_4cb._virtualHost=args.virtualHost;
+_4cb._credentialsOrKey=args.credentials;
 };
-var _4cb=null;
-var _48e=function(_4cc,_4cd,_4ce){
-_411((_4ce.channel===0),_40a.UNEXPECTED_FRAME.message);
-var buf=new _40f();
-var _4d0=new AmqpArguments();
-_4d0.addLongString("library","KaazingAmqpClient");
-_4d0.addLongString("library_version","9.06");
-_4d0.addLongString("library_platform","JavaScript");
-var _4d1=_4cc._locale||"en_US";
-var _4d2="AMQPLAIN";
-var _4d3=_4cc._credentialsOrKey;
-if(typeof (_4d3.resolve)!="function"){
-var _4d4=_417(_4d3.username,_4d3.password);
-_4cb(_4cc,_4d0,_4d2,_4d4,_4d1);
+var _4d1=null;
+var _491=function(_4d2,_4d3,_4d4){
+_413((_4d4.channel===0),_40c.UNEXPECTED_FRAME.message);
+var buf=new _411();
+var _4d6=new AmqpArguments();
+_4d6.addLongString("library","KaazingAmqpClient");
+_4d6.addLongString("library_version","3.2.0");
+_4d6.addLongString("library_platform","JavaScript");
+var _4d7=_4d2._locale||"en_US";
+var _4d8="AMQPLAIN";
+var _4d9=_4d2._credentialsOrKey;
+if(typeof (_4d9.resolve)!="function"){
+var _4da=_419(_4d9.username,_4d9.password);
+_4d1(_4d2,_4d6,_4d8,_4da,_4d7);
 }else{
-_4d3.resolve(function(_4d5){
-var _4d6=_417(_4d5.username,_4d5.password);
-_4cb(_4cc,_4d0,_4d2,_4d6,_4d1);
+_4d9.resolve(function(_4db){
+var _4dc=_419(_4db.username,_4db.password);
+_4d1(_4d2,_4d6,_4d8,_4dc,_4d7);
 });
 }
 };
-var _48f=function(_4d7,_4d8,_4d9){
-_411((_4d9.channel===0),_40a.UNEXPECTED_FRAME.message);
-var _4da=_4d9.args[0].value;
-var _4db=_4d9.args[1].value;
-var _4dc=0;
-_4dd(_4d7,_4da,_4db,_4dc);
-_4de(_4d7,_4d7._virtualHost,_4d7._openContinuation,_4d7._openErrorCb);
+var _492=function(_4dd,_4de,_4df){
+_413((_4df.channel===0),_40c.UNEXPECTED_FRAME.message);
+var _4e0=_4df.args[0].value;
+var _4e1=_4df.args[1].value;
+var _4e2=0;
+_4e3(_4dd,_4e0,_4e1,_4e2);
+_4e4(_4dd,_4dd._virtualHost,_4dd._openContinuation,_4dd._openErrorCb);
 };
-var _492=function _492(_4df,_4e0,_4e1){
-if(_4e0==="nowaitAction"){
-_4df._waitingAction=null;
+var _495=function _495(_4e5,_4e6,_4e7){
+if(_4e7){
+if(_4e7.actionName&&(_4e7.actionName=="closeConnection")){
 return;
 }
-var _4e2={};
-if(_4e1.methodName=="openOkConnection"){
-_4e2=_4df;
+}
+if(_4e6==="nowaitAction"){
+_4e5._waitingAction=null;
+return;
+}
+var _4e8={};
+if(!_4e8._connection){
+_4e8=_4e5;
 }else{
-_4e2=_4df._connection;
+_4e8=_4e5._connection;
 }
-var e=new AmqpEvent(_4df,_4e1);
-if(_4df._waitingAction){
-if(_4e0==="closeChannelFrame"){
-_4df._waitingAction.error(e);
+var e=new AmqpEvent(_4e5,_4e7);
+if(_4e5._waitingAction){
+if(_4e6==="closeChannelFrame"){
+_4e5._waitingAction.error(e);
 }else{
-if(_4e1.methodName=="openOkConnection"){
-_4e2.setReadyState(_4e2.OPEN);
-if(_4e2._options.autoReconnect&&!_4e2._session.terminated&&_4e2._session.replay==true){
-_4e2._session.reconnectMode=true;
-for(var id in _4e2._channels){
-_4a2(_4e2._channels[id],[null,null]);
-}
-_4e2._session.replayActionList._processAllActions();
-for(var id in _4e2._channels){
-if(_4e2._channels[id].flowFlag==="undefined"){
-_4e2._channels[id].flowFlag=true;
-}
-_4e2._channels[id].flowChannel(_4e2._channels[id].flowFlag);
-_4e2._session.replayActionsCount++;
-}
+if(_4e7.methodName=="closeConnection"){
+var _4ea={};
+_4ea.methodName="error";
+_4ea.args=_4e7.args;
+_4e8.dispatchEvent(new AmqpEvent(_4e8,_4ea));
+_497(_4e8,"",_4e7);
+return;
 }else{
-for(var id in _4e2._channels){
-_4a2(_4e2._channels[id],[_4e2._channels[id]._callbacks,null]);
-}
-}
+if(_4e7.methodName=="openOkConnection"){
+_4e8.setReadyState(_4e8.OPEN);
 }else{
-_4df._waitingAction.continuation(e);
+_4e5._waitingAction.continuation(e);
 }
 }
-_4df._waitingAction=null;
+}
 }else{
 throw (new Error("AmqpClient not in waiting state: protocol violation"));
 }
-if(_4e2._options.autoReconnect){
-if(_4e1.methodName=="openOkConnection"||_4e1.methodName=="openOkChannel"){
-_4e2._session.replayActionsCount++;
-}
-}
-if(!_4e2._options.autoReconnect){
-_4df.dispatchEvent(e);
-}else{
-if(!_4e2._session.reconnectMode){
-_4df.dispatchEvent(e);
-if(_4e1.methodName=="openOkConnection"){
-_4e2._openContinuation();
-}
-}else{
-_4e2._session.replayActionsCount--;
-if(_4e2._session.replayActionsCount==0){
-_4e2._openContinuation();
-_4e2._session.reconnectMode=!_4e2._session.reconnectMode;
-_4e2._session.replayActionList._processAllNewActions();
-}
-}
+_4e5.dispatchEvent(e);
+if(_4e7.methodName=="openOkConnection"){
+_4e8._openContinuation();
 }
 };
-var _490=function _490(_4e5,_4e6,_4e7){
-var _4e8=_4e5;
+var _493=function _493(_4eb,_4ec,_4ed){
+var _4ee=_4eb;
 setTimeout(function(){
-_4e8._processActions();
+_4ee._processActions();
 },0);
 };
-var _493=function openHandler(_4e9,_4ea,_4eb){
-if(_4eb.channel===0){
+var _496=function openHandler(_4ef,_4f0,_4f1){
+if(_4f1.channel===0){
 }else{
-if(_4e9._channels[_4eb.channel]){
-var _4ec=_4e9._channels[_4eb.channel];
-_4ed(_4ec,_4ea,_4eb);
+if(_4ef._channels[_4f1.channel]){
+var _4f2=_4ef._channels[_4f1.channel];
+_4f3(_4f2,_4f0,_4f1);
 }else{
 }
 }
 };
-var _4ee=function _4ee(_4ef,_4f0,_4f1){
+var _4f4=function _4f4(_4f5,_4f6,_4f7){
 };
-var _494=function _494(_4f2,_4f3,_4f4){
-if(!(_4f2.getReadyState()==_4f2.CONNECTING)){
+var _497=function _497(_4f8,_4f9,_4fa){
+if(!(_4f8.getReadyState()==_4f8.CONNECTING)){
 var e;
-if(typeof (_4f4)==="undefined"){
-e=new AmqpEvent(_4f2,{"args":[],"methodName":"closeOkConnection"});
+if(typeof (_4fa)==="undefined"){
+e=new AmqpEvent(_4f8,{"args":[],"methodName":"closeOkConnection"});
 }else{
-_4f4.methodName="closeOkConnection";
-e=new AmqpEvent(_4f2,_4f4);
+_4fa.methodName="closeOkConnection";
+e=new AmqpEvent(_4f8,_4fa);
 }
-_4f2.dispatchEvent(e);
+_4f8.dispatchEvent(e);
 }
-if(_4f2._options.autoReconnect&&!_4f2._session.terminated){
-if(_4f2._readyState!=_4f2.CONNECTING){
-_4f2._session.replayActionsCount=_4f2._session.replayActionList.getActionList().length;
-_4f2._session.replayActionList.setReplayLength(_4f2._session.replayActionsCount);
+_4f8.setReadyState(_4f8.CLOSED);
+if(typeof (_4f8._channels)!=="undefined"){
+for(var i in _4f8._channels){
+var _4fd=_4f8._channels[i];
+_4fd.dispatchEvent(e);
 }
-_4f2.setReadyState(_4f2.CONNECTING);
-_attemptReconnect(_4f2);
-}else{
-_4f2.setReadyState(_4f2.CLOSED);
-if(typeof (_4f2._channels)!=="undefined"){
-for(var i in _4f2._channels){
-var _4f7=_4f2._channels[i];
-_4f7.dispatchEvent(e);
-}
-_4f2._socket.onclose=function(){
+_4f8._socket.onclose=function(){
 };
-_4f2._socket.close();
+_4f8._socket.close();
 }
-if(typeof (_4f2._openErrorCb)!=="undefined"){
-_4f2._openErrorCb(e);
+if(typeof (_4f8._openErrorCb)!=="undefined"){
+_4f8._openErrorCb(e);
 }
-}
-};
-function _attemptReconnect(_4f8){
-_4f8._session.replay=true;
-var _4f9=_4f8._session;
-var args={"url":_4f9.url[1],"virtualHost":_4f9.virtualHost,"credentials":_4f9.credentials};
-var _4fb=getRetryDelay(_4f8._session.retryAttemptNumber++);
-_4f8._session.lastFailoverLocationIndex++;
-var i=_4f8._session.lastFailoverLocationIndex%_4f8._session.failoverLocations.length;
-var url=_4f8._session.failoverLocations[i];
-_4f8._session.location=location;
-_4f8._session.retryTimer=setTimeout(function(){
-_reconnect(_4f8,url,_4f9.virtualHost,_4f9.credentials);
-},_4fb);
 };
 function _reconnect(_4fe,url,_500,_501){
 var args={"url":url,"virtualHost":_500,"credentials":_501};
 _4fe._stateMachine.enterState("handshaking","",args);
 };
-function getRetryDelay(n){
-var maxN=6;
-var _505;
-if(n<maxN){
-_505=n*n;
-}else{
-_505=maxN*maxN;
-}
-return _505*1000;
-};
-var _4a8=function _4a8(_506,id,_508,cb,_50a){
-_506._id=id;
-_506._callbacks=cb;
-_506._connection=_508;
-_506._transacted=false;
-_506._waitingAction=null;
-_506._initAsyncClient();
-_506._stateMachine.addState("channelReady",[{"inputs":["openChannelAction","closeChannelAction","consumeBasicAction","flowChannelAction","declareExchangeAction","declareQueueAction","bindQueueAction","unbindQueueAction","deleteQueueAction","deleteExchangeAction","purgeQueueAction","cancelBasicAction","recoverBasicAction","rejectBasicAction","selectTxAction","commitTxAction","rollbackTxAction",],"targetState":"waiting"},{"inputs":["publishBasicAction","ackBasicAction"],"targetState":"channelReady"},{"inputs":["getBasicAction"],"targetState":"getting"},{"inputs":["deliverBasicFrame"],"targetState":"readingContentHeader"}],_490);
-_506._stateMachine.addState("getting",[{"inputs":["getOkBasicFrame"],"targetState":"readingContentHeader"},{"inputs":["getEmptyBasicFrame"],"targetState":"channelReady"},{"inputs":["closeChannelFrame"],"targetState":"closing"}],_491,_50b);
-_506._stateMachine.addState("waiting",[{"inputs":["openOkChannelFrame","closeOkChannelFrame","flowOkChannelFrame","declareOkExchangeFrame","declareOkQueueFrame","bindOkQueueFrame","unbindOkQueueFrame","deleteOkQueueFrame","deleteOkExchangeFrame","purgeOkQueueFrame","cancelOkBasicFrame","recoverOkBasicFrame","rejectOkBasicFrame","commitOkTxFrame","rollbackOkTxFrame","selectOkTxFrame","getOkBasicFrame","getEmptyBasicFrame","consumeOkBasicFrame","nowaitAction"],"targetState":"channelReady"},{"inputs":["closeChannelFrame"],"targetState":"closing"}],_491,_492);
-_506._stateMachine.addState("readingContentHeader",[{"inputs":["headerFrame"],"targetState":"readingContentBody"}],_50c,_50d);
-_506._stateMachine.addState("readingContentBody",[{"inputs":["bodyFrame"],"targetState":"channelReady"}],null,_50e);
-_506._stateMachine.addState("closing",[{"inputs":["closeOkChannelAction"],"targetState":"closed"}],null);
-_506._stateMachine.addState("closed",null,null);
-if(_508.getReadyState()==_508.OPEN){
-_4a2(_506,[cb,_50a]);
+var _4ad=function _4ad(_503,id,_505,cb){
+_503._id=id;
+_503._callbacks=cb;
+_503._connection=_505;
+_503._transacted=false;
+_503._waitingAction=null;
+_503._initAsyncClient();
+_503._stateMachine.addState("channelReady",[{"inputs":["openChannelAction","closeChannelAction","consumeBasicAction","flowChannelAction","declareExchangeAction","declareQueueAction","bindQueueAction","unbindQueueAction","deleteQueueAction","deleteExchangeAction","purgeQueueAction","cancelBasicAction","recoverBasicAction","rejectBasicAction","selectTxAction","commitTxAction","rollbackTxAction",],"targetState":"waiting"},{"inputs":["publishBasicAction","ackBasicAction"],"targetState":"channelReady"},{"inputs":["getBasicAction"],"targetState":"getting"},{"inputs":["deliverBasicFrame"],"targetState":"readingContentHeader"}],_493);
+_503._stateMachine.addState("getting",[{"inputs":["getOkBasicFrame"],"targetState":"readingContentHeader"},{"inputs":["getEmptyBasicFrame"],"targetState":"channelReady"},{"inputs":["closeChannelFrame"],"targetState":"closing"}],_494,_507);
+_503._stateMachine.addState("waiting",[{"inputs":["openOkChannelFrame","closeOkChannelFrame","flowOkChannelFrame","declareOkExchangeFrame","declareOkQueueFrame","bindOkQueueFrame","unbindOkQueueFrame","deleteOkQueueFrame","deleteOkExchangeFrame","purgeOkQueueFrame","cancelOkBasicFrame","recoverOkBasicFrame","rejectOkBasicFrame","commitOkTxFrame","rollbackOkTxFrame","selectOkTxFrame","getOkBasicFrame","getEmptyBasicFrame","consumeOkBasicFrame","nowaitAction"],"targetState":"channelReady"},{"inputs":["closeChannelFrame"],"targetState":"closing"}],_494,_495);
+_503._stateMachine.addState("readingContentHeader",[{"inputs":["headerFrame"],"targetState":"readingContentBody"}],_508,_509);
+_503._stateMachine.addState("readingContentBody",[{"inputs":["bodyFrame"],"targetState":"channelReady"}],null,_50a);
+_503._stateMachine.addState("closing",[{"inputs":["closeOkChannelAction"],"targetState":"closed"}],null);
+_503._stateMachine.addState("closed",null,null);
+if(_505.getReadyState()==_505.OPEN){
+_4a8(_503,[cb]);
 }
 };
-var _4a7=function(){
+var _4ac=function(){
 };
-_4a7.prototype=new _3fa();
-var _487=_4a7.prototype;
-_487._init=function(_50f){
+_4ac.prototype=new _3fc();
+var _489=_4ac.prototype;
+_489._init=function(_50b){
 };
-var _510=function _510(_511,_512,_513,args,body,_516){
-var buf=new _40f();
-var _518=_512.classIndex;
-buf.putMethodFrame(_512,_513,args);
-if(_512.hasContent){
-var _519=0;
-buf.putHeaderFrame(_513,_518,_519,body.remaining(),_516);
+var _50c=function _50c(_50d,_50e,_50f,args,body,_512){
+var buf=new _411();
+var _514=_50e.classIndex;
+buf.putMethodFrame(_50e,_50f,args);
+if(_50e.hasContent){
+var _515=0;
+buf.putHeaderFrame(_50f,_514,_515,body.remaining(),_512);
 if(body.remaining()>0){
-buf.putBodyFrame(_513,body);
+buf.putBodyFrame(_50f,body);
 }
 }
 buf.flip();
-_4bb(_511._connection,buf);
+_4c1(_50d._connection,buf);
 };
-var _4ed=function _4ed(_51a,_51b,_51c){
-_51a._stateMachine.feedInput(_51b,_51c);
-};
-var _50e=function _50e(_51d,_51e,_51f){
-_51f.args=_51d._headerFrame.args;
-_51f.methodName=_51d._headerFrame.methodName;
-var e=new AmqpEvent(_51d,_51f,_51d._headerFrame.contentProperties);
-if(_51f.methodName==="getOkBasic"){
-_51d._waitingAction.continuation(e);
+var _4f3=function _4f3(_516,_517,_518){
+if(_518){
+var _519=_518.methodName||"";
+if(_519=="closeChannel"){
+var _51a={};
+_51a.methodName="error";
+_51a.type="error";
+_51a.args=_518.args;
+_516.dispatchEvent(new AmqpEvent(_516,_51a));
+_516.dispatchEvent(new AmqpEvent(_516,_518));
+return;
 }
-_51d.dispatchEvent(e);
+}
+_516._stateMachine.feedInput(_517,_518);
 };
-var _50c=function _50c(_521,_522,_523){
-_521._headerFrame=_523;
+var _50a=function _50a(_51b,_51c,_51d){
+_51d.args=_51b._headerFrame.args;
+_51d.methodName=_51b._headerFrame.methodName;
+var e=new AmqpEvent(_51b,_51d,_51b._headerFrame.contentProperties);
+if(_51d.methodName==="getOkBasic"){
+_51b._waitingAction.continuation(e);
+}
+_51b.dispatchEvent(e);
 };
-var _50d=function _50d(_524,_525,_526){
-_524._headerFrame.contentProperties=_526.contentProperties;
+var _508=function _508(_51f,_520,_521){
+_51f._headerFrame=_521;
 };
-var _50b=function(_527,_528,_529){
-var e=new AmqpEvent(_527,_529);
-if(_527._waitingAction){
-if(_528==="closeChannelFrame"){
-_527._waitingAction.error(e);
-_527.dispatchEvent(e);
-_527._waitingAction=null;
+var _509=function _509(_522,_523,_524){
+_522._headerFrame.contentProperties=_524.contentProperties;
+};
+var _507=function(_525,_526,_527){
+var e=new AmqpEvent(_525,_527);
+if(_525._waitingAction){
+if(_526==="closeChannelFrame"){
+_525._waitingAction.error(e);
+_525.dispatchEvent(e);
+_525._waitingAction=null;
 }else{
-if(_528==="getEmptyBasicFrame"){
-_527._waitingAction.continuation(e);
-_527.dispatchEvent(e);
-_527._waitingAction=null;
+if(_526==="getEmptyBasicFrame"){
+_525._waitingAction.continuation(e);
+_525.dispatchEvent(e);
+_525._waitingAction=null;
 }
 }
 }else{
 throw new Error("AmqpClient not in waiting state: protocol violation");
 }
 };
-var _491=function _491(_52b,_52c,_52d){
-var _52e=_52d.args[1];
-if(_52e.synchronous){
-_52b._waitingAction=_52d;
+var _494=function _494(_529,_52a,_52b){
+var _52c=_52b.args[1];
+if(_52c.synchronous){
+_529._waitingAction=_52b;
 }else{
 throw (new Error("AMQP: trying to enter wait state for method that is not sychronous"));
 }
 };
-_4a7.prototype.flowFlag=true;
-_4a7.prototype.onmessage=function(e){
+_4ac.prototype.flowFlag=true;
+_4ac.prototype.onmessage=function(e){
 };
-_4a7.prototype.onclose=function(e){
+_4ac.prototype.onclose=function(e){
 };
-_4a7.prototype.onopen=function(e){
+_4ac.prototype.onerror=function(e){
 };
-_4a7.prototype.ondeclarequeue=function(e){
+_4ac.prototype.onopen=function(e){
 };
-_4a7.prototype.ondeclareexchange=function(e){
+_4ac.prototype.ondeclarequeue=function(e){
 };
-_4a7.prototype.onflow=function(e){
+_4ac.prototype.ondeclareexchange=function(e){
 };
-_4a7.prototype.onbindqueue=function(e){
+_4ac.prototype.onflow=function(e){
 };
-_4a7.prototype.onunbindqueue=function(e){
+_4ac.prototype.onbindqueue=function(e){
 };
-_4a7.prototype.ondeletequeue=function(e){
+_4ac.prototype.onunbindqueue=function(e){
 };
-_4a7.prototype.ondeleteexchange=function(e){
+_4ac.prototype.ondeletequeue=function(e){
 };
-_4a7.prototype.onconsume=function(e){
+_4ac.prototype.ondeleteexchange=function(e){
 };
-_4a7.prototype.oncancel=function(e){
+_4ac.prototype.onconsume=function(e){
 };
-_4a7.prototype.oncommittransaction=function(e){
+_4ac.prototype.oncancel=function(e){
 };
-_4a7.prototype.onrollbacktransaction=function(e){
+_4ac.prototype.oncommittransaction=function(e){
 };
-_4a7.prototype.onselecttransaction=function(e){
+_4ac.prototype.onrollbacktransaction=function(e){
 };
-_4a7.prototype.onget=function(e){
+_4ac.prototype.onselecttransaction=function(e){
 };
-_4a7.prototype.onpurgequeue=function(e){
+_4ac.prototype.onget=function(e){
 };
-_4a7.prototype.onrecover=function(e){
+_4ac.prototype.onpurgequeue=function(e){
 };
-_4a7.prototype.onreject=function(e){
+_4ac.prototype.onrecover=function(e){
 };
-var _4cb=function(_542,_543,_544,_545,_546,_547,_548){
-var args=[_543,_544,_545,_546];
-var _54a="startOkConnection";
-_542._enqueueAction(_54a,_4be,[_542,_40e[_54a],0,args],_547,_548);
-return _542;
+_4ac.prototype.onreject=function(e){
 };
-var _54b=function(_54c,_54d,_54e,_54f){
-var args=[_54d];
-var _551="secureOkConnection";
-_54c._enqueueAction(_551,_4be,[_54c,_40e[_551],0,args],_54e,_54f);
-return _54c;
+var _4d1=function(_541,_542,_543,_544,_545,_546){
+var args=[_542,_543,_544,_545];
+var _548="startOkConnection";
+_541._enqueueAction(_548,_4c4,[_541,_410[_548],0,args],_546);
+return _541;
 };
-var _4dd=function(_552,_553,_554,_555,_556,_557){
-var args=[_553,_554,_555];
-var _559="tuneOkConnection";
-_552._enqueueAction(_559,_4be,[_552,_40e[_559],0,args],_556,_557);
-return _552;
+var _549=function(_54a,_54b,_54c){
+var args=[_54b];
+var _54e="secureOkConnection";
+_54a._enqueueAction(_54e,_4c4,[_54a,_410[_54e],0,args],_54c);
+return _54a;
 };
-var _4de=function(_55a,_55b,_55c,_55d){
-var args=[_55b,0,0];
-var _55f="openConnection";
-_55a._enqueueAction(_55f,_4be,[_55a,_40e[_55f],0,args],_55c,_55d);
-return _55a;
+var _4e3=function(_54f,_550,_551,_552,_553){
+var args=[_550,_551,_552];
+var _555="tuneOkConnection";
+_54f._enqueueAction(_555,_4c4,[_54f,_410[_555],0,args],_553);
+return _54f;
 };
-var _49f=function(_560,_561,_562,_563,_564,_565,_566){
-var args=[_561,_562,_563,_564];
-var _568="closeConnection";
-_560._enqueueAction(_568,_4be,[_560,_40e[_568],0,args],_565,_566);
-return _560;
+var _4e4=function(_556,_557,_558){
+var args=[_557,0,0];
+var _55a="openConnection";
+_556._enqueueAction(_55a,_4c4,[_556,_410[_55a],0,args],_558);
+return _556;
 };
-var _569=function(_56a,_56b,_56c){
+var _4a5=function(_55b,_55c,_55d,_55e,_55f,_560){
+var args=[_55c,_55d,_55e,_55f];
+var _562="closeConnection";
+_55b._enqueueAction(_562,_4c4,[_55b,_410[_562],0,args],_560);
+return _55b;
+};
+var _563=function(_564,_565){
 var args=[];
-var _56e="closeOkConnection";
-_56a._enqueueAction(_56e,_4be,[_56a,_40e[_56e],0,args],_56b,_56c);
-return _56a;
+var _567="closeOkConnection";
+_564._enqueueAction(_567,_4c4,[_564,_410[_567],0,args],_565);
+return _564;
 };
-_4a7.prototype.openChannel=function(_56f,_570){
+_4ac.prototype.openChannel=function(_568){
 var args=[0];
-var _572="openChannel";
-var _573=_40e[_572];
-var _574=false;
+var _56a="openChannel";
+var _56b=_410[_56a];
+var _56c=false;
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_572,_510,[this,_573,this._id,args],_56f,_570);
+this._enqueueAction(_56a,_50c,[this,_56b,this._id,args],_568);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_572,this,this._enqueueAction,[_572,_510,[this,_573,this._id,args],_56f,_570]);
+if(_56a=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_572=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_574){
+if(_56c){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.flowChannel=function(_575,_576,_577){
+_4ac.prototype.flowChannel=function(_56d,_56e){
+var args=[_56d];
+var _570="flowChannel";
+var _571=_410[_570];
+var _572=false;
+for(var i=0;i<_571.allParameters.length;i++){
+var _574=_571.allParameters[i].name;
+if(_574="noWait"){
+_572=true;
+break;
+}
+}
+if(this._connection._readyState==this._connection.OPEN){
+this._enqueueAction(_570,_50c,[this,_571,this._id,args],_56e);
+}
+if(_570=="flowChannel"){
+_4ac.prototype.flowFlag=_56d;
+}
+if(_572){
+if(typeof (noWait)!=="undefined"&&noWait){
+this._enqueueAction("nowait");
+}
+}
+return this;
+};
+_4ac.prototype.flowOkChannel=function(_575,_576){
 var args=[_575];
-var _579="flowChannel";
-var _57a=_40e[_579];
-var _57b=false;
-for(var i=0;i<_57a.allParameters.length;i++){
-var _57d=_57a.allParameters[i].name;
-if(_57d="noWait"){
-_57b=true;
+var _578="flowOkChannel";
+var _579=_410[_578];
+var _57a=false;
+for(var i=0;i<_579.allParameters.length;i++){
+var _57c=_579.allParameters[i].name;
+if(_57c="noWait"){
+_57a=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_579,_510,[this,_57a,this._id,args],_576,_577);
+this._enqueueAction(_578,_50c,[this,_579,this._id,args],_576);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_579,this,this._enqueueAction,[_579,_510,[this,_57a,this._id,args],_576,_577]);
+if(_578=="flowChannel"){
+_4ac.prototype.flowFlag=_575;
 }
-if(_579=="flowChannel"){
-_4a7.prototype.flowFlag=_575;
-}
-if(_57b){
+if(_57a){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.flowOkChannel=function(_57e,_57f,_580){
-var args=[_57e];
-var _582="flowOkChannel";
-var _583=_40e[_582];
-var _584=false;
-for(var i=0;i<_583.allParameters.length;i++){
-var _586=_583.allParameters[i].name;
-if(_586="noWait"){
-_584=true;
+_4ac.prototype.closeChannel=function(_57d,_57e,_57f,_580,_581){
+var args=[_57d,_57e,_57f,_580];
+var _583="closeChannel";
+var _584=_410[_583];
+var _585=false;
+for(var i=0;i<_584.allParameters.length;i++){
+var _587=_584.allParameters[i].name;
+if(_587="noWait"){
+_585=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_582,_510,[this,_583,this._id,args],_57f,_580);
+this._enqueueAction(_583,_50c,[this,_584,this._id,args],_581);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_582,this,this._enqueueAction,[_582,_510,[this,_583,this._id,args],_57f,_580]);
+if(_583=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_582=="flowChannel"){
-_4a7.prototype.flowFlag=_57e;
-}
-if(_584){
+if(_585){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.closeChannel=function(_587,_588,_589,_58a,_58b,_58c){
-var args=[_587,_588,_589,_58a];
-var _58e="closeChannel";
-var _58f=_40e[_58e];
-var _590=false;
-for(var i=0;i<_58f.allParameters.length;i++){
-var _592=_58f.allParameters[i].name;
-if(_592="noWait"){
-_590=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_58e,_510,[this,_58f,this._id,args],_58b,_58c);
-}
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_58e,this,this._enqueueAction,[_58e,_510,[this,_58f,this._id,args],_58b,_58c]);
-}
-if(_58e=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_590){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4a7.prototype.closeOkChannel=function(_593,_594){
+_4ac.prototype.closeOkChannel=function(_588){
 var args=[];
-var _596="closeOkChannel";
-var _597=_40e[_596];
-var _598=false;
+var _58a="closeOkChannel";
+var _58b=_410[_58a];
+var _58c=false;
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_596,_510,[this,_597,this._id,args],_593,_594);
+this._enqueueAction(_58a,_50c,[this,_58b,this._id,args],_588);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_596,this,this._enqueueAction,[_596,_510,[this,_597,this._id,args],_593,_594]);
+if(_58a=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_596=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_598){
+if(_58c){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.declareExchange=function(_599,type,_59b,_59c,_59d,_59e,_59f,_5a0){
-var args=[0,_599,type,_59b,_59c,0,0,_59d,_59e];
-var _5a2="declareExchange";
-var _5a3=_40e[_5a2];
-var _5a4=false;
-for(var i=0;i<_5a3.allParameters.length;i++){
-var _5a6=_5a3.allParameters[i].name;
-if(_5a6="noWait"){
-_5a4=true;
+_4ac.prototype.declareExchange=function(_58d,type,_58f,_590,_591,_592,_593){
+var args=[0,_58d,type,_58f,_590,0,0,_591,_592];
+var _595="declareExchange";
+var _596=_410[_595];
+var _597=false;
+for(var i=0;i<_596.allParameters.length;i++){
+var _599=_596.allParameters[i].name;
+if(_599="noWait"){
+_597=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5a2,_510,[this,_5a3,this._id,args],_59f,_5a0);
+this._enqueueAction(_595,_50c,[this,_596,this._id,args],_593);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_5a2,this,this._enqueueAction,[_5a2,_510,[this,_5a3,this._id,args],_59f,_5a0]);
+if(_595=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_5a2=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_5a4){
-if(typeof (_59d)!=="undefined"&&_59d){
+if(_597){
+if(typeof (_591)!=="undefined"&&_591){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.deleteExchange=function(_5a7,_5a8,_5a9,_5aa,_5ab){
-var args=[0,_5a7,_5a8,_5a9];
-var _5ad="deleteExchange";
-var _5ae=_40e[_5ad];
+_4ac.prototype.deleteExchange=function(_59a,_59b,_59c,_59d){
+var args=[0,_59a,_59b,_59c];
+var _59f="deleteExchange";
+var _5a0=_410[_59f];
+var _5a1=false;
+for(var i=0;i<_5a0.allParameters.length;i++){
+var _5a3=_5a0.allParameters[i].name;
+if(_5a3="noWait"){
+_5a1=true;
+break;
+}
+}
+if(this._connection._readyState==this._connection.OPEN){
+this._enqueueAction(_59f,_50c,[this,_5a0,this._id,args],_59d);
+}
+if(_59f=="flowChannel"){
+_4ac.prototype.flowFlag=active;
+}
+if(_5a1){
+if(typeof (_59c)!=="undefined"&&_59c){
+this._enqueueAction("nowait");
+}
+}
+return this;
+};
+_4ac.prototype.declareQueue=function(_5a4,_5a5,_5a6,_5a7,_5a8,_5a9,_5aa,_5ab){
+var args=[0,_5a4,_5a5,_5a6,_5a7,_5a8,_5a9,_5aa];
+var _5ad="declareQueue";
+var _5ae=_410[_5ad];
 var _5af=false;
 for(var i=0;i<_5ae.allParameters.length;i++){
 var _5b1=_5ae.allParameters[i].name;
@@ -5329,13 +5314,10 @@ break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5ad,_510,[this,_5ae,this._id,args],_5aa,_5ab);
-}
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_5ad,this,this._enqueueAction,[_5ad,_510,[this,_5ae,this._id,args],_5aa,_5ab]);
+this._enqueueAction(_5ad,_50c,[this,_5ae,this._id,args],_5ab);
 }
 if(_5ad=="flowChannel"){
-_4a7.prototype.flowFlag=active;
+_4ac.prototype.flowFlag=active;
 }
 if(_5af){
 if(typeof (_5a9)!=="undefined"&&_5a9){
@@ -5344,206 +5326,210 @@ this._enqueueAction("nowait");
 }
 return this;
 };
-_4a7.prototype.declareQueue=function(_5b2,_5b3,_5b4,_5b5,_5b6,_5b7,_5b8,_5b9,_5ba){
-var args=[0,_5b2,_5b3,_5b4,_5b5,_5b6,_5b7,_5b8];
-var _5bc="declareQueue";
-var _5bd=_40e[_5bc];
-var _5be=false;
-for(var i=0;i<_5bd.allParameters.length;i++){
-var _5c0=_5bd.allParameters[i].name;
-if(_5c0="noWait"){
-_5be=true;
+_4ac.prototype.bindQueue=function(_5b2,_5b3,_5b4,_5b5,_5b6,_5b7){
+var args=[0,_5b2,_5b3,_5b4,_5b5,_5b6];
+var _5b9="bindQueue";
+var _5ba=_410[_5b9];
+var _5bb=false;
+for(var i=0;i<_5ba.allParameters.length;i++){
+var _5bd=_5ba.allParameters[i].name;
+if(_5bd="noWait"){
+_5bb=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5bc,_510,[this,_5bd,this._id,args],_5b9,_5ba);
+this._enqueueAction(_5b9,_50c,[this,_5ba,this._id,args],_5b7);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_5bc,this,this._enqueueAction,[_5bc,_510,[this,_5bd,this._id,args],_5b9,_5ba]);
+if(_5b9=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_5bc=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_5be){
-if(typeof (_5b7)!=="undefined"&&_5b7){
+if(_5bb){
+if(typeof (_5b5)!=="undefined"&&_5b5){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.bindQueue=function(_5c1,_5c2,_5c3,_5c4,_5c5,_5c6,_5c7){
-var args=[0,_5c1,_5c2,_5c3,_5c4,_5c5];
-var _5c9="bindQueue";
-var _5ca=_40e[_5c9];
-var _5cb=false;
-for(var i=0;i<_5ca.allParameters.length;i++){
-var _5cd=_5ca.allParameters[i].name;
-if(_5cd="noWait"){
-_5cb=true;
+_4ac.prototype.unbindQueue=function(_5be,_5bf,_5c0,_5c1,_5c2){
+var args=[0,_5be,_5bf,_5c0,_5c1];
+var _5c4="unbindQueue";
+var _5c5=_410[_5c4];
+var _5c6=false;
+for(var i=0;i<_5c5.allParameters.length;i++){
+var _5c8=_5c5.allParameters[i].name;
+if(_5c8="noWait"){
+_5c6=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5c9,_510,[this,_5ca,this._id,args],_5c6,_5c7);
+this._enqueueAction(_5c4,_50c,[this,_5c5,this._id,args],_5c2);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_5c9,this,this._enqueueAction,[_5c9,_510,[this,_5ca,this._id,args],_5c6,_5c7]);
+if(_5c4=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_5c9=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_5cb){
-if(typeof (_5c4)!=="undefined"&&_5c4){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4a7.prototype.unbindQueue=function(_5ce,_5cf,_5d0,_5d1,_5d2,_5d3){
-var args=[0,_5ce,_5cf,_5d0,_5d1];
-var _5d5="unbindQueue";
-var _5d6=_40e[_5d5];
-var _5d7=false;
-for(var i=0;i<_5d6.allParameters.length;i++){
-var _5d9=_5d6.allParameters[i].name;
-if(_5d9="noWait"){
-_5d7=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5d5,_510,[this,_5d6,this._id,args],_5d2,_5d3);
-}
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_5d5,this,this._enqueueAction,[_5d5,_510,[this,_5d6,this._id,args],_5d2,_5d3]);
-}
-if(_5d5=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_5d7){
+if(_5c6){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.purgeQueue=function(_5da,_5db,_5dc,_5dd){
-var args=[0,_5da,_5db];
-var _5df="purgeQueue";
-var _5e0=_40e[_5df];
-var _5e1=false;
-for(var i=0;i<_5e0.allParameters.length;i++){
-var _5e3=_5e0.allParameters[i].name;
-if(_5e3="noWait"){
-_5e1=true;
+_4ac.prototype.purgeQueue=function(_5c9,_5ca,_5cb){
+var args=[0,_5c9,_5ca];
+var _5cd="purgeQueue";
+var _5ce=_410[_5cd];
+var _5cf=false;
+for(var i=0;i<_5ce.allParameters.length;i++){
+var _5d1=_5ce.allParameters[i].name;
+if(_5d1="noWait"){
+_5cf=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5df,_510,[this,_5e0,this._id,args],_5dc,_5dd);
+this._enqueueAction(_5cd,_50c,[this,_5ce,this._id,args],_5cb);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_5df,this,this._enqueueAction,[_5df,_510,[this,_5e0,this._id,args],_5dc,_5dd]);
+if(_5cd=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_5df=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_5e1){
-if(typeof (_5db)!=="undefined"&&_5db){
+if(_5cf){
+if(typeof (_5ca)!=="undefined"&&_5ca){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.deleteQueue=function(_5e4,_5e5,_5e6,_5e7,_5e8,_5e9){
-var args=[0,_5e4,_5e5,_5e6,_5e7];
-var _5eb="deleteQueue";
-var _5ec=_40e[_5eb];
-var _5ed=false;
-for(var i=0;i<_5ec.allParameters.length;i++){
-var _5ef=_5ec.allParameters[i].name;
-if(_5ef="noWait"){
-_5ed=true;
+_4ac.prototype.deleteQueue=function(_5d2,_5d3,_5d4,_5d5,_5d6){
+var args=[0,_5d2,_5d3,_5d4,_5d5];
+var _5d8="deleteQueue";
+var _5d9=_410[_5d8];
+var _5da=false;
+for(var i=0;i<_5d9.allParameters.length;i++){
+var _5dc=_5d9.allParameters[i].name;
+if(_5dc="noWait"){
+_5da=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5eb,_510,[this,_5ec,this._id,args],_5e8,_5e9);
+this._enqueueAction(_5d8,_50c,[this,_5d9,this._id,args],_5d6);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_5eb,this,this._enqueueAction,[_5eb,_510,[this,_5ec,this._id,args],_5e8,_5e9]);
+if(_5d8=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_5eb=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_5ed){
-if(typeof (_5e7)!=="undefined"&&_5e7){
+if(_5da){
+if(typeof (_5d5)!=="undefined"&&_5d5){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.qosBasic=function(_5f0,_5f1,_5f2,_5f3,_5f4){
-var args=[_5f0,_5f1,_5f2];
-var _5f6="qosBasic";
-var _5f7=_40e[_5f6];
-var _5f8=false;
-for(var i=0;i<_5f7.allParameters.length;i++){
-var _5fa=_5f7.allParameters[i].name;
-if(_5fa="noWait"){
-_5f8=true;
+_4ac.prototype.qosBasic=function(_5dd,_5de,_5df,_5e0){
+var args=[_5dd,_5de,_5df];
+var _5e2="qosBasic";
+var _5e3=_410[_5e2];
+var _5e4=false;
+for(var i=0;i<_5e3.allParameters.length;i++){
+var _5e6=_5e3.allParameters[i].name;
+if(_5e6="noWait"){
+_5e4=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5f6,_510,[this,_5f7,this._id,args],_5f3,_5f4);
+this._enqueueAction(_5e2,_50c,[this,_5e3,this._id,args],_5e0);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_5f6,this,this._enqueueAction,[_5f6,_510,[this,_5f7,this._id,args],_5f3,_5f4]);
+if(_5e2=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_5f6=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_5f8){
+if(_5e4){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.consumeBasic=function(_5fb,_5fc,_5fd,_5fe,_5ff,_600,_601,_602,_603){
-var args=[0,_5fb,_5fc,_5fd,_5fe,_5ff,_600,_601];
-var _605="consumeBasic";
-var _606=_40e[_605];
-var _607=false;
-for(var i=0;i<_606.allParameters.length;i++){
-var _609=_606.allParameters[i].name;
-if(_609="noWait"){
-_607=true;
+_4ac.prototype.consumeBasic=function(_5e7,_5e8,_5e9,_5ea,_5eb,_5ec,_5ed,_5ee){
+var args=[0,_5e7,_5e8,_5e9,_5ea,_5eb,_5ec,_5ed];
+var _5f0="consumeBasic";
+var _5f1=_410[_5f0];
+var _5f2=false;
+for(var i=0;i<_5f1.allParameters.length;i++){
+var _5f4=_5f1.allParameters[i].name;
+if(_5f4="noWait"){
+_5f2=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_605,_510,[this,_606,this._id,args],_602,_603);
+this._enqueueAction(_5f0,_50c,[this,_5f1,this._id,args],_5ee);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_605,this,this._enqueueAction,[_605,_510,[this,_606,this._id,args],_602,_603]);
+if(_5f0=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_605=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_607){
-if(typeof (_600)!=="undefined"&&_600){
+if(_5f2){
+if(typeof (_5ec)!=="undefined"&&_5ec){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.cancelBasic=function(_60a,_60b,_60c,_60d){
-var args=[_60a,_60b];
-var _60f="cancelBasic";
-var _610=_40e[_60f];
+_4ac.prototype.cancelBasic=function(_5f5,_5f6,_5f7){
+var args=[_5f5,_5f6];
+var _5f9="cancelBasic";
+var _5fa=_410[_5f9];
+var _5fb=false;
+for(var i=0;i<_5fa.allParameters.length;i++){
+var _5fd=_5fa.allParameters[i].name;
+if(_5fd="noWait"){
+_5fb=true;
+break;
+}
+}
+if(this._connection._readyState==this._connection.OPEN){
+this._enqueueAction(_5f9,_50c,[this,_5fa,this._id,args],_5f7);
+}
+if(_5f9=="flowChannel"){
+_4ac.prototype.flowFlag=active;
+}
+if(_5fb){
+if(typeof (_5f6)!=="undefined"&&_5f6){
+this._enqueueAction("nowait");
+}
+}
+return this;
+};
+_4ac.prototype.publishBasic=function(body,_5ff,_600,_601,_602,_603,_604){
+var args=[0,_600,_601,_602,_603];
+var _606="publishBasic";
+var _607=_410[_606];
+var _608=false;
+for(var i=0;i<_607.allParameters.length;i++){
+var _60a=_607.allParameters[i].name;
+if(_60a="noWait"){
+_608=true;
+break;
+}
+}
+if(this._connection._readyState==this._connection.OPEN){
+this._enqueueAction(_606,_50c,[this,_607,this._id,args,body,_5ff],_604);
+}
+if(_606=="flowChannel"){
+_4ac.prototype.flowFlag=active;
+}
+if(_608){
+if(typeof (noWait)!=="undefined"&&noWait){
+this._enqueueAction("nowait");
+}
+}
+return this;
+};
+_4ac.prototype.getBasic=function(_60b,_60c,_60d){
+var args=[0,_60b,_60c];
+var _60f="getBasic";
+var _610=_410[_60f];
 var _611=false;
 for(var i=0;i<_610.allParameters.length;i++){
 var _613=_610.allParameters[i].name;
@@ -5553,155 +5539,87 @@ break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_60f,_510,[this,_610,this._id,args],_60c,_60d);
-}
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_60f,this,this._enqueueAction,[_60f,_510,[this,_610,this._id,args],_60c,_60d]);
+this._enqueueAction(_60f,_50c,[this,_610,this._id,args],_60d);
 }
 if(_60f=="flowChannel"){
-_4a7.prototype.flowFlag=active;
+_4ac.prototype.flowFlag=active;
 }
 if(_611){
-if(typeof (_60b)!=="undefined"&&_60b){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4a7.prototype.publishBasic=function(body,_615,_616,_617,_618,_619,_61a,_61b){
-var args=[0,_616,_617,_618,_619];
-var _61d="publishBasic";
-var _61e=_40e[_61d];
-var _61f=false;
-for(var i=0;i<_61e.allParameters.length;i++){
-var _621=_61e.allParameters[i].name;
-if(_621="noWait"){
-_61f=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_61d,_510,[this,_61e,this._id,args,body,_615],_61a,_61b);
-}
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_61d,this,this._enqueueAction,[_61d,_510,[this,_61e,this._id,args,body,_615],_61a,_61b]);
-}
-if(_61d=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_61f){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.getBasic=function(_622,_623,_624,_625){
-var args=[0,_622,_623];
-var _627="getBasic";
-var _628=_40e[_627];
-var _629=false;
-for(var i=0;i<_628.allParameters.length;i++){
-var _62b=_628.allParameters[i].name;
-if(_62b="noWait"){
-_629=true;
+_4ac.prototype.ackBasic=function(_614,_615,_616){
+var args=[_614,_615];
+var _618="ackBasic";
+var _619=_410[_618];
+var _61a=false;
+for(var i=0;i<_619.allParameters.length;i++){
+var _61c=_619.allParameters[i].name;
+if(_61c="noWait"){
+_61a=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_627,_510,[this,_628,this._id,args],_624,_625);
+this._enqueueAction(_618,_50c,[this,_619,this._id,args],_616);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_627,this,this._enqueueAction,[_627,_510,[this,_628,this._id,args],_624,_625]);
+if(_618=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_627=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_629){
+if(_61a){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.ackBasic=function(_62c,_62d,_62e,_62f){
-var args=[_62c,_62d];
-var _631="ackBasic";
-var _632=_40e[_631];
-var _633=false;
-for(var i=0;i<_632.allParameters.length;i++){
-var _635=_632.allParameters[i].name;
-if(_635="noWait"){
-_633=true;
+_4ac.prototype.rejectBasic=function(_61d,_61e,_61f){
+var args=[_61d,_61e];
+var _621="rejectBasic";
+var _622=_410[_621];
+var _623=false;
+for(var i=0;i<_622.allParameters.length;i++){
+var _625=_622.allParameters[i].name;
+if(_625="noWait"){
+_623=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_631,_510,[this,_632,this._id,args],_62e,_62f);
+this._enqueueAction(_621,_50c,[this,_622,this._id,args],_61f);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_631,this,this._enqueueAction,[_631,_510,[this,_632,this._id,args],_62e,_62f]);
+if(_621=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_631=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_633){
+if(_623){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.rejectBasic=function(_636,_637,_638,_639){
-var args=[_636,_637];
-var _63b="rejectBasic";
-var _63c=_40e[_63b];
-var _63d=false;
-for(var i=0;i<_63c.allParameters.length;i++){
-var _63f=_63c.allParameters[i].name;
-if(_63f="noWait"){
-_63d=true;
+_4ac.prototype.recoverBasic=function(_626,_627){
+var args=[_626];
+var _629="recoverBasic";
+var _62a=_410[_629];
+var _62b=false;
+for(var i=0;i<_62a.allParameters.length;i++){
+var _62d=_62a.allParameters[i].name;
+if(_62d="noWait"){
+_62b=true;
 break;
 }
 }
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_63b,_510,[this,_63c,this._id,args],_638,_639);
+this._enqueueAction(_629,_50c,[this,_62a,this._id,args],_627);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_63b,this,this._enqueueAction,[_63b,_510,[this,_63c,this._id,args],_638,_639]);
+if(_629=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_63b=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_63d){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4a7.prototype.recoverBasic=function(_640,_641,_642){
-var args=[_640];
-var _644="recoverBasic";
-var _645=_40e[_644];
-var _646=false;
-for(var i=0;i<_645.allParameters.length;i++){
-var _648=_645.allParameters[i].name;
-if(_648="noWait"){
-_646=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_644,_510,[this,_645,this._id,args],_641,_642);
-}
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_644,this,this._enqueueAction,[_644,_510,[this,_645,this._id,args],_641,_642]);
-}
-if(_644=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_646){
+if(_62b){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
@@ -5709,116 +5627,460 @@ this._enqueueAction("nowait");
 return this;
 };
 _basicProperties=[{"name":"contentType","domain":"Shortstr","label":"MIME content type"},{"name":"contentEncoding","domain":"Shortstr","label":"MIME content encoding"},{"name":"headers","domain":"Table","label":"message header field table"},{"name":"deliveryMode","domain":"Octet","label":"non-persistent (1) or persistent (2)"},{"name":"priority","domain":"Octet","label":"message priority, 0 to 9"},{"name":"correlationId","domain":"Shortstr","label":"application correlation identifier"},{"name":"replyTo","domain":"Shortstr","label":"address to reply to"},{"name":"expiration","domain":"Shortstr","label":"message expiration specification"},{"name":"messageId","domain":"Shortstr","label":"application message identifier"},{"name":"timestamp","domain":"Timestamp","label":"message timestamp"},{"name":"type","domain":"Shortstr","label":"message type name"},{"name":"userId","domain":"Shortstr","label":"creating user id"},{"name":"appId","domain":"Shortstr","label":"creating application id"},{"name":"reserved","domain":"Shortstr","label":"reserved, must be empty"}];
-_4a7.prototype.selectTx=function(_649,_64a){
+_4ac.prototype.selectTx=function(_62e){
 var args=[];
-var _64c="selectTx";
-var _64d=_40e[_64c];
-var _64e=false;
+var _630="selectTx";
+var _631=_410[_630];
+var _632=false;
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_64c,_510,[this,_64d,this._id,args],_649,_64a);
+this._enqueueAction(_630,_50c,[this,_631,this._id,args],_62e);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_64c,this,this._enqueueAction,[_64c,_510,[this,_64d,this._id,args],_649,_64a]);
+if(_630=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_64c=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_64e){
+if(_632){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.commitTx=function(_64f,_650){
+_4ac.prototype.commitTx=function(_633){
 var args=[];
-var _652="commitTx";
-var _653=_40e[_652];
-var _654=false;
+var _635="commitTx";
+var _636=_410[_635];
+var _637=false;
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_652,_510,[this,_653,this._id,args],_64f,_650);
+this._enqueueAction(_635,_50c,[this,_636,this._id,args],_633);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_652,this,this._enqueueAction,[_652,_510,[this,_653,this._id,args],_64f,_650]);
+if(_635=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_652=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_654){
+if(_637){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-_4a7.prototype.rollbackTx=function(_655,_656){
+_4ac.prototype.rollbackTx=function(_638){
 var args=[];
-var _658="rollbackTx";
-var _659=_40e[_658];
-var _65a=false;
+var _63a="rollbackTx";
+var _63b=_410[_63a];
+var _63c=false;
 if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_658,_510,[this,_659,this._id,args],_655,_656);
+this._enqueueAction(_63a,_50c,[this,_63b,this._id,args],_638);
 }
-if(this._connection._options.autoReconnect){
-this._connection._session.replayActionList._addAction(_658,this,this._enqueueAction,[_658,_510,[this,_659,this._id,args],_655,_656]);
+if(_63a=="flowChannel"){
+_4ac.prototype.flowFlag=active;
 }
-if(_658=="flowChannel"){
-_4a7.prototype.flowFlag=active;
-}
-if(_65a){
+if(_63c){
 if(typeof (noWait)!=="undefined"&&noWait){
 this._enqueueAction("nowait");
 }
 }
 return this;
 };
-var func=_4a7.prototype.openChannel;
-var _4a2=function(_65c,args){
-_65c._stateMachine.enterState("channelReady","",null);
-func.apply(_65c,args);
+var func=_4ac.prototype.openChannel;
+var _4a8=function(_63e,args){
+_63e._stateMachine.enterState("channelReady","",null);
+func.apply(_63e,args);
 };
-delete _4a7.prototype.openChannel;
-var _65e=_4a7.prototype.closeOkChannel;
-var _65f=function(_660,args){
-_65e.apply(_660,args);
+delete _4ac.prototype.openChannel;
+var _640=_4ac.prototype.closeOkChannel;
+var _641=function(_642,args){
+_640.apply(_642,args);
 };
-delete _4a7.prototype.closeOkChannel;
-var _49e=function(){
+delete _4ac.prototype.closeOkChannel;
+var _644=_4ac.prototype.closeChannel;
+_4ac.prototype.closeChannel=function(_645,_646){
+if(typeof _645=="object"){
+myConfig=_645||{};
+var _647=myConfig.replyCode||0;
+var _648=myConfig.replyText||"";
+var _649=myConfig.classId||0;
+var _64a=myConfig.methodId||0;
+if(typeof _647!="number"){
+throw new Error("AmqpChannel.closeChannel(): Parameter 'replyCode' is expected to be of numeric type");
+}
+if(typeof _648!="string"){
+throw new Error("AmqpChannel.closeChannel(): Parameter 'replyText' is expected to be a string");
+}
+if(typeof _649!="number"){
+throw new Error("AmqpChannel.closeChannel(): Parameter 'classId' is expected to be of numeric type");
+}
+if(typeof _64a!="number"){
+throw new Error("AmqpChannel.closeChannel(): Parameter 'methodId' is expected to be of numeric type");
+}
+return _644.call(this,_647,_648,_649,_64a,_646);
+}else{
+return _644.apply(this,arguments);
+}
+};
+var _64b=_4ac.prototype.declareExchange;
+_4ac.prototype.declareExchange=function(_64c,_64d){
+if(typeof _64c=="object"){
+myConfig=_64c||{};
+var _64e=myConfig.exchange;
+var type=myConfig.type;
+var _650=myConfig.passive||false;
+var _651=myConfig.durable||false;
+var _652=myConfig.noWait||false;
+var args=myConfig.args||null;
+if(!_64e||typeof _64e!="string"){
+throw new Error("AmqpChannel.declareExchange(): String parameter 'exchange' is required");
+}
+if(!type||typeof type!="string"||((type!="fanout")&&(type!="direct")&&(type!="topic")&&(type!="headers"))){
+throw new Error("AmqpChannel.declareExchange(): Legal values of parameter 'type' are direct | fanout | headers | topic");
+}
+if(typeof _650!="boolean"){
+throw new Error("AmqpChannel.declareExchange(): Parameter 'passive' only accepts boolean values");
+}
+if(typeof _651!="boolean"){
+throw new Error("AmqpChannel.declareExchange(): Parameter 'durable' only accepts boolean values");
+}
+if(typeof _652!="boolean"){
+throw new Error("AmqpChannel.declareExchange(): Parameter 'noWait' only accepts boolean values");
+}
+return _64b.call(this,_64e,type,_650,_651,_652,args,_64d);
+}else{
+return _64b.apply(this,arguments);
+}
+};
+var _654=_4ac.prototype.deleteExchange;
+_4ac.prototype.deleteExchange=function(_655,_656){
+if(typeof _655=="object"){
+myConfig=_655||{};
+var _657=myConfig.exchange;
+var _658=myConfig.ifUnused||false;
+var _659=myConfig.noWait||false;
+if(!_657||typeof _657!="string"){
+throw new Error("AmqpChannel.deleteExchange(): String parameter 'exchange' is required");
+}
+if(typeof _658!="boolean"){
+throw new Error("AmqpChannel.deleteExchange(): Parameter 'ifUnused' only accepts boolean values");
+}
+if(typeof _659!="boolean"){
+throw new Error("AmqpChannel.deleteExchange(): Parameter 'noWait' only accepts boolean values");
+}
+return _654.call(this,_657,_658,_659,_656);
+}else{
+return _654.apply(this,arguments);
+}
+};
+var _65a=_4ac.prototype.declareQueue;
+_4ac.prototype.declareQueue=function(_65b,_65c){
+if(typeof _65b=="object"){
+myConfig=_65b||{};
+var _65d=myConfig.queue;
+var _65e=myConfig.passive||false;
+var _65f=myConfig.durable||false;
+var _660=myConfig.exclusive||false;
+var _661=myConfig.autoDelete||false;
+var _662=myConfig.noWait||false;
+var args=myConfig.args||null;
+if(!_65d||typeof _65d!="string"){
+throw new Error("AmqpChannel.declareQueue(): String parameter 'queue' is required");
+}
+if(typeof _65e!="boolean"){
+throw new Error("AmqpChannel.declareQueue(): Parameter 'passive' only accepts boolean values");
+}
+if(typeof _65f!="boolean"){
+throw new Error("AmqpChannel.declareQueue(): Parameter 'durable' only accepts boolean values");
+}
+if(typeof _660!="boolean"){
+throw new Error("AmqpChannel.declareQueue(): Parameter 'exclusive' only accepts boolean values");
+}
+if(typeof _661!="boolean"){
+throw new Error("AmqpChannel.declareQueue(): Parameter 'autoDelete' only accepts boolean values");
+}
+if(typeof _662!="boolean"){
+throw new Error("AmqpChannel.declareQueue(): Parameter 'noWait' only accepts boolean values");
+}
+return _65a.call(this,_65d,_65e,_65f,_660,_661,_662,args,_65c);
+}else{
+return _65a.apply(this,arguments);
+}
+};
+var _664=_4ac.prototype.bindQueue;
+_4ac.prototype.bindQueue=function(_665,_666){
+if(typeof _665=="object"){
+myConfig=_665||{};
+var _667=myConfig.queue;
+var _668=myConfig.exchange;
+var _669=myConfig.routingKey;
+var _66a=myConfig.noWait||false;
+var args=myConfig.args||null;
+if(!_667||typeof _667!="string"){
+throw new Error("AmqpChannel.bindQueue(): String parameter 'queue' is required");
+}
+if(!_668||typeof _668!="string"){
+throw new Error("AmqpChannel.bindQueue(): String parameter 'exchange' is required");
+}
+if(!_669||typeof _669!="string"){
+throw new Error("AmqpChannel.bindQueue(): String parameter 'routingKey' is required");
+}
+if(typeof _66a!="boolean"){
+throw new Error("AmqpChannel.bindQueue(): Parameter 'noWait' only accepts boolean values");
+}
+return _664.call(this,_667,_668,_669,_66a,args,_666);
+}else{
+return _664.apply(this,arguments);
+}
+};
+var _66c=_4ac.prototype.unbindQueue;
+_4ac.prototype.unbindQueue=function(_66d,_66e){
+if(typeof _66d=="object"){
+myConfig=_66d||{};
+var _66f=myConfig.queue;
+var _670=myConfig.exchange;
+var _671=myConfig.routingKey;
+var args=myConfig.args||null;
+if(!_66f||typeof _66f!="string"){
+throw new Error("AmqpChannel.unbindQueue(): String parameter 'queue' is required");
+}
+if(!_670||typeof _670!="string"){
+throw new Error("AmqpChannel.unbindQueue(): String parameter 'exchange' is required");
+}
+if(!_671||typeof _671!="string"){
+throw new Error("AmqpChannel.unbindQueue(): String parameter 'routingKey' is required");
+}
+return _66c.call(this,_66f,_670,_671,args,_66e);
+}else{
+return _66c.apply(this,arguments);
+}
+};
+var _673=_4ac.prototype.purgeQueue;
+_4ac.prototype.purgeQueue=function(_674,_675){
+if(typeof _674=="object"){
+myConfig=_674||{};
+var _676=myConfig.queue;
+var _677=myConfig.noWait||false;
+if(!_676||typeof _676!="string"){
+throw new Error("AmqpChannel.purgeQueue(): String parameter 'queue' is required");
+}
+if(typeof _677!="boolean"){
+throw new Error("AmqpChannel.purgeQueue(): Parameter 'noWait' only accepts boolean values");
+}
+return _673.call(this,_676,_677,_675);
+}else{
+return _673.apply(this,arguments);
+}
+};
+var _678=_4ac.prototype.deleteQueue;
+_4ac.prototype.deleteQueue=function(_679,_67a){
+if(typeof _679=="object"){
+myConfig=_679||{};
+var _67b=myConfig.queue;
+var _67c=myConfig.ifUnused||false;
+var _67d=myConfig.ifEmpty||false;
+var _67e=myConfig.noWait||false;
+if(!_67b||typeof _67b!="string"){
+throw new Error("AmqpChannel.deleteQueue(): String parameter 'queue' is required");
+}
+if(typeof _67c!="boolean"){
+throw new Error("AmqpChannel.deleteQueue(): Parameter 'ifUnused' only accepts boolean values");
+}
+if(typeof _67d!="boolean"){
+throw new Error("AmqpChannel.deleteQueue(): Parameter 'ifEmpty' only accepts boolean values");
+}
+if(typeof _67e!="boolean"){
+throw new Error("AmqpChannel.deleteQueue(): Parameter 'noWait' only accepts boolean values");
+}
+return _678.call(this,_67b,_67c,_67d,_67e,_67a);
+}else{
+return _678.apply(this,arguments);
+}
+};
+var _67f=_4ac.prototype.qosBasic;
+_4ac.prototype.qosBasic=function(_680,_681){
+if(typeof _680=="object"){
+myConfig=_680||{};
+var _682=myConfig.prefetchSize||0;
+var _683=myConfig.prefetchCount||0;
+var _684=myConfig.global||false;
+if(typeof _682!="number"){
+throw new Error("AmqpChannel.qosBasic(): Parameter 'prefetchSize' is expected to be of numeric type");
+}
+if(typeof _683!="number"){
+throw new Error("AmqpChannel.qosBasic(): Parameter 'prefetchCount' is expected to be of numeric type");
+}
+if(typeof _684!="boolean"){
+throw new Error("AmqpChannel.qosBasic(): Parameter 'global' only accepts boolean values");
+}
+return _67f.call(this,_682,_683,_684,_681);
+}else{
+return _67f.apply(this,arguments);
+}
+};
+var _685=_4ac.prototype.consumeBasic;
+_4ac.prototype.consumeBasic=function(_686,_687){
+if(typeof _686=="object"){
+myConfig=_686||{};
+var _688=myConfig.queue;
+var _689=myConfig.consumerTag;
+var _68a=myConfig.noLocal||false;
+var _68b=myConfig.noAck||false;
+var _68c=myConfig.exclusive||false;
+var _68d=myConfig.noWait||false;
+var args=myConfig.args||null;
+if(!_688||typeof _688!="string"){
+throw new Error("AmqpChannel.consumeBasic(): String parameter 'queue' is required");
+}
+if(!_689||typeof _689!="string"){
+throw new Error("AmqpChannel.consumeBasic(): String parameter 'consumerTag' is required");
+}
+if(typeof _68a!="boolean"){
+throw new Error("AmqpChannel.consumeBasic(): Parameter 'noLocal' only accepts boolean values");
+}
+if(typeof _68b!="boolean"){
+throw new Error("AmqpChannel.consumeBasic(): Parameter 'noAck' only accepts boolean values");
+}
+if(typeof _68c!="boolean"){
+throw new Error("AmqpChannel.consumeBasic(): Parameter 'exclusive' only accepts boolean values");
+}
+if(typeof _68d!="boolean"){
+throw new Error("AmqpChannel.consumeBasic(): Parameter 'noWait' only accepts boolean values");
+}
+return _685.call(this,_688,_689,_68a,_68b,_68c,_68d,args,_687);
+}else{
+return _685.apply(this,arguments);
+}
+};
+var _68f=_4ac.prototype.cancelBasic;
+_4ac.prototype.cancelBasic=function(_690,_691){
+if(typeof _690=="object"){
+myConfig=_690||{};
+var _692=myConfig.consumerTag;
+var _693=myConfig.noWait||false;
+if(!_692||typeof _692!="string"){
+throw new Error("AmqpChannel.cancelBasic(): String parameter 'consumerTag' is required");
+}
+if(typeof _693!="boolean"){
+throw new Error("AmqpChannel.cancelBasic(): Parameter 'noWait' only accepts boolean values");
+}
+return _68f.call(this,_692,_693,_691);
+}else{
+return _68f.apply(this,arguments);
+}
+};
+var _694=_4ac.prototype.publishBasic;
+_4ac.prototype.publishBasic=function(_695,_696){
+if(typeof _695=="object"&&_695.body){
+myConfig=_695||{};
+var body=myConfig.body;
+var _698=myConfig.headers||{};
+var _699=myConfig.exchange;
+var _69a=myConfig.routingKey;
+var _69b=myConfig.mandatory||false;
+var _69c=myConfig.immediate||false;
+if(!body){
+throw new Error("AmqpChannel.publishBasic(): ByteBuffer parameter 'body' is required");
+}
+if(!_699||typeof _699!="string"){
+throw new Error("AmqpChannel.publishBasic(): String parameter 'exchange' is required");
+}
+if(!_69a||typeof _69a!="string"){
+throw new Error("AmqpChannel.publishBasic(): String parameter 'routingKey' is required");
+}
+if(typeof _69b!="boolean"){
+throw new Error("AmqpChannel.publishBasic(): Parameter 'mandatory' only accepts boolean values");
+}
+if(typeof _69c!="boolean"){
+throw new Error("AmqpChannel.publishBasic(): Parameter 'immediate' only accepts boolean values");
+}
+return _694.call(this,body,_698,_699,_69a,_69b,_69c,_696);
+}else{
+return _694.apply(this,arguments);
+}
+};
+var _69d=_4ac.prototype.getBasic;
+_4ac.prototype.getBasic=function(_69e,_69f){
+if(typeof _69e=="object"){
+myConfig=_69e||{};
+var _6a0=myConfig.queue;
+var _6a1=myConfig.noAck||false;
+if(!_6a0||typeof _6a0!="string"){
+throw new Error("AmqpChannel.getBasic(): String parameter 'queue' is required");
+}
+if(typeof _6a1!="boolean"){
+throw new Error("AmqpChannel.getBasic(): Parameter 'noAck' only accepts boolean values");
+}
+return _69d.call(this,_6a0,_6a1,_69f);
+}else{
+return _69d.apply(this,arguments);
+}
+};
+var _6a2=_4ac.prototype.ackBasic;
+_4ac.prototype.ackBasic=function(_6a3,_6a4){
+if(typeof _6a3=="object"){
+myConfig=_6a3||{};
+var _6a5=myConfig.deliveryTag;
+var _6a6=myConfig.multiple||false;
+if(!_6a5||typeof _6a5!="string"){
+throw new Error("AmqpChannel.ackBasic(): String parameter 'deliveryTag' is required");
+}
+if(typeof _6a6!="boolean"){
+throw new Error("AmqpChannel.ackBasic(): Parameter 'multiple' only accepts boolean values");
+}
+return _6a2.call(this,_6a5,_6a6,_6a4);
+}else{
+return _6a2.apply(this,arguments);
+}
+};
+var _6a7=_4ac.prototype.rejectBasic;
+_4ac.prototype.rejectBasic=function(_6a8,_6a9){
+if(typeof _6a8=="object"){
+myConfig=_6a8||{};
+var _6aa=myConfig.deliveryTag;
+var _6ab=myConfig.requeue||false;
+if(!_6aa||typeof _6aa!="string"){
+throw new Error("AmqpChannel.rejectBasic(): String parameter 'deliveryTag' is required");
+}
+if(typeof _6ab!="boolean"){
+throw new Error("AmqpChannel.rejectBasic(): Parameter 'requeue' only accepts boolean values");
+}
+return _6a7.call(this,_6aa,_6ab,_6a9);
+}else{
+return _6a7.apply(this,arguments);
+}
+};
+var _6ac=function(){
 this._actionList=new Array();
 this.currentAction=0;
 this._replayLength=0;
 };
-_49e.prototype.getActionList=function(){
+_6ac.prototype.getActionList=function(){
 return this._actionList;
 };
-_49e.prototype.setReplayLength=function(l){
+_6ac.prototype.setReplayLength=function(l){
 this._replayLength=l;
 };
-_49e.prototype._processActions=function _processActions(){
+_6ac.prototype._processActions=function _processActions(){
 if(!this._actionList.length){
 return;
 }
 if(this.currentAction==this._actionList.length){
 this.currentAction=0;
 }
-var _663=this._actionList[this.currentAction];
+var _6ae=this._actionList[this.currentAction];
 this.currentAction++;
-_663.func.apply(_663.object,_663.args);
+_6ae.func.apply(_6ae.object,_6ae.args);
 };
-_49e.prototype._processAllActions=function _processAllActions(){
+_6ac.prototype._processAllActions=function _processAllActions(){
 for(i=0;i<this._replayLength;i++){
-var _664=this._actionList[i];
-_664.func.apply(_664.object,_664.args);
+var _6af=this._actionList[i];
+_6af.func.apply(_6af.object,_6af.args);
 }
 };
-_49e.prototype._processAllNewActions=function _processAllNewActions(){
+_6ac.prototype._processAllNewActions=function _processAllNewActions(){
 for(i=this._replayLength;i<this._actionList.length;i++){
-var _665=this._actionList[i];
-_665.func.apply(_665.object,_665.args);
+var _6b0=this._actionList[i];
+_6b0.func.apply(_6b0.object,_6b0.args);
 }
 };
-_49e.prototype._addAction=function _addAction(_666,_667,func,args){
-switch(_666){
+_6ac.prototype._addAction=function _addAction(_6b1,_6b2,func,args){
+switch(_6b1){
 case "declareExchange":
 break;
 case "declareQueue":
@@ -5830,38 +6092,38 @@ break;
 default:
 return;
 }
-var _66a=function _66a(){
+var _6b5=function _6b5(){
 };
-var _66b={};
-_66b.object=_667;
-_66b.func=func||_66a;
-_66b.args=args||null;
-this._actionList.push(_66b);
+var _6b6={};
+_6b6.object=_6b2;
+_6b6.func=func||_6b5;
+_6b6.args=args||null;
+this._actionList.push(_6b6);
 };
 })();
 var AmqpArguments=function(){
 };
 AmqpArguments.prototype=new Array();
 (function(){
-var _66c=AmqpArguments.prototype;
-var _add=function(_66e,key,_670,type){
-var _672={};
-_672.key=key;
-_672.value=_670;
-_672.type=type;
-_66e.push(_672);
+var _6b7=AmqpArguments.prototype;
+var _add=function(_6b9,key,_6bb,type){
+var _6bd={};
+_6bd.key=key;
+_6bd.value=_6bb;
+_6bd.type=type;
+_6b9.push(_6bd);
 };
-_66c.addLongString=function(key,_674){
-_add(this,key,_674,"longstr");
+_6b7.addLongString=function(key,_6bf){
+_add(this,key,_6bf,"longstr");
 return this;
 };
-_66c.addInteger=function(key,_676){
-_add(this,key,_676,"int");
+_6b7.addInteger=function(key,_6c1){
+_add(this,key,_6c1,"int");
 return this;
 };
 })();
 (function(){
-var _677=function(type){
+var _6c2=function(type){
 switch(type){
 case "deliverBasic":
 return "message";
@@ -5906,24 +6168,30 @@ case "recoverOkBasic":
 return "recover";
 case "rejectOkBasic":
 return "reject";
+case "error":
+return "error";
 default:
 throw (new Error("AMQP: unknown event name "+type));
 }
 };
-AmqpEvent=function(_679,_67a,_67b){
-this.type=_67a.methodName;
-this.type=_677(this.type);
+AmqpEvent=function(_6c4,_6c5,_6c6){
+this.type=_6c5.methodName;
+this.type=_6c2(this.type);
 this.args={};
-for(var i=0;i<_67a.args.length;i++){
-this.args[_67a.args[i].name]=_67a.args[i].value;
+for(var i=0;i<_6c5.args.length;i++){
+this.args[_6c5.args[i].name]=_6c5.args[i].value;
 }
-this.headers=_67b;
-this.body=_67a.body;
-this.channel=_679;
+this.headers=_6c6;
+this.body=_6c5.body;
+this.target=_6c4;
+if(this.type=="error"){
+this.message=this.args["replyText"];
+}
 };
-var _67d=AmqpEvent.prototype;
-_67d.type;
-_67d.body;
-_67d.headers;
-_67d.channel;
+var _6c8=AmqpEvent.prototype;
+_6c8.type;
+_6c8.message;
+_6c8.body;
+_6c8.headers;
+_6c8.target;
 })();
