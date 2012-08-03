@@ -12,14 +12,16 @@ d3.select("#knobsRef").on "click", ->
   d3.select(".knobs").classed "invisible", false
 
 d3.select("#mainRef").on "click", ->
-  d3.select("#page").text refresh()
+  d3.select("#page").text cluster
   d3.select(".gallery").classed "invisible", false
   d3.select(".knobs").classed "invisible", true
+  refresh()
 
 d3.selectAll("input[name=cluster]").on("change", ->
   cluster = this.value
   d3.select("#viewAMQP").attr("href", makeHref(cluster))
-  d3.select("#page").text refresh()
+  d3.select("#page").text cluster
+  refresh()
   )
 
 refresh = ->
@@ -30,7 +32,7 @@ refresh = ->
       buildSignalGraph( settings, journal, source )
     )
   )
-  cluster
 
 d3.select("#viewAMQP").attr("href", makeHref(cluster))
+d3.select("#page").text cluster
 refresh()
