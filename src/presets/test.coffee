@@ -4,6 +4,9 @@ presets.test =
   journal:
     host: "ec2-184-73-9-249.compute-1.amazonaws.com:27017"
 
+  amqp:
+    host: "cadt0734.rms.com:55672"
+
   kaazing:
 
     connect:

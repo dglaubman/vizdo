@@ -4,6 +4,9 @@ presets.dev1 =
   journal:
     host: "ec2-184-73-9-249.compute-1.amazonaws.com:27017"
 
+  amqp:
+    host: "ec2-50-16-67-125.compute-1.amazonaws.com:55672"
+
   kaazing:
 
     connect:
