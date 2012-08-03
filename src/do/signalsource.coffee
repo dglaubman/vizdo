@@ -28,7 +28,7 @@ DO.signalsource = (settings, callback) ->
 
   onExchange = (event) ->
     settings.log "amqp exchange '#{exchangeName}' declared ok"
-    queue = settings.kaazing.queue.queue + ~~ (Math.random() * 10000000)
+    queue = "vizdo" + ~~ (Math.random() * 10000000)
     settings.kaazing.queue.queue =
       settings.kaazing.bind.queue =
       settings.kaazing.consume.queue = queue
