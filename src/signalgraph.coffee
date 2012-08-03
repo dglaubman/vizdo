@@ -1,4 +1,9 @@
-buildSignalGraph = (journal, source) ->
+buildSignalGraph = ( settings, j, source) ->
+
+  journal = j.journal
+  dots = j.dots
+  log = settings.log
+  cluster = settings.cluster
 
   chart = d3.select("#chart")
   width = chart.attr( "width" )
@@ -6,9 +11,14 @@ buildSignalGraph = (journal, source) ->
   m = [20, 120, 20, 120]
   w = width - m[1] - m[3]
   h = height - m[0] - m[2]
+  duration = 750
 
   translate = (x,y) -> "translate(" + x + "," + y + ")"
-  tree = d3.layout.tree().size([h, w])
+
+  tree = d3.layout.tree()
+    .size([h, w])
+    .children( (d) -> d.values )
+
   diagonal = d3.svg.diagonal()
     .projection( (d) -> [d.y, d.x] )
 
@@ -23,13 +33,6 @@ buildSignalGraph = (journal, source) ->
     .append("g")
       .attr("transform", translate(m[3], m[0]) )
 
-  # nest() expects array of values, tree() expects array of children
-  values2Children = (tre) ->
-    if tre.values?
-      tre.children = tre.values
-      values2Children child for child in tre.children
-      tre.values = null
-
   maxTextLen = 20
   shorten = (text) ->
     if (text.length < maxTextLen + 1)
@@ -38,6 +41,17 @@ buildSignalGraph = (journal, source) ->
       text[0..9] + "..." +  text.slice(-8)
 
   nest = d3.nest()
+    .key( (d) -> dots[d.DOTMsg.Header.DefinitionId]?[0]?.Name || "Unknown DOT" )
+    .key( (d) -> "Instance " + d.DOTMsg.Header.InstanceId )
+    .key( (d) -> shorten d.Signal )
+      .entries( journal )
+
+  data = { key: cluster, values: nest }
+  data.x0 = h / 2
+  data.y0 = 0
+  nodes = tree.nodes data
+
+  link = svg.selectAll("path.link")
     .data(tree.links(nodes))
   .enter().append("path")
     .attr("class", "link")
@@ -48,7 +62,7 @@ buildSignalGraph = (journal, source) ->
   .enter()
     .append("g")
     .attr("class", "node")
-    .attr("transform", (d) -> "translate(#{d.y},#{d.x})")
+    .attr("transform", (d) -> translate(d.y,d.x) )
 
   node.append("circle")
     .attr("r", 4.5 )
@@ -60,17 +74,6 @@ buildSignalGraph = (journal, source) ->
     .attr("text-anchor", (d) -> if d.children? then "end" else "start" )
     .text( (d) -> if d.key? then d.key else new Date( d.PublishTime.$date ).toISOString() )
 
+  source.subscribe( (event) ->
+    log "message from #{event.args.routingKey}: " + event.body.getString(Charset.UTF8) )
 
-  toggleAll = (d) ->
-    if (d.children)
-      d.children.forEach(toggleAll)
-      toggle(d)
-
-  # Toggle children.
-  toggle = (d) ->
-    if d.children?
-      d._children = d.children;
-      d.children = null;
-    else
-      d.children = d._children;
-      d._children = null;

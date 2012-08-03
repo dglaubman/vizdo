@@ -22,23 +22,23 @@ presets.test =
       desc: "Config used by declareExchage"
 
     queue:
-      queue: 'dglaubman001'
+      queue: 'vizdo'
       passive: false
       durable: false
-      exclusive: true
+      exclusive: false
       autoDelete: true
       noWait: false
       desc: "Config used by declareQueue"
 
     bind:
-      queue: "dglaubman001"
+      queue: "vizdo"
       exchange: "signalX"
       routingKey: "#"
       noWait: false
       desc: "Config used by doBind"
 
     consume:
-      queue: "dglaubman001"
+      queue: "vizdo"
       consumerTag: "vizdo"
       noLocal: false
       noAck: true

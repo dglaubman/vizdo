@@ -1,3 +1,5 @@
+DO.amqp = null
+
 DO.signalsource = (settings, callback) ->
 
   settings.log "init signalsource"
@@ -17,7 +19,7 @@ DO.signalsource = (settings, callback) ->
 
   onConnect = (event) ->
     settings.log "amqp connection opened ok"
-    channel = amqp.openChannel onChannel
+    channel = DO.amqp.openChannel onChannel
 
   onChannel= (event) ->
     settings.log "amqp channel opened ok"
@@ -26,6 +28,10 @@ DO.signalsource = (settings, callback) ->
 
   onExchange = (event) ->
     settings.log "amqp exchange '#{exchangeName}' declared ok"
+    queue = settings.kaazing.queue.queue + ~~ (Math.random() * 10000000)
+    settings.kaazing.queue.queue =
+      settings.kaazing.bind.queue =
+      settings.kaazing.consume.queue = queue
     channel.declareQueue(settings.kaazing.queue, onQueue )
 
   onQueue = (event) ->
@@ -40,7 +46,9 @@ DO.signalsource = (settings, callback) ->
   onError = (event) ->
     settings.log "ERROR: amqp says '#{event.message}'"
 
-  amqp = new AmqpClient()
-  amqp.addEventListener "close", -> settings.log("amqp connection closed")
-  amqp.connect( settings.kaazing.connect,  onConnect )
+  DO.amqp?.disconnect()
+  DO.amqp = new AmqpClient()
+  DO.amqp.onclose =  -> settings.log("amqp connection closed")
+  DO.amqp.onerror =  (event) -> settings.log("ERROR: amqp says '#{event.message}'")
+  DO.amqp.connect(settings.kaazing.connect,  onConnect )
 

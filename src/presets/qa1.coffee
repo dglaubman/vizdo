@@ -22,23 +22,23 @@ presets.qa1 =
       desc: "Config used by declareExchange"
 
     queue:
-      queue: 'dglaubman001'
+      queue: 'vizdoconsumer'
       passive: false
       durable: false
-      exclusive: true
+      exclusive: false
       autoDelete: true
       noWait: false
       desc: "Config used by declareQueue"
 
     bind:
-      queue: "dglaubman001"
+      queue: "vizdoconsumer"
       exchange: "DOSignalX"
       routingKey: "#"
       noWait: false
       desc: "Config used by doBind"
 
     consume:
-      queue: "dglaubman001"
+      queue: "vizdoconsumer"
       consumerTag: "vizdo"
       noLocal: false
       noAck: true
@@ -49,5 +49,5 @@ presets.qa1 =
   mongoose:
     baseUri: "http://cadt0734.rms.com:27080/DODatabase"
     skip: 20
-    limit: 30
-    batchsize: 40
+    limit: 20
+    batchsize: 20

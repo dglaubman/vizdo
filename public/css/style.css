@@ -123,3 +123,8 @@ button:hover {
 .invisible {
     display: none
 }
+
+label {
+  font: 18px Helvetica Neue;
+  margin-bottom: 22px;
+}

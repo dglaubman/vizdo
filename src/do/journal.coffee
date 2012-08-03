@@ -1,4 +1,4 @@
-DO.journal = (settings, callback ) ->
+DO.journal = (settings, callback) ->
 
   onconnect = (reply) ->
     if reply.ok isnt 1
@@ -15,7 +15,7 @@ DO.journal = (settings, callback ) ->
         return settings.log "mongoose says: " + reply.errmsg
 
       dots = d3.nest()
-        .key( (d) -> d.id )
+        .key( (d) -> d.Id )
         .map( reply.results )
 
       req = settings.mongoose.baseUri +

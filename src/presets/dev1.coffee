@@ -22,23 +22,23 @@ presets.dev1 =
       desc: "Config used by declareExchange"
 
     queue:
-      queue: 'dglaubman001'
+      queue: 'vizdoconsumer'
       passive: false
       durable: false
-      exclusive: true
+      exclusive: false
       autoDelete: true
       noWait: false
       desc: "Config used by declareQueue"
 
     bind:
-      queue: "dglaubman001"
+      queue: "vizdoconsumer"
       exchange: "DOSignalX"
       routingKey: "#"
       noWait: false
       desc: "Config used by doBind"
 
     consume:
-      queue: "dglaubman001"
+      queue: "vizdoconsumer"
       consumerTag: "vizdo"
       noLocal: false
       noAck: true

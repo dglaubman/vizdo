@@ -17,25 +17,34 @@
     <div class="content">
 
       <div class="topbar">
-	<a id="mainRef" href="#">Main</a>
+	<a id="mainRef" href="#">Refresh</a>
 	<a id="knobsRef" href="#">Knobs</a>
 	<a id="viewAMQP" target="_blank" href="http://guest:guest@ec2-50-16-67-125.compute-1.amazonaws.com:55672">AMQP</a>
       </div>
 
       <div class="sidebar">
 	<a href="/"><h1>VizDO</h1></a>
-	<br/>
-	<br/>
-	<br/>
-<label for="dev1">Dev1</label>
-<label for="qa1">QA1</label>
-<input type="radio" name="cluster" id="dev1" value="dev1" /><input type="radio" name="cluster" id="qa1" value="qa1" />	
-
-
       </div>
-      <h1 id="page">Click on a signal to resend</h1>
+      <h1 id="page">Click on a cluster name</h1>
       
       <div class='gallery' id='chart' height='1100' width='920'>
+	<div class='sidebar'>
+	  <br/>
+	  <br/>
+	  <br/>
+	  <div>
+	    <input type="radio" name="cluster" id="dev1" value="dev1" />
+	    <label for="dev1">Dev1</label>
+	  </div>
+	  <div>
+	    <input type="radio" name="cluster" id="qa1" value="qa1" />	
+	    <label for="qa1">QA1</label>
+	  </div>
+	  <div>
+	    <input type="radio" name="cluster" id="test" value="test" checked />	
+	    <label for="test">Test</label>
+	  </div>
+      </div>
       </div>
 
     <div class="knobs invisible">
@@ -63,8 +72,8 @@
   <script src="/js/presets/dev1.js"></script>
 
   <script src="/js/signalgraph.js"></script>
+  
   <!-- <script src="/js/refresh.js"></script> -->
-  <!-- <script src="/js/knobs.js"></script> -->
   <script src="/js/vizdo.js"></script>
 
 </body>

@@ -1,15 +1,29 @@
 log = DO.log d3.select("#log")
+cluster = d3.select("input[name=cluster]:checked").attr("value")
 
-cluster = "dev1"
-update = (cluster) ->
+d3.select("#knobsRef").on "click", ->
+  d3.select("#page").text "Twiddle (with care)"
+  d3.select(".gallery").classed "invisible", true
+  d3.select(".knobs").classed "invisible", false
+
+d3.select("#mainRef").on "click", ->
+  d3.select("#page").text refresh()
+  d3.select(".gallery").classed "invisible", false
+  d3.select(".knobs").classed "invisible", true
+
+d3.selectAll("input[name=cluster]").on("change", ->
+  cluster = this.value
+  d3.select("#page").text refresh()
+  )
+
+refresh = ->
   settings = presets[cluster]
   settings.log = log
   DO.journal( settings, (journal) ->
     DO.signalsource( settings, (source) ->
-      buildSignalGraph( journal, source )
+      buildSignalGraph( settings, journal, source )
     )
   )
-update cluster
-# settings = DO.settings
-# settings.log =  DO.log( d3.select("#log") )
-# DO.signalsource( settings, (source) -> source.subscribe( (evt) -> settings.log "hi there from  #{evt.type}" ))
+  cluster
+
+refresh()
