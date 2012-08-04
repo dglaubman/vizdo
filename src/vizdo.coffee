@@ -17,12 +17,11 @@ d3.select("#mainRef").on "click", ->
   d3.select(".knobs").classed "invisible", true
   refresh()
 
-d3.selectAll("input[name=cluster]").on("change", ->
+d3.selectAll("input[name=cluster]").on "change", ->
   cluster = this.value
-  d3.select("#viewAMQP").attr("href", makeHref(cluster))
+  d3.select("#viewAMQP").attr "href", makeHref(cluster)
   d3.select("#page").text cluster
   refresh()
-  )
 
 refresh = ->
   settings = presets[cluster]

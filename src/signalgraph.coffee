@@ -67,12 +67,26 @@ buildSignalGraph = ( settings, j, source) ->
   node.append("circle")
     .attr("r", 4.5 )
 
+  formatDate = (t) ->
+    date = new Date( t.$date )
+    now = new Date()
+    switch ~~( (now.getTime() -  date.getTime()) /  8640000)
+      when 0
+        d = date.toTimeString()
+        d[0..8]
+      when [1..7]
+        d = date.toTimeString()
+        d[0..8] + date.getDate() + "/" + date.getMonth()
+      else
+        date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
+
   text = node
     .append( "text" )
-    .attr("dx", (d) -> if d.children? then -8 else 8)
-    .attr("dy", 3)
-    .attr("text-anchor", (d) -> if d.children? then "end" else "start" )
-    .text( (d) -> if d.key? then d.key else new Date( d.PublishTime.$date ).toISOString() )
+      .attr("dx", (d) -> if d.children? then -8 else 8)
+      .attr("dy", 3)
+      .attr("text-anchor", (d) -> if d.children? then "end" else "start" )
+      .attr( "class", (d) -> if d.key?.slice(-6) is ".ERROR" then "error" )
+    .text( (d) -> if d.key? then d.key else formatDate( d.PublishTime ) )
 
   source.subscribe( (event) ->
     log "message from #{event.args.routingKey}: " + event.body.getString(Charset.UTF8) )
