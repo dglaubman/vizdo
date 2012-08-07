@@ -45,10 +45,17 @@ a:hover {
   left: 0px;
 }
 
+.knobs {
+  position: relative;
+  left: 0px;
+}
 .content .gallery a:hover img {
   border-color: steelblue;
 }
 
+.content .knobs a:hover img {
+  border-color: steelblue;
+}
 .list {
   clear: left;
   margin-top: 14px;

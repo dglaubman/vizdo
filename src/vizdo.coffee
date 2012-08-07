@@ -7,9 +7,10 @@ makeHref = (cluster) ->
   "http://" + username + ":" + password + "@" + host
 
 d3.select("#knobsRef").on "click", ->
-  d3.select("#page").text "Twiddle (with care)"
+  d3.select("#page").text "Twiddle (with care). Click on a leaf to edit"
   d3.select(".gallery").classed "invisible", true
   d3.select(".knobs").classed "invisible", false
+  knobs( presets[cluster] )
 
 d3.select("#mainRef").on "click", ->
   d3.select("#page").text cluster
