@@ -48,7 +48,7 @@ presets.dev1 =
 
   mongoose:
     baseUri: "http://cadt0734.rms.com:27080/DODatabase"
-    skip: 20
-    limit: 30
+    skip: 0
+    limit: 40
     batchsize: 40
 
