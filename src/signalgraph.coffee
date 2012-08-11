@@ -70,15 +70,15 @@ buildSignalGraph = ( settings, j, source) ->
   formatDate = (t) ->
     date = new Date( t.$date )
     now = new Date()
-    switch ~~( (now.getTime() -  date.getTime()) /  8640000)
+    switch ~~( (now.getTime() -  date.getTime()) /  86400000)
       when 0
         d = date.toTimeString()
         d[0..8]
-      when [1..7]
+      when 1,2,3,4,5,6,7
         d = date.toTimeString()
-        d[0..8] + date.getDate() + "/" + date.getMonth()
+        d[0..8] + (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
       else
-        date.getDate() + "/" + date.getMonth() + "/" + date.getFullYear()
+        (date.Month() + 1) + "/" + date.getDate() + "/" + date.getFullYear()
 
   text = node
     .append( "text" )

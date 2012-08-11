@@ -10,7 +10,7 @@ presets.dev1 =
   kaazing:
 
     connect:
-      url: "ws://cadt0734.rms.com:8001/amqp"
+      url: "ws://cadt0734.rms.com:8002/amqp"
       credentials:
         username: "guest"
         password: "guest"
@@ -25,7 +25,6 @@ presets.dev1 =
       desc: "Config used by declareExchange"
 
     queue:
-      queue: 'vizdoconsumer'
       passive: false
       durable: false
       exclusive: false
@@ -34,14 +33,12 @@ presets.dev1 =
       desc: "Config used by declareQueue"
 
     bind:
-      queue: "vizdoconsumer"
       exchange: "DOSignalX"
       routingKey: "#"
       noWait: false
       desc: "Config used by doBind"
 
     consume:
-      queue: "vizdoconsumer"
       consumerTag: "vizdo"
       noLocal: false
       noAck: true

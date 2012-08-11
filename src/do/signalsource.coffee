@@ -2,8 +2,8 @@ DO.amqp = null
 
 DO.signalsource = (settings, callback) ->
 
-  settings.log "init signalsource"
-  exchangeName = settings.kaazing.exchange.exchange
+  log = settings.log
+  exchange = settings.kaazing.exchange.exchange
   channel = null
 
   source =
@@ -15,19 +15,20 @@ DO.signalsource = (settings, callback) ->
       body.putString text, Charset.UTF8
       body.flip()
       headers = {}
-      channel.publishBasic body, headers, exchangeName, signal, false, false
+      channel.publishBasic body, headers, exchange, signal, false, false
 
   onConnect = (event) ->
-    settings.log "amqp connection opened ok"
+    log "amqp connection opened ok"
     channel = DO.amqp.openChannel onChannel
 
   onChannel= (event) ->
-    settings.log "amqp channel opened ok"
-    channel.onerror = onError
+    log "amqp channel opened ok"
+    channel.onerror = DO.amqp.onerror
+    channel.onclose = -> log "amqp channel closed"
     channel.declareExchange( settings.kaazing.exchange, onExchange )
 
   onExchange = (event) ->
-    settings.log "amqp exchange '#{exchangeName}' declared ok"
+    log "amqp exchange '#{exchange}' declared ok"
     queue = "vizdo" + ~~ (Math.random() * 10000000)
     settings.kaazing.queue.queue =
       settings.kaazing.bind.queue =
@@ -35,20 +36,17 @@ DO.signalsource = (settings, callback) ->
     channel.declareQueue(settings.kaazing.queue, onQueue )
 
   onQueue = (event) ->
-    settings.log "amqp queue '#{settings.kaazing.queue.queue}' declared ok"
+    log "amqp queue '#{settings.kaazing.queue.queue}' declared ok"
     channel.bindQueue( settings.kaazing.bind, onBind )
 
   onBind = (event) ->
-    settings.log "amqp bind ok"
+    log "amqp bind ok"
     channel.consumeBasic( settings.kaazing.consume )
     callback source
 
-  onError = (event) ->
-    settings.log "ERROR: amqp says '#{event.message}'"
-
   DO.amqp?.disconnect()
   DO.amqp = new AmqpClient()
-  DO.amqp.onclose =  -> settings.log("amqp connection closed")
-  DO.amqp.onerror =  (event) -> settings.log("ERROR: amqp says '#{event.message}'")
+  DO.amqp.onclose =  -> log("amqp connection closed")
+  DO.amqp.onerror =  (event) -> log("ERROR from amqp" )
   DO.amqp.connect(settings.kaazing.connect,  onConnect )
 
