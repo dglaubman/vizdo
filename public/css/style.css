@@ -91,6 +91,7 @@ h1 {
   font-weight: 300;
 }
 
+
 .foot {
   position: relative;
   font-weight: 300;
@@ -134,4 +135,9 @@ button:hover {
 label {
   font: 18px Helvetica Neue;
   margin-bottom: 22px;
+}
+
+.log {
+    height: 300px;
+    overflow: scroll;
 }

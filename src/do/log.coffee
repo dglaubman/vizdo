@@ -3,7 +3,7 @@ DO.log = (target) ->
   lineNo = 0
 
   (msg) ->
-    target.append("pre").text( msg )
+    target.insert("pre", ":first-child").text( msg )
     if lineNo++ > maxLines
       target.html ''
       lineNo = 0

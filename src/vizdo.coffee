@@ -1,4 +1,6 @@
 log = DO.log d3.select("#log")
+d3.select("#semver").text( DO.semver )
+
 cluster = d3.select("input[name=cluster]:checked").attr("value")
 
 makeHref = (cluster) ->
@@ -7,7 +9,7 @@ makeHref = (cluster) ->
   "http://" + username + ":" + password + "@" + host
 
 d3.select("#knobsRef").on "click", ->
-  d3.select("#page").text "Twiddle (with care). Click on a leaf to edit"
+  d3.select("#page").text cluster + " settings. Click on a leaf to edit."
   d3.select(".gallery").classed "invisible", true
   d3.select(".knobs").classed "invisible", false
   knobs( presets[cluster] )

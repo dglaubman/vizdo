@@ -25,7 +25,6 @@ presets.test =
       desc: "Config used by declareExchage"
 
     queue:
-      queue: 'vizdo'
       passive: false
       durable: false
       exclusive: false
@@ -34,23 +33,21 @@ presets.test =
       desc: "Config used by declareQueue"
 
     bind:
-      queue: "vizdo"
       exchange: "signalX"
       routingKey: "#"
       noWait: false
       desc: "Config used by doBind"
 
     consume:
-      queue: "vizdo"
       consumerTag: "vizdo"
       noLocal: false
       noAck: true
       exclusive: false
-      noWait: true
+      noWait: false
       desc: "Config used by doBind"
 
   mongoose:
     baseUri: "http://cadt0734.rms.com:27080/DODatabase"
-    skip: 20
+    skip: 0
     limit: 30
     batchsize: 40

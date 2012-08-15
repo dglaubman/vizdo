@@ -1,1 +1,1 @@
-DO = { version: "0.0.1" }
+DO = { semver: "0.1.0" }

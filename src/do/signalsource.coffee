@@ -6,17 +6,6 @@ DO.signalsource = (settings, callback) ->
   exchange = settings.kaazing.exchange.exchange
   channel = null
 
-  source =
-    subscribe: (callback) ->
-      channel.onmessage = callback
-
-    publish: (signal, text) ->
-      body = new ByteBuffer()
-      body.putString text, Charset.UTF8
-      body.flip()
-      headers = {}
-      channel.publishBasic body, headers, exchange, signal, false, false
-
   onConnect = (event) ->
     log "amqp connection opened ok"
     channel = DO.amqp.openChannel onChannel
@@ -41,8 +30,18 @@ DO.signalsource = (settings, callback) ->
 
   onBind = (event) ->
     log "amqp bind ok"
-    channel.consumeBasic( settings.kaazing.consume )
-    callback source
+    callback(
+      subscribe: (msgHandler) ->
+        channel.consumeBasic( settings.kaazing.consume)
+        channel.onmessage = msgHandler
+
+      publish: (signal, text) ->
+        body = new ByteBuffer()
+        body.putString text, Charset.UTF8
+        body.flip()
+        headers = {}
+        channel.publishBasic body, headers, exchange, signal, false, false
+      )
 
   DO.amqp?.disconnect()
   DO.amqp = new AmqpClient()

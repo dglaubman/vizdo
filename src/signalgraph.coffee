@@ -89,5 +89,5 @@ buildSignalGraph = ( settings, j, source) ->
     .text( (d) -> if d.key? then d.key else formatDate( d.PublishTime ) )
 
   source.subscribe( (event) ->
-    log "message from #{event.args.routingKey}: " + event.body.getString(Charset.UTF8) )
+    log "rcv msg" )##{event.type} #{event.args.routingKey}: " + event.body.getString(Charset.UTF8) )
 

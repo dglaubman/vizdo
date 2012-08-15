@@ -26,7 +26,7 @@ presets.dev1 =
 
     queue:
       passive: false
-      durable: false
+      durable: true
       exclusive: false
       autoDelete: true
       noWait: false
