@@ -1,23 +1,27 @@
-DO.amqp = null
-
 DO.signalsource = (settings, callback) ->
 
+  amqp = new AmqpClient()
   log = settings.log
-  exchange = settings.kaazing.exchange.exchange
+  xname = settings.kaazing.exchange.exchange
   channel = null
 
-  onConnect = (event) ->
-    log "amqp connection opened ok"
-    channel = DO.amqp.openChannel onChannel
+  onBind = (event) ->
+    log "amqp bind ok"
+    callback(
+      subscribe: (msgHandler) ->
+        channel.onmessage = msgHandler
+        channel.consumeBasic( settings.kaazing.consume)
 
-  onChannel= (event) ->
-    log "amqp channel opened ok"
-    channel.onerror = DO.amqp.onerror
-    channel.onclose = -> log "amqp channel closed"
-    channel.declareExchange( settings.kaazing.exchange, onExchange )
+      publish: (signal, text) ->
+        body = new ByteBuffer()
+        body.putString text, Charset.UTF8
+        body.flip()
+        headers = {}
+        channel.publishBasic body, headers, xname, signal, false, false
+      )
 
   onExchange = (event) ->
-    log "amqp exchange '#{exchange}' declared ok"
+    log "amqp exchange '#{xname}' declared ok"
     queue = "vizdo" + ~~ (Math.random() * 10000000)
     settings.kaazing.queue.queue =
       settings.kaazing.bind.queue =
@@ -28,24 +32,13 @@ DO.signalsource = (settings, callback) ->
     log "amqp queue '#{settings.kaazing.queue.queue}' declared ok"
     channel.bindQueue( settings.kaazing.bind, onBind )
 
-  onBind = (event) ->
-    log "amqp bind ok"
-    callback(
-      subscribe: (msgHandler) ->
-        channel.consumeBasic( settings.kaazing.consume)
-        channel.onmessage = msgHandler
+  onChannel= (event) ->
+    log "amqp channel opened ok"
+    channel.declareExchange( settings.kaazing.exchange, onExchange )
 
-      publish: (signal, text) ->
-        body = new ByteBuffer()
-        body.putString text, Charset.UTF8
-        body.flip()
-        headers = {}
-        channel.publishBasic body, headers, exchange, signal, false, false
-      )
+  onConnect = (event) ->
+    log "amqp connection opened ok"
+    channel = amqp.openChannel onChannel
 
-  DO.amqp?.disconnect()
-  DO.amqp = new AmqpClient()
-  DO.amqp.onclose =  -> log("amqp connection closed")
-  DO.amqp.onerror =  (event) -> log("ERROR from amqp" )
-  DO.amqp.connect(settings.kaazing.connect,  onConnect )
+  amqp.connect(settings.kaazing.connect,  onConnect )
 

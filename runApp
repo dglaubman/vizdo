@@ -1,3 +1,4 @@
+coffee --bare -o public/js/lib  -c src/lib
 coffee --bare -o public/js  -c src/ 
 coffee --bare -o public/js/presets -c  src/presets/
 coffee --bare -o public/js/do -c  src/do/

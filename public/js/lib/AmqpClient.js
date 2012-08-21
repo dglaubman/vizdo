@@ -2173,7 +2173,7 @@ _261.onmessage(e);
 }
 };
 function closeHandler(_267,e){
-_267.onclose(e);
+if(_267.onclose) _267.onclose(e);
 };
 function errorHandler(_269,e){
 _269.onerror(e);

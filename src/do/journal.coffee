@@ -1,8 +1,11 @@
 DO.journal = (settings, callback) ->
 
-  onconnect = (reply) ->
+  onerror = () -> settings.log "error connecting to journal via mongoose"
+
+  onconnect = (raw) ->
+    reply = JSON.parse raw
     if reply.ok isnt 1
-      return settings.log "mongoose says: " + reply.errmsg
+      return settings.log "mongoose says: " + reply?.errmsg
 
     settings.log 'connected'
 
@@ -33,6 +36,5 @@ DO.journal = (settings, callback) ->
 
   url = settings.mongoose.baseUri + "/_connect"
   server = "server=#{settings.journal.host}&name=#{settings.cluster}"
-  $.post(url, server, onconnect )
-    .error () -> settings.log "error connecting to journal via mongoose"
+  post(url, server, onconnect, onerror )
   settings.log "connecting to Journal at #{settings.journal.host} ..."
