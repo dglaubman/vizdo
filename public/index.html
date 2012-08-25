@@ -26,7 +26,6 @@
 	<a href="/"><h1>VizDO</h1></a>
       </div>
       <h1 id="page">Click on a cluster name</h1>
-      
       <div class='gallery' id='chart' height='1100' width='920'>
 	<div class='sidebar'>
 	  <br/>
@@ -44,13 +43,15 @@
 	    <input type="radio" name="cluster" id="test" value="test" checked />	
 	    <label for="test">Test</label>
 	  </div>
-      </div>
-      </div>
-
-    <div class="knobs invisible" id="chart2" height="800" width="920">
-
+	  <div>
+	  <br/>
+	  <input type="button" id="prevPage" value="<" />
+	  <input type="button" id="nextPage" value=">" />
+	  </div>
+	</div>
     </div>
-    
+      <div class="knobs invisible" id="chart2" height="800" width="920">
+      </div>
     <div class="foot">
       <div><h3>Log</h3><hr/>
       <div id="log" class="log"></div>

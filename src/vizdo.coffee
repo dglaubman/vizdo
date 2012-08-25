@@ -26,6 +26,16 @@ d3.selectAll("input[name=cluster]").on "change", ->
   d3.select("#page").text cluster
   refresh()
 
+d3.selectAll("input[type=button]").on "click", (d) ->
+  settings = presets[cluster].mongoose
+  oldskip = settings.skip
+  delta = Math.min settings.limit, settings.batchsize
+  sign = if @value is "<" then -1 else 1
+  newskip = settings.skip + sign * delta
+  newskip = Math.max 0, newskip
+  settings.skip = newskip
+  refresh()
+
 refresh = ->
   settings = presets[cluster]
   settings.log = log

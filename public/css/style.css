@@ -91,7 +91,6 @@ h1 {
   font-weight: 300;
 }
 
-
 .foot {
   position: relative;
   font-weight: 300;
@@ -101,22 +100,19 @@ h1 {
 /*  clear: left; */
 }
 
-button {
-/*  background-color: #lightgrey; */
-  font: 14px Helvetica Neue;
-/*  color: #fff;
-  text-shadow: 0 -1px 1px #222; */
-  padding: 6px 10px 6px 10px;
+input[type=button] {
+  font: 20px Helvetica Neue;
+  color: #333; 
+  padding: 4px 6px 4px 6px;
   border: 0;
   border-bottom: 1px solid #222;
-  min-width: 80px;
   -moz-border-radius: 5px;
   -moz-box-shadow: 0 1px 3px #999;
   -webkit-border-radius: 5px;
   -webkit-box-shadow: 0 1px 3px #999;
 }
 
-button:hover {
+input[type=button]:hover {
   background-color: #555;
 }
 
