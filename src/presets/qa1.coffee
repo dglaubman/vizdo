@@ -2,7 +2,7 @@ presets.qa1 =
   cluster: "qa1"
 
   journal:
-    host: "ec2-23-22-139-188.compute-1.amazonaws.com:27017"
+    host: "ec2-23-23-44-52.compute-1.amazonaws.com"
 
   amqp:
     host: "ec2-107-21-184-64.compute-1.amazonaws.com:55672"

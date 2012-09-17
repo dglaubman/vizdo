@@ -3,373 +3,214 @@
  */
 
 var browser=null;
-if(typeof (ActiveXObject)!="undefined"){
-browser="ie";
-}else{
-if(Object.prototype.toString.call(window.opera)=="[object Opera]"){
-browser="opera";
-}else{
-if(navigator.vendor.indexOf("Apple")!=-1){
-browser="safari";
-if(navigator.userAgent.indexOf("iPad")!=-1||navigator.userAgent.indexOf("iPhone")!=-1){
-browser.ios=true;
-}
-}else{
-if(navigator.vendor.indexOf("Google")!=-1){
-if(navigator.userAgent.indexOf("Android")!=-1){
-browser="android";
-}else{
-browser="chrome";
-}
-}else{
-if(navigator.product=="Gecko"&&window.find&&!navigator.savePreferences){
-browser="firefox";
-}else{
-throw new Error("couldn't detect browser");
-}
-}
-}
-}
-}
-switch(browser){
-case "ie":
-(function(){
-if(document.createEvent===undefined){
-var _1=function(){
+if(typeof(ActiveXObject)!="undefined"){browser="ie"
+}else{if(Object.prototype.toString.call(window.opera)=="[object Opera]"){browser="opera"
+}else{if(navigator.vendor.indexOf("Apple")!=-1){browser="safari";
+if(navigator.userAgent.indexOf("iPad")!=-1||navigator.userAgent.indexOf("iPhone")!=-1){browser.ios=true
+}}else{if(navigator.vendor.indexOf("Google")!=-1){if(navigator.userAgent.indexOf("Android")!=-1){browser="android"
+}else{browser="chrome"
+}}else{if(navigator.product=="Gecko"&&window.find&&!navigator.savePreferences){browser="firefox"
+}else{throw new Error("couldn't detect browser")
+}}}}}switch(browser){case"ie":(function(){if(document.createEvent===undefined){var a=function(){};
+a.prototype.initEvent=function(h,j,g){this.type=h;
+this.bubbles=j;
+this.cancelable=g
 };
-_1.prototype.initEvent=function(_2,_3,_4){
-this.type=_2;
-this.bubbles=_3;
-this.cancelable=_4;
+document.createEvent=function(g){if(g!="Events"){throw new Error("Unsupported event name: "+g)
+}return new a()
+}
+}document._w_3_c_d_o_m_e_v_e_n_t_s_createElement=document.createElement;
+document.createElement=function(g){var j=this._w_3_c_d_o_m_e_v_e_n_t_s_createElement(g);
+if(j.addEventListener===undefined){var h={};
+j.addEventListener=function(l,m,k){j.attachEvent("on"+l,m);
+return e(h,l,m,k)
 };
-document.createEvent=function(_5){
-if(_5!="Events"){
-throw new Error("Unsupported event name: "+_5);
-}
-return new _1();
+j.removeEventListener=function(l,m,k){return d(h,l,m,k)
 };
+j.dispatchEvent=function(k){return f(h,k)
 }
-document._w_3_c_d_o_m_e_v_e_n_t_s_createElement=document.createElement;
-document.createElement=function(_6){
-var _7=this._w_3_c_d_o_m_e_v_e_n_t_s_createElement(_6);
-if(_7.addEventListener===undefined){
-var _8={};
-_7.addEventListener=function(_9,_a,_b){
-_7.attachEvent("on"+_9,_a);
-return addEventListener(_8,_9,_a,_b);
+}return j
 };
-_7.removeEventListener=function(_c,_d,_e){
-return removeEventListener(_8,_c,_d,_e);
-};
-_7.dispatchEvent=function(_f){
-return dispatchEvent(_8,_f);
-};
-}
-return _7;
-};
-if(window.addEventListener===undefined){
-var _10=document.createElement("div");
-var _11=(typeof (postMessage)==="undefined");
-window.addEventListener=function(_12,_13,_14){
-if(_11&&_12=="message"){
-_10.addEventListener(_12,_13,_14);
-}else{
-window.attachEvent("on"+_12,_13);
-}
-};
-window.removeEventListener=function(_15,_16,_17){
-if(_11&&_15=="message"){
-_10.removeEventListener(_15,_16,_17);
-}else{
-window.detachEvent("on"+_15,_16);
-}
-};
-window.dispatchEvent=function(_18){
-if(_11&&_18.type=="message"){
-_10.dispatchEvent(_18);
-}else{
-window.fireEvent("on"+_18.type,_18);
-}
-};
-}
-function addEventListener(_19,_1a,_1b,_1c){
-if(_1c){
-throw new Error("Not implemented");
-}
-var _1d=_19[_1a]||{};
-_19[_1a]=_1d;
-_1d[_1b]=_1b;
-};
-function removeEventListener(_1e,_1f,_20,_21){
-if(_21){
-throw new Error("Not implemented");
-}
-var _22=_1e[_1f]||{};
-delete _22[_20];
-};
-function dispatchEvent(_23,_24){
-var _25=_24.type;
-var _26=_23[_25]||{};
-for(var key in _26){
-if(typeof (_26[key])=="function"){
-try{
-_26[key](_24);
-}
-catch(e){
-}
-}
-}
-};
-})();
+if(window.addEventListener===undefined){var b=document.createElement("div");
+var c=(typeof(postMessage)==="undefined");
+window.addEventListener=function(h,j,g){if(c&&h=="message"){b.addEventListener(h,j,g)
+}else{window.attachEvent("on"+h,j)
+}};
+window.removeEventListener=function(h,j,g){if(c&&h=="message"){b.removeEventListener(h,j,g)
+}else{window.detachEvent("on"+h,j)
+}};
+window.dispatchEvent=function(g){if(c&&g.type=="message"){b.dispatchEvent(g)
+}else{window.fireEvent("on"+g.type,g)
+}}
+}function e(j,h,l,g){if(g){throw new Error("Not implemented")
+}var k=j[h]||{};
+j[h]=k;
+k[l]=l
+}function d(j,h,l,g){if(g){throw new Error("Not implemented")
+}var k=j[h]||{};
+delete k[l]
+}function f(j,l){var g=l.type;
+var k=j[g]||{};
+for(var h in k){if(typeof(k[h])=="function"){try{k[h](l)
+}catch(m){}}}}})();
 break;
-case "chrome":
-case "android":
-case "safari":
-if(typeof (window.postMessage)==="undefined"&&typeof (window.dispatchEvent)==="undefined"&&typeof (document.dispatchEvent)==="function"){
-window.dispatchEvent=function(_28){
-document.dispatchEvent(_28);
+case"chrome":case"android":case"safari":if(typeof(window.postMessage)==="undefined"&&typeof(window.dispatchEvent)==="undefined"&&typeof(document.dispatchEvent)==="function"){window.dispatchEvent=function(a){document.dispatchEvent(a)
 };
 var addEventListener0=window.addEventListener;
-window.addEventListener=function(_29,_2a,_2b){
-if(_29==="message"){
-document.addEventListener(_29,_2a,_2b);
-}else{
-addEventListener0.call(window,_29,_2a,_2b);
-}
+window.addEventListener=function(b,c,a){if(b==="message"){document.addEventListener(b,c,a)
+}else{addEventListener0.call(window,b,c,a)
+}};
+var removeEventListener0=window.removeEventListener;
+window.removeEventListener=function(b,c,a){if(b==="message"){document.removeEventListener(b,c,a)
+}else{removeEventListener0.call(window,b,c,a)
+}}
+}break;
+case"opera":var addEventListener0=window.addEventListener;
+window.addEventListener=function(b,d,a){var c=d;
+if(b==="message"){c=function(f){if(f.origin===undefined&&f.uri!==undefined){var e=new URI(f.uri);
+delete e.path;
+delete e.query;
+delete e.fragment;
+f.origin=e.toString()
+}return d(f)
+};
+d._$=c
+}addEventListener0.call(window,b,c,a)
 };
 var removeEventListener0=window.removeEventListener;
-window.removeEventListener=function(_2c,_2d,_2e){
-if(_2c==="message"){
-document.removeEventListener(_2c,_2d,_2e);
-}else{
-removeEventListener0.call(window,_2c,_2d,_2e);
-}
+window.removeEventListener=function(b,d,a){var c=d;
+if(b==="message"){c=d._$
+}removeEventListener0.call(window,b,c,a)
 };
-}
-break;
-case "opera":
-var addEventListener0=window.addEventListener;
-window.addEventListener=function(_2f,_30,_31){
-var _32=_30;
-if(_2f==="message"){
-_32=function(_33){
-if(_33.origin===undefined&&_33.uri!==undefined){
-var uri=new URI(_33.uri);
-delete uri.path;
-delete uri.query;
-delete uri.fragment;
-_33.origin=uri.toString();
-}
-return _30(_33);
+break
+}function URI(h){h=h||"";
+var b=0;
+var e=h.indexOf("://");
+if(e!=-1){this.scheme=h.slice(0,e);
+b=e+3;
+var d=h.indexOf("/",b);
+if(d==-1){d=h.length;
+h+="/"
+}var f=h.slice(b,d);
+this.authority=f;
+b=d;
+this.host=f;
+var c=f.indexOf(":");
+if(c!=-1){this.host=f.slice(0,c);
+this.port=parseInt(f.slice(c+1),10);
+if(isNaN(this.port)){throw new Error("Invalid URI syntax")
+}}}var g=h.indexOf("?",b);
+if(g!=-1){this.path=h.slice(b,g);
+b=g+1
+}var a=h.indexOf("#",b);
+if(a!=-1){if(g!=-1){this.query=h.slice(b,a)
+}else{this.path=h.slice(b,a)
+}b=a+1;
+this.fragment=h.slice(b)
+}else{if(g!=-1){this.query=h.slice(b)
+}else{this.path=h.slice(b)
+}}}(function(){var a=URI.prototype;
+a.toString=function(){var e=[];
+var d=this.scheme;
+if(d!==undefined){e.push(d);
+e.push("://");
+e.push(this.host);
+var c=this.port;
+if(c!==undefined){e.push(":");
+e.push(c.toString())
+}}if(this.path!==undefined){e.push(this.path)
+}if(this.query!==undefined){e.push("?");
+e.push(this.query)
+}if(this.fragment!==undefined){e.push("#");
+e.push(this.fragment)
+}return e.join("")
 };
-_30._$=_32;
-}
-addEventListener0.call(window,_2f,_32,_31);
-};
-var removeEventListener0=window.removeEventListener;
-window.removeEventListener=function(_35,_36,_37){
-var _38=_36;
-if(_35==="message"){
-_38=_36._$;
-}
-removeEventListener0.call(window,_35,_38,_37);
-};
-break;
-}
-function URI(str){
-str=str||"";
-var _3a=0;
-var _3b=str.indexOf("://");
-if(_3b!=-1){
-this.scheme=str.slice(0,_3b);
-_3a=_3b+3;
-var _3c=str.indexOf("/",_3a);
-if(_3c==-1){
-_3c=str.length;
-str+="/";
-}
-var _3d=str.slice(_3a,_3c);
-this.authority=_3d;
-_3a=_3c;
-this.host=_3d;
-var _3e=_3d.indexOf(":");
-if(_3e!=-1){
-this.host=_3d.slice(0,_3e);
-this.port=parseInt(_3d.slice(_3e+1),10);
-if(isNaN(this.port)){
-throw new Error("Invalid URI syntax");
-}
-}
-}
-var _3f=str.indexOf("?",_3a);
-if(_3f!=-1){
-this.path=str.slice(_3a,_3f);
-_3a=_3f+1;
-}
-var _40=str.indexOf("#",_3a);
-if(_40!=-1){
-if(_3f!=-1){
-this.query=str.slice(_3a,_40);
-}else{
-this.path=str.slice(_3a,_40);
-}
-_3a=_40+1;
-this.fragment=str.slice(_3a);
-}else{
-if(_3f!=-1){
-this.query=str.slice(_3a);
-}else{
-this.path=str.slice(_3a);
-}
-}
-};
-(function(){
-var _41=URI.prototype;
-_41.toString=function(){
-var sb=[];
-var _43=this.scheme;
-if(_43!==undefined){
-sb.push(_43);
-sb.push("://");
-sb.push(this.host);
-var _44=this.port;
-if(_44!==undefined){
-sb.push(":");
-sb.push(_44.toString());
-}
-}
-if(this.path!==undefined){
-sb.push(this.path);
-}
-if(this.query!==undefined){
-sb.push("?");
-sb.push(this.query);
-}
-if(this.fragment!==undefined){
-sb.push("#");
-sb.push(this.fragment);
-}
-return sb.join("");
-};
-var _45={"http":80,"ws":80,"https":443,"wss":443};
+var b={http:80,ws:80,https:443,wss:443};
+URI.replaceProtocol=function(c,e){var d=c.indexOf("://");
+if(d>0){return e+c.substr(d)
+}else{return""
+}}
 })();
-(function(){
-Base64={};
-Base64.encode=function(_46){
-var _47=[];
-var _48;
-var _49;
-var _4a;
-while(_46.length){
-switch(_46.length){
-case 1:
-_48=_46.shift();
-_47.push(_4b[(_48>>2)&63]);
-_47.push(_4b[((_48<<4)&48)]);
-_47.push("=");
-_47.push("=");
+(function(){Base64={};
+Base64.encode=function(g){var f=[];
+var h;
+var e;
+var d;
+while(g.length){switch(g.length){case 1:h=g.shift();
+f.push(c[(h>>2)&63]);
+f.push(c[((h<<4)&48)]);
+f.push("=");
+f.push("=");
 break;
-case 2:
-_48=_46.shift();
-_49=_46.shift();
-_47.push(_4b[(_48>>2)&63]);
-_47.push(_4b[((_48<<4)&48)|((_49>>4)&15)]);
-_47.push(_4b[(_49<<2)&60]);
-_47.push("=");
+case 2:h=g.shift();
+e=g.shift();
+f.push(c[(h>>2)&63]);
+f.push(c[((h<<4)&48)|((e>>4)&15)]);
+f.push(c[(e<<2)&60]);
+f.push("=");
 break;
-default:
-_48=_46.shift();
-_49=_46.shift();
-_4a=_46.shift();
-_47.push(_4b[(_48>>2)&63]);
-_47.push(_4b[((_48<<4)&48)|((_49>>4)&15)]);
-_47.push(_4b[((_49<<2)&60)|((_4a>>6)&3)]);
-_47.push(_4b[_4a&63]);
-break;
-}
-}
-return _47.join("");
+default:h=g.shift();
+e=g.shift();
+d=g.shift();
+f.push(c[(h>>2)&63]);
+f.push(c[((h<<4)&48)|((e>>4)&15)]);
+f.push(c[((e<<2)&60)|((d>>6)&3)]);
+f.push(c[d&63]);
+break
+}}return f.join("")
 };
-Base64.decode=function(_4c){
-if(_4c.length===0){
-return [];
-}
-if(_4c.length%4!==0){
-throw new Error("Invalid base64 string (must be quads)");
-}
-var _4d=[];
-for(var i=0;i<_4c.length;i+=4){
-var _4f=_4c.charAt(i);
-var _50=_4c.charAt(i+1);
-var _51=_4c.charAt(i+2);
-var _52=_4c.charAt(i+3);
-var _53=_54[_4f];
-var _55=_54[_50];
-var _56=_54[_51];
-var _57=_54[_52];
-_4d.push(((_53<<2)&252)|((_55>>4)&3));
-if(_51!="="){
-_4d.push(((_55<<4)&240)|((_56>>2)&15));
-if(_52!="="){
-_4d.push(((_56<<6)&192)|(_57&63));
-}
-}
-}
-return _4d;
+Base64.decode=function(j){if(j.length===0){return[]
+}if(j.length%4!==0){throw new Error("Invalid base64 string (must be quads)")
+}var o=[];
+for(var d=0;
+d<j.length;
+d+=4){var l=j.charAt(d);
+var h=j.charAt(d+1);
+var f=j.charAt(d+2);
+var e=j.charAt(d+3);
+var n=a[l];
+var m=a[h];
+var k=a[f];
+var g=a[e];
+o.push(((n<<2)&252)|((m>>4)&3));
+if(f!="="){o.push(((m<<4)&240)|((k>>2)&15));
+if(e!="="){o.push(((k<<6)&192)|(g&63))
+}}}return o
 };
-var _4b="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split("");
-var _54={"=":0};
-for(var i=0;i<_4b.length;i++){
-_54[_4b[i]]=i;
-}
-if(typeof (window.btoa)==="undefined"){
-window.btoa=function(s){
-var _5a=s.split("");
-for(var i=0;i<_5a.length;i++){
-_5a[i]=(_5a[i]).charCodeAt();
-}
-return Base64.encode(_5a);
+var c="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/".split("");
+var a={"=":0};
+for(var b=0;
+b<c.length;
+b++){a[c[b]]=b
+}if(typeof(window.btoa)==="undefined"){window.btoa=function(f){var d=f.split("");
+for(var e=0;
+e<d.length;
+e++){d[e]=(d[e]).charCodeAt()
+}return Base64.encode(d)
 };
-window.atob=function(_5c){
-var _5d=Base64.decode(_5c);
-for(var i=0;i<_5d.length;i++){
-_5d[i]=String.fromCharCode(_5d[i]);
+window.atob=function(d){var e=Base64.decode(d);
+for(var f=0;
+f<e.length;
+f++){e[f]=String.fromCharCode(e[f])
+}return e.join("")
 }
-return _5d.join("");
-};
-}
-})();
-var postMessage0=(function(){
-var _5f=new URI((browser=="ie")?document.URL:location.href);
-var _60={"http":80,"https":443};
-if(_5f.port==null){
-_5f.port=_60[_5f.scheme];
-_5f.authority=_5f.host+":"+_5f.port;
-}
-var _61=_5f.scheme+"://"+_5f.authority;
-var _62="/.kr";
-if(typeof (postMessage)!=="undefined"){
-return function(_63,_64,_65){
-if(typeof (_64)!="string"){
-throw new Error("Unsupported type. Messages must be strings");
-}
-switch(browser){
-case "ie":
-case "opera":
-case "firefox":
-setTimeout(function(){
-_63.postMessage(_64,_65);
+}})();
+var postMessage0=(function(){var g=new URI((browser=="ie")?document.URL:location.href);
+var u={http:80,https:443};
+if(g.port==null){g.port=u[g.scheme];
+g.authority=g.host+":"+g.port
+}var y=g.scheme+"://"+g.authority;
+var s="/.kr";
+if(typeof(postMessage)!=="undefined"){return function(E,D,C){if(typeof(D)!="string"){throw new Error("Unsupported type. Messages must be strings")
+}if(C==="null"){C="*"
+}switch(browser){case"ie":case"opera":case"firefox":setTimeout(function(){E.postMessage(D,C)
 },0);
 break;
-default:
-_63.postMessage(_64,_65);
-break;
-}
-};
-}else{
-function MessagePipe(_66){
-this.sourceToken=toPaddedHex(Math.floor(Math.random()*(Math.pow(2,32)-1)),8);
-this.iframe=_66;
+default:E.postMessage(D,C);
+break
+}}
+}else{function v(C){this.sourceToken=d(Math.floor(Math.random()*(Math.pow(2,32)-1)),8);
+this.iframe=C;
 this.bridged=false;
 this.lastWrite=0;
 this.lastRead=0;
@@ -377,5821 +218,5503 @@ this.lastReadIndex=2;
 this.lastSyn=0;
 this.lastAck=0;
 this.queue=[];
-this.escapedFragments=[];
-};
-var _67=MessagePipe.prototype;
-_67.attach=function(_68,_69,_6a,_6b,_6c,_6d){
-this.target=_68;
-this.targetOrigin=_69;
-this.targetToken=_6a;
-this.reader=_6b;
-this.writer=_6c;
-this.writerURL=_6d;
-try{
-this._lastHash=_6b.location.hash;
-this.poll=pollLocationHash;
-}
-catch(permissionDenied){
-this._lastDocumentURL=_6b.document.URL;
-this.poll=pollDocumentURL;
-}
-if(_68==parent){
-dequeue(this,true);
-}
-};
-_67.detach=function(){
-this.poll=function(){
-};
+this.escapedFragments=[]
+}var w=v.prototype;
+w.attach=function(I,D,E,C,H,G){this.target=I;
+this.targetOrigin=D;
+this.targetToken=E;
+this.reader=C;
+this.writer=H;
+this.writerURL=G;
+try{this._lastHash=C.location.hash;
+this.poll=e
+}catch(F){this._lastDocumentURL=C.document.URL;
+this.poll=c
+}if(I==parent){b(this,true)
+}};
+w.detach=function(){this.poll=function(){};
 delete this.target;
 delete this.targetOrigin;
 delete this.reader;
 delete this.lastFragment;
 delete this.writer;
-delete this.writerURL;
+delete this.writerURL
 };
-_67.poll=function(){
-};
-function pollLocationHash(){
-var _6e=this.reader.location.hash;
-if(this._lastHash!=_6e){
-process(this,_6e.substring(1));
-this._lastHash=_6e;
-}
-};
-function pollDocumentURL(){
-var _6f=this.reader.document.URL;
-if(this._lastDocumentURL!=_6f){
-var _70=_6f.indexOf("#");
-if(_70!=-1){
-process(this,_6f.substring(_70+1));
-this._lastDocumentURL=_6f;
-}
-}
-};
-_67.post=function(_71,_72,_73){
-bridgeIfNecessary(this,_71);
-var _74=1000;
-var _75=escape(_72);
-var _76=[];
-while(_75.length>_74){
-var _77=_75.substring(0,_74);
-_75=_75.substring(_74);
-_76.push(_77);
-}
-_76.push(_75);
-this.queue.push([_73,_76]);
-if(this.writer!=null&&this.lastAck>=this.lastSyn){
-dequeue(this,false);
-}
-};
-function bridgeIfNecessary(_78,_79){
-if(_78.lastWrite<1&&!_78.bridged){
-if(_79.parent==window){
-var src=_78.iframe.src;
-var _7b=src.split("#");
-var _7c=null;
-var _7d=document.getElementsByTagName("meta");
-for(var i=0;i<_7d.length;i++){
-if(_7d[i].name=="kaazing:resources"){
-alert("kaazing:resources is no longer supported. Please refer to the Administrator's Guide section entitled \"Configuring a Web Server to Integrate with Kaazing Gateway\"");
-}
-}
-var _7f=_61;
-var _80=_7f.toString()+_62+"?.kr=xsp&.kv=10.05";
-if(_7c){
-var _81=new URI(_7f.toString());
-var _7b=_7c.split(":");
-_81.host=_7b.shift();
-if(_7b.length){
-_81.port=_7b.shift();
-}
-_80=_81.toString()+_62+"?.kr=xsp&.kv=10.05";
-}
-for(var i=0;i<_7d.length;i++){
-if(_7d[i].name=="kaazing:postMessageBridgeURL"){
-var _82=_7d[i].content;
-var _83=new URI(_82);
-var _84=new URI(location.toString());
-if(!_83.authority){
-_83.host=_84.host;
-_83.port=_84.port;
-_83.scheme=_84.scheme;
-if(_82.indexOf("/")!=0){
-var _85=_84.path.split("/");
-_85.pop();
-_85.push(_82);
-_83.path=_85.join("/");
-}
-}
-postMessage0.BridgeURL=_83.toString();
-}
-}
-if(postMessage0.BridgeURL){
-_80=postMessage0.BridgeURL;
-}
-var _86=["I",_7f,_78.sourceToken,escape(_80)];
-if(_7b.length>1){
-var _87=_7b[1];
-_86.push(escape(_87));
-}
-_7b[1]=_86.join("!");
-setTimeout(function(){
-_79.location.replace(_7b.join("#"));
+w.poll=function(){};
+function e(){var C=this.reader.location.hash;
+if(this._lastHash!=C){l(this,C.substring(1));
+this._lastHash=C
+}}function c(){var D=this.reader.document.URL;
+if(this._lastDocumentURL!=D){var C=D.indexOf("#");
+if(C!=-1){l(this,D.substring(C+1));
+this._lastDocumentURL=D
+}}}w.post=function(G,F,C){p(this,G);
+var I=1000;
+var D=escape(F);
+var H=[];
+while(D.length>I){var E=D.substring(0,I);
+D=D.substring(I);
+H.push(E)
+}H.push(D);
+this.queue.push([C,H]);
+if(this.writer!=null&&this.lastAck>=this.lastSyn){b(this,false)
+}};
+function p(N,M){if(N.lastWrite<1&&!N.bridged){if(M.parent==window){var C=N.iframe.src;
+var G=C.split("#");
+var Q=null;
+var R=document.getElementsByTagName("meta");
+for(var H=0;
+H<R.length;
+H++){if(R[H].name=="kaazing:resources"){alert('kaazing:resources is no longer supported. Please refer to the Administrator\'s Guide section entitled "Configuring a Web Server to Integrate with Kaazing Gateway"')
+}}var E=y;
+var K=E.toString()+s+"?.kr=xsp&.kv=10.05";
+if(Q){var J=new URI(E.toString());
+var G=Q.split(":");
+J.host=G.shift();
+if(G.length){J.port=G.shift()
+}K=J.toString()+s+"?.kr=xsp&.kv=10.05"
+}for(var H=0;
+H<R.length;
+H++){if(R[H].name=="kaazing:postMessageBridgeURL"){var F=R[H].content;
+var L=new URI(F);
+var D=new URI(location.toString());
+if(!L.authority){L.host=D.host;
+L.port=D.port;
+L.scheme=D.scheme;
+if(F.indexOf("/")!=0){var P=D.path.split("/");
+P.pop();
+P.push(F);
+L.path=P.join("/")
+}}n.BridgeURL=L.toString()
+}}if(n.BridgeURL){K=n.BridgeURL
+}var O=["I",E,N.sourceToken,escape(K)];
+if(G.length>1){var I=G[1];
+O.push(escape(I))
+}G[1]=O.join("!");
+setTimeout(function(){M.location.replace(G.join("#"))
 },200);
-_78.bridged=true;
-}
-}
-};
-function flush(_88,_89){
-var _8a=_88.writerURL+"#"+_89;
-_88.writer.location.replace(_8a);
-};
-function fromHex(_8b){
-return parseInt(_8b,16);
-};
-function toPaddedHex(_8c,_8d){
-var hex=_8c.toString(16);
-var _8f=[];
-_8d-=hex.length;
-while(_8d-->0){
-_8f.push("0");
-}
-_8f.push(hex);
-return _8f.join("");
-};
-function dequeue(_90,_91){
-var _92=_90.queue;
-var _93=_90.lastRead;
-if((_92.length>0||_91)&&_90.lastSyn>_90.lastAck){
-var _94=_90.lastFrames;
-var _95=_90.lastReadIndex;
-if(fromHex(_94[_95])!=_93){
-_94[_95]=toPaddedHex(_93,8);
-flush(_90,_94.join(""));
-}
-}else{
-if(_92.length>0){
-var _96=_92.shift();
-var _97=_96[0];
-if(_97=="*"||_97==_90.targetOrigin){
-_90.lastWrite++;
-var _98=_96[1];
-var _99=_98.shift();
-var _9a=3;
-var _94=[_90.targetToken,toPaddedHex(_90.lastWrite,8),toPaddedHex(_93,8),"F",toPaddedHex(_99.length,4),_99];
-var _95=2;
-if(_98.length>0){
-_94[_9a]="f";
-_90.queue.unshift(_96);
-}
-if(_90.resendAck){
-var _9b=[_90.targetToken,toPaddedHex(_90.lastWrite-1,8),toPaddedHex(_93,8),"a"];
-_94=_9b.concat(_94);
-_95+=_9b.length;
-}
-flush(_90,_94.join(""));
-_90.lastFrames=_94;
-_90.lastReadIndex=_95;
-_90.lastSyn=_90.lastWrite;
-_90.resendAck=false;
-}
-}else{
-if(_91){
-_90.lastWrite++;
-var _94=[_90.targetToken,toPaddedHex(_90.lastWrite,8),toPaddedHex(_93,8),"a"];
-var _95=2;
-if(_90.resendAck){
-var _9b=[_90.targetToken,toPaddedHex(_90.lastWrite-1,8),toPaddedHex(_93,8),"a"];
-_94=_9b.concat(_94);
-_95+=_9b.length;
-}
-flush(_90,_94.join(""));
-_90.lastFrames=_94;
-_90.lastReadIndex=_95;
-_90.resendAck=true;
-}
-}
-}
-};
-function process(_9c,_9d){
-var _9e=_9d.substring(0,8);
-var _9f=fromHex(_9d.substring(8,16));
-var _a0=fromHex(_9d.substring(16,24));
-var _a1=_9d.charAt(24);
-if(_9e!=_9c.sourceToken){
-throw new Error("postMessage emulation tampering detected");
-}
-var _a2=_9c.lastRead;
-var _a3=_a2+1;
-if(_9f==_a3){
-_9c.lastRead=_a3;
-}
-if(_9f==_a3||_9f==_a2){
-_9c.lastAck=_a0;
-}
-if(_9f==_a3||(_9f==_a2&&_a1=="a")){
-switch(_a1){
-case "f":
-var _a4=_9d.substr(29,fromHex(_9d.substring(25,29)));
-_9c.escapedFragments.push(_a4);
-dequeue(_9c,true);
+N.bridged=true
+}}}function q(E,D){var C=E.writerURL+"#"+D;
+E.writer.location.replace(C)
+}function x(C){return parseInt(C,16)
+}function d(E,C){var D=E.toString(16);
+var F=[];
+C-=D.length;
+while(C-->0){F.push("0")
+}F.push(D);
+return F.join("")
+}function b(J,K){var H=J.queue;
+var N=J.lastRead;
+if((H.length>0||K)&&J.lastSyn>J.lastAck){var E=J.lastFrames;
+var D=J.lastReadIndex;
+if(x(E[D])!=N){E[D]=d(N,8);
+q(J,E.join(""))
+}}else{if(H.length>0){var L=H.shift();
+var F=L[0];
+if(F=="*"||F==J.targetOrigin){J.lastWrite++;
+var M=L[1];
+var G=M.shift();
+var I=3;
+var E=[J.targetToken,d(J.lastWrite,8),d(N,8),"F",d(G.length,4),G];
+var D=2;
+if(M.length>0){E[I]="f";
+J.queue.unshift(L)
+}if(J.resendAck){var C=[J.targetToken,d(J.lastWrite-1,8),d(N,8),"a"];
+E=C.concat(E);
+D+=C.length
+}q(J,E.join(""));
+J.lastFrames=E;
+J.lastReadIndex=D;
+J.lastSyn=J.lastWrite;
+J.resendAck=false
+}}else{if(K){J.lastWrite++;
+var E=[J.targetToken,d(J.lastWrite,8),d(N,8),"a"];
+var D=2;
+if(J.resendAck){var C=[J.targetToken,d(J.lastWrite-1,8),d(N,8),"a"];
+E=C.concat(E);
+D+=C.length
+}q(J,E.join(""));
+J.lastFrames=E;
+J.lastReadIndex=D;
+J.resendAck=true
+}}}}function l(G,J){var C=J.substring(0,8);
+var M=x(J.substring(8,16));
+var F=x(J.substring(16,24));
+var H=J.charAt(24);
+if(C!=G.sourceToken){throw new Error("postMessage emulation tampering detected")
+}var K=G.lastRead;
+var I=K+1;
+if(M==I){G.lastRead=I
+}if(M==I||M==K){G.lastAck=F
+}if(M==I||(M==K&&H=="a")){switch(H){case"f":var E=J.substr(29,x(J.substring(25,29)));
+G.escapedFragments.push(E);
+b(G,true);
 break;
-case "F":
-var _a5=_9d.substr(29,fromHex(_9d.substring(25,29)));
-if(_9c.escapedFragments!==undefined){
-_9c.escapedFragments.push(_a5);
-_a5=_9c.escapedFragments.join("");
-_9c.escapedFragments=[];
-}
-var _a6=unescape(_a5);
-dispatch(_a6,_9c.target,_9c.targetOrigin);
-dequeue(_9c,true);
+case"F":var D=J.substr(29,x(J.substring(25,29)));
+if(G.escapedFragments!==undefined){G.escapedFragments.push(D);
+D=G.escapedFragments.join("");
+G.escapedFragments=[]
+}var L=unescape(D);
+B(L,G.target,G.targetOrigin);
+b(G,true);
 break;
-case "a":
-if(_9d.length>25){
-process(_9c,_9d.substring(25));
-}else{
-dequeue(_9c,false);
+case"a":if(J.length>25){l(G,J.substring(25))
+}else{b(G,false)
+}break;
+default:throw new Error("unknown postMessage emulation payload type: "+H)
+}}}function B(E,F,D){var C=document.createEvent("Events");
+C.initEvent("message",false,true);
+C.data=E;
+C.origin=D;
+C.source=F;
+dispatchEvent(C)
+}var k={};
+var A=[];
+function f(){for(var E=0,C=A.length;
+E<C;
+E++){var D=A[E];
+D.poll()
+}setTimeout(f,20)
+}function o(F){if(F==parent){return k.parent
+}else{if(F.parent==window){var E=document.getElementsByTagName("iframe");
+for(var C=0;
+C<E.length;
+C++){var D=E[C];
+if(F==D.contentWindow){return m(D)
+}}}else{throw new Error("Generic peer postMessage not yet implemented")
+}}}function m(E){var D=E._name;
+if(D===undefined){D="iframe$"+String(Math.random()).substring(2);
+E._name=D
+}var C=k[D];
+if(C===undefined){C=new v(E);
+k[D]=C
+}return C
+}function n(F,E,C){if(typeof(E)!="string"){throw new Error("Unsupported type. Messages must be strings")
+}if(F==window){if(C=="*"||C==y){B(E,window,y)
+}}else{var D=o(F);
+D.post(F,E,C)
+}}n.attach=function(I,D,F,C,H,G){var E=o(I);
+E.attach(I,D,F,C,H,G);
+A.push(E)
+};
+var a=function(E){var F=new URI((browser=="ie")?document.URL:location.href);
+var G;
+var S={http:80,https:443};
+if(F.port==null){F.port=S[F.scheme];
+F.authority=F.host+":"+F.port
+}var J=unescape(F.fragment||"");
+if(J.length>0){var D=J.split(",");
+var O=D.shift();
+var C=D.shift();
+var U=D.shift();
+var L=F.scheme+"://"+document.domain+":"+F.port;
+var R=F.scheme+"://"+F.authority;
+var H=O+"/.kr?.kr=xsc&.kv=10.05";
+var N=document.location.toString().split("#")[0];
+var K=H+"#"+escape([L,C,escape(N)].join(","));
+if(typeof(ActiveXObject)!="undefined"){G=new ActiveXObject("htmlfile");
+G.open();
+try{G.parentWindow.opener=window
+}catch(Q){if(E){G.domain=E
+}G.parentWindow.opener=window
+}G.write("<html>");
+G.write("<body>");
+if(E){G.write("<script>CollectGarbage();document.domain='"+E+"';<\/script>")
+}G.write('<iframe src="'+H+'"></iframe>');
+G.write("</body>");
+G.write("</html>");
+G.close();
+var I=G.body.lastChild;
+var P=G.parentWindow;
+var V=parent;
+var M=V.parent.postMessage0;
+if(typeof(M)!="undefined"){I.onload=function(){var W=I.contentWindow;
+W.location.replace(K);
+M.attach(V,O,U,P,W,H)
 }
+}}else{var I=document.createElement("iframe");
+I.src=K;
+document.body.appendChild(I);
+var P=window;
+var T=I.contentWindow;
+var V=parent;
+var M=V.parent.postMessage0;
+if(typeof(M)!="undefined"){M.attach(V,O,U,P,T,H)
+}}}window.onunload=function(){try{var X=window.parent.parent.postMessage0;
+if(typeof(X)!="undefined"){X.detach(V)
+}}catch(W){}if(typeof(G)!=="undefined"){G.parentWindow.opener=null;
+G.open();
+G.close();
+G=null;
+CollectGarbage()
+}}
+};
+n.__init__=function(D,E){var C=a.toString();
+D.URI=URI;
+D.browser=browser;
+if(!E){E=""
+}D.setTimeout("("+C+")('"+E+"')",0)
+};
+n.bridgeURL=false;
+n.detach=function(E){var C=o(E);
+for(var D=0;
+D<A.length;
+D++){if(A[D]==C){A.splice(D,1)
+}}C.detach()
+};
+if(window!=top){k.parent=new v();
+function h(){var G=new URI((browser=="ie")?document.URL:location.href);
+var K=G.fragment||"";
+if(document.body!=null&&K.length>0&&K.charAt(0)=="I"){var O=unescape(K);
+var H=O.split("!");
+if(H.shift()=="I"){var C=H.shift();
+var F=H.shift();
+var L=unescape(H.shift());
+var I=y;
+if(C==I){try{parent.location.hash
+}catch(D){document.domain=document.domain
+}}var J=H.shift()||"";
+switch(browser){case"firefox":location.replace([location.href.split("#")[0],J].join("#"));
 break;
-default:
-throw new Error("unknown postMessage emulation payload type: "+_a1);
-}
-}
+default:location.hash=J;
+break
+}var E=o(parent);
+E.targetToken=F;
+var P=E.sourceToken;
+var N=L+"#"+escape([I,F,P].join(","));
+var M;
+M=document.createElement("iframe");
+M.src=N;
+M.style.position="absolute";
+M.style.left="-10px";
+M.style.top="10px";
+M.style.visibility="hidden";
+M.style.width="0px";
+M.style.height="0px";
+document.body.appendChild(M);
+return
+}}setTimeout(h,20)
+}h()
+}var j=document.getElementsByTagName("meta");
+for(var t=0;
+t<j.length;
+t++){if(j[t].name==="kaazing:postMessage"){if("immediate"==j[t].content){var r=function(){var F=document.getElementsByTagName("iframe");
+for(var D=0;
+D<F.length;
+D++){var E=F[D];
+if(E.style.KaaPostMessage=="immediate"){E.style.KaaPostMessage="none";
+var C=m(E);
+p(C,E.contentWindow)
+}}setTimeout(r,20)
 };
-function dispatch(_a7,_a8,_a9){
-var _aa=document.createEvent("Events");
-_aa.initEvent("message",false,true);
-_aa.data=_a7;
-_aa.origin=_a9;
-_aa.source=_a8;
-dispatchEvent(_aa);
-};
-var _ab={};
-var _ac=[];
-function pollReaders(){
-for(var i=0,len=_ac.length;i<len;i++){
-var _af=_ac[i];
-_af.poll();
-}
-setTimeout(pollReaders,20);
-};
-function findMessagePipe(_b0){
-if(_b0==parent){
-return _ab["parent"];
-}else{
-if(_b0.parent==window){
-var _b1=document.getElementsByTagName("iframe");
-for(var i=0;i<_b1.length;i++){
-var _b3=_b1[i];
-if(_b0==_b3.contentWindow){
-return supplyIFrameMessagePipe(_b3);
-}
-}
-}else{
-throw new Error("Generic peer postMessage not yet implemented");
-}
-}
-};
-function supplyIFrameMessagePipe(_b4){
-var _b5=_b4._name;
-if(_b5===undefined){
-_b5="iframe$"+String(Math.random()).substring(2);
-_b4._name=_b5;
-}
-var _b6=_ab[_b5];
-if(_b6===undefined){
-_b6=new MessagePipe(_b4);
-_ab[_b5]=_b6;
-}
-return _b6;
-};
-function postMessage0(_b7,_b8,_b9){
-if(typeof (_b8)!="string"){
-throw new Error("Unsupported type. Messages must be strings");
-}
-if(_b7==window){
-if(_b9=="*"||_b9==_61){
-dispatch(_b8,window,_61);
-}
-}else{
-var _ba=findMessagePipe(_b7);
-_ba.post(_b7,_b8,_b9);
-}
-};
-postMessage0.attach=function(_bb,_bc,_bd,_be,_bf,_c0){
-var _c1=findMessagePipe(_bb);
-_c1.attach(_bb,_bc,_bd,_be,_bf,_c0);
-_ac.push(_c1);
-};
-var _c2=function(_c3){
-var _c4=new URI((browser=="ie")?document.URL:location.href);
-var _c5;
-var _c6={"http":80,"https":443};
-if(_c4.port==null){
-_c4.port=_c6[_c4.scheme];
-_c4.authority=_c4.host+":"+_c4.port;
-}
-var _c7=unescape(_c4.fragment||"");
-if(_c7.length>0){
-var _c8=_c7.split(",");
-var _c9=_c8.shift();
-var _ca=_c8.shift();
-var _cb=_c8.shift();
-var _cc=_c4.scheme+"://"+document.domain+":"+_c4.port;
-var _cd=_c4.scheme+"://"+_c4.authority;
-var _ce=_c9+"/.kr?.kr=xsc&.kv=10.05";
-var _cf=document.location.toString().split("#")[0];
-var _d0=_ce+"#"+escape([_cc,_ca,escape(_cf)].join(","));
-if(typeof (ActiveXObject)!="undefined"){
-_c5=new ActiveXObject("htmlfile");
-_c5.open();
-try{
-_c5.parentWindow.opener=window;
-}
-catch(domainError){
-if(_c3){
-_c5.domain=_c3;
-}
-_c5.parentWindow.opener=window;
-}
-_c5.write("<html>");
-_c5.write("<body>");
-if(_c3){
-_c5.write("<script>CollectGarbage();document.domain='"+_c3+"';</"+"script>");
-}
-_c5.write("<iframe src=\""+_ce+"\"></iframe>");
-_c5.write("</body>");
-_c5.write("</html>");
-_c5.close();
-var _d1=_c5.body.lastChild;
-var _d2=_c5.parentWindow;
-var _d3=parent;
-var _d4=_d3.parent.postMessage0;
-if(typeof (_d4)!="undefined"){
-_d1.onload=function(){
-var _d5=_d1.contentWindow;
-_d5.location.replace(_d0);
-_d4.attach(_d3,_c9,_cb,_d2,_d5,_ce);
-};
-}
-}else{
-var _d1=document.createElement("iframe");
-_d1.src=_d0;
-document.body.appendChild(_d1);
-var _d2=window;
-var _d6=_d1.contentWindow;
-var _d3=parent;
-var _d4=_d3.parent.postMessage0;
-if(typeof (_d4)!="undefined"){
-_d4.attach(_d3,_c9,_cb,_d2,_d6,_ce);
-}
-}
-}
-window.onunload=function(){
-try{
-var _d7=window.parent.parent.postMessage0;
-if(typeof (_d7)!="undefined"){
-_d7.detach(_d3);
-}
-}
-catch(permissionDenied){
-}
-if(typeof (_c5)!=="undefined"){
-_c5.parentWindow.opener=null;
-_c5.open();
-_c5.close();
-_c5=null;
-CollectGarbage();
-}
-};
-};
-postMessage0.__init__=function(_d8,_d9){
-var _da=_c2.toString();
-_d8.URI=URI;
-_d8.browser=browser;
-if(!_d9){
-_d9="";
-}
-_d8.setTimeout("("+_da+")('"+_d9+"')",0);
-};
-postMessage0.bridgeURL=false;
-postMessage0.detach=function(_db){
-var _dc=findMessagePipe(_db);
-for(var i=0;i<_ac.length;i++){
-if(_ac[i]==_dc){
-_ac.splice(i,1);
-}
-}
-_dc.detach();
-};
-if(window!=top){
-_ab["parent"]=new MessagePipe();
-function initializeAsTargetIfNecessary(){
-var _de=new URI((browser=="ie")?document.URL:location.href);
-var _df=_de.fragment||"";
-if(document.body!=null&&_df.length>0&&_df.charAt(0)=="I"){
-var _e0=unescape(_df);
-var _e1=_e0.split("!");
-if(_e1.shift()=="I"){
-var _e2=_e1.shift();
-var _e3=_e1.shift();
-var _e4=unescape(_e1.shift());
-var _e5=_61;
-if(_e2==_e5){
-try{
-parent.location.hash;
-}
-catch(permissionDenied){
-document.domain=document.domain;
-}
-}
-var _e6=_e1.shift()||"";
-switch(browser){
-case "firefox":
-location.replace([location.href.split("#")[0],_e6].join("#"));
-break;
-default:
-location.hash=_e6;
-break;
-}
-var _e7=findMessagePipe(parent);
-_e7.targetToken=_e3;
-var _e8=_e7.sourceToken;
-var _e9=_e4+"#"+escape([_e5,_e3,_e8].join(","));
-var _ea;
-_ea=document.createElement("iframe");
-_ea.src=_e9;
-_ea.style.position="absolute";
-_ea.style.left="-10px";
-_ea.style.top="10px";
-_ea.style.visibility="hidden";
-_ea.style.width="0px";
-_ea.style.height="0px";
-document.body.appendChild(_ea);
-return;
-}
-}
-setTimeout(initializeAsTargetIfNecessary,20);
-};
-initializeAsTargetIfNecessary();
-}
-var _eb=document.getElementsByTagName("meta");
-for(var i=0;i<_eb.length;i++){
-if(_eb[i].name==="kaazing:postMessage"){
-if("immediate"==_eb[i].content){
-var _ed=function(){
-var _ee=document.getElementsByTagName("iframe");
-for(var i=0;i<_ee.length;i++){
-var _f0=_ee[i];
-if(_f0.style["KaaPostMessage"]=="immediate"){
-_f0.style["KaaPostMessage"]="none";
-var _f1=supplyIFrameMessagePipe(_f0);
-bridgeIfNecessary(_f1,_f0.contentWindow);
-}
-}
-setTimeout(_ed,20);
-};
-setTimeout(_ed,20);
-}
-break;
-}
-}
-for(var i=0;i<_eb.length;i++){
-if(_eb[i].name==="kaazing:postMessagePrefix"){
-var _f2=_eb[i].content;
-if(_f2!=null&&_f2.length>0){
-if(_f2.charAt(0)!="/"){
-_f2="/"+_f2;
-}
-_62=_f2;
-}
-}
-}
-setTimeout(pollReaders,20);
-return postMessage0;
-}
-})();
-var XMLHttpRequest0=(function(){
-var _f3=new URI((browser=="ie")?document.URL:location.href);
-var _f4={"http":80,"https":443};
-if(_f3.port==null){
-_f3.port=_f4[_f3.scheme];
-_f3.authority=_f3.host+":"+_f3.port;
-}
-var _f5={};
-var _f6={};
-var _f7=0;
-function XMLHttpRequest0(){
-if(browser=="firefox"&&typeof (Object.getPrototypeOf)=="function"){
-var xhr=new XMLHttpRequest();
-xhr.withCredentials=true;
-return xhr;
-}
-};
-var _f9=XMLHttpRequest0.prototype;
-_f9.readyState=0;
-_f9.responseText="";
-_f9.status=0;
-_f9.statusText="";
-_f9.timeout=0;
-_f9.onreadystatechange;
-_f9.onerror;
-_f9.onload;
-_f9.onprogress;
-_f9.open=function(_fa,_fb,_fc){
-if(!_fc){
-throw new Error("Asynchronous is required for cross-origin XMLHttpRequest emulation");
-}
-switch(this.readyState){
-case 0:
-case 4:
-break;
-default:
-throw new Error("Invalid ready state");
-}
-if(_fb.indexOf(".kv=")==-1){
-_fb+=((_fb.indexOf("?")==-1)?"?":"&")+".kv=10.05";
-}else{
-_fb=_fb.replace(/\.kv=[^&]*(.*)/,".kv=10.05$1");
-}
-var id=register(this);
-var _fe=supplyPipe(this,_fb);
-_fe.attach(id);
-this._pipe=_fe;
+setTimeout(r,20)
+}break
+}}for(var t=0;
+t<j.length;
+t++){if(j[t].name==="kaazing:postMessagePrefix"){var z=j[t].content;
+if(z!=null&&z.length>0){if(z.charAt(0)!="/"){z="/"+z
+}s=z
+}}}setTimeout(f,20);
+return n
+}})();
+var XMLHttpRequest0=(function(){var e=new URI((browser=="ie")?document.URL:location.href);
+var g={http:80,https:443};
+if(e.port==null){e.port=g[e.scheme];
+e.authority=e.host+":"+e.port
+}var b={};
+var a={};
+var c=0;
+function o(){}var h=o.prototype;
+h.readyState=0;
+h.responseText="";
+h.status=0;
+h.statusText="";
+h.timeout=0;
+h.onreadystatechange;
+h.onerror;
+h.onload;
+h.onprogress;
+h.open=function(u,p,r){if(!r){throw new Error("Asynchronous is required for cross-origin XMLHttpRequest emulation")
+}switch(this.readyState){case 0:case 4:break;
+default:throw new Error("Invalid ready state")
+}var t=m(this);
+var q=k(this,p);
+q.attach(t);
+this._pipe=q;
 this._requestHeaders=[];
-this._method=_fa;
-this._location=_fb;
-this._responseHeaders=null;
+this._method=u;
+this._location=p;
+this._responseHeaders={};
 this.readyState=1;
 this.status=0;
 this.statusText="";
 this.responseText="";
-var _ff=this;
-setTimeout(function(){
-_ff.readyState=1;
-onreadystatechange(_ff);
+var s=this;
+setTimeout(function(){s.readyState=1;
+n(s)
+},0)
+};
+h.setRequestHeader=function(p,q){if(this.readyState!==1){throw new Error("Invalid ready state")
+}this._requestHeaders.push([p,q])
+};
+h.send=function(q){if(this.readyState!==1){throw new Error("Invalid ready state")
+}var p=this;
+setTimeout(function(){p.readyState=2;
+n(p)
 },0);
+l(this,q)
 };
-_f9.setRequestHeader=function(_100,_101){
-if(this.readyState!==1){
-throw new Error("Invalid ready state");
-}
-this._requestHeaders.push([_100,_101]);
+h.abort=function(){var p=this._pipe;
+if(p!==undefined){p.post(["a",this._id].join(""));
+p.detach(this._id)
+}};
+h.getResponseHeader=function(p){if(this.status==0){throw new Error("Invalid ready state")
+}var q=this._responseHeaders;
+return q[p]
 };
-_f9.send=function(_102){
-if(this.readyState!==1){
-throw new Error("Invalid ready state");
-}
-var _103=this;
-setTimeout(function(){
-_103.readyState=2;
-onreadystatechange(_103);
-},0);
-doSend(this,_102);
+h.getAllResponseHeaders=function(){if(this.status==0){throw new Error("Invalid ready state")
+}return this._responseHeaders
 };
-_f9.abort=function(){
-var pipe=this._pipe;
-if(pipe!==undefined){
-pipe.post(["a",this._id].join(""));
-pipe.detach(this._id);
-}
+function n(p){if(typeof(p.onreadystatechange)!=="undefined"){p.onreadystatechange()
+}switch(p.readyState){case 3:if(typeof(p.onprogress)!=="undefined"){p.onprogress()
+}break;
+case 4:if(p.status<100||p.status>=500){if(typeof(p.onerror)!=="undefined"){p.onerror()
+}}else{if(typeof(p.onprogress)!=="undefined"){p.onprogress()
+}if(typeof(p.onload)!=="undefined"){p.onload()
+}}break
+}}function m(p){var q=j(c++,8);
+a[q]=p;
+p._id=q;
+return q
+}function l(s,u){if(typeof(u)!=="string"){u=""
+}var p=s._method.substring(0,10);
+var v=s._location;
+var r=s._requestHeaders;
+var t=j(s.timeout,4);
+var w=(s.onprogress!==undefined)?"t":"f";
+var y=["s",s._id,p.length,p,j(v.length,4),v,j(r.length,4)];
+for(var q=0;
+q<r.length;
+q++){var x=r[q];
+y.push(j(x[0].length,4));
+y.push(x[0]);
+y.push(j(x[1].length,4));
+y.push(x[1])
+}y.push(j(u.length,8),u,j(t,4),w);
+s._pipe.post(y.join(""))
+}function k(w,z){var q=new URI(z);
+var r=(q.scheme!=null&&q.authority!=null);
+var y=r?q.scheme:e.scheme;
+var C=r?q.authority:e.authority;
+if(C!=null&&q.port==null){C=q.host+":"+g[y]
+}var u=y+"://"+C;
+var s=b[u];
+if(s!==undefined){if(!("iframe" in s&&"contentWindow" in s.iframe&&typeof s.iframe.contentWindow=="object")){s=b[u]=undefined
+}}if(s===undefined){var t=document.createElement("iframe");
+t.style.position="absolute";
+t.style.left="-10px";
+t.style.top="10px";
+t.style.visibility="hidden";
+t.style.width="0px";
+t.style.height="0px";
+var B=new URI(u);
+B.query=".kr=xs";
+B.path="/";
+t.src=B.toString();
+function A(D){this.buffer.push(D)
+}function v(E){var D=this.attached[E];
+if(D===undefined){D={};
+this.attached[E]=D
+}if(D.timerID!==undefined){clearTimeout(D.timerID);
+delete D.timerID
+}}function x(F){var D=this.attached[F];
+if(D!==undefined&&D.timerID===undefined){var E=this;
+D.timerID=setTimeout(function(){delete E.attached[F];
+var G=a[F];
+if(G._pipe==s){delete a[F];
+delete G._id;
+delete G._pipe
+}postMessage0(s.iframe.contentWindow,["d",F].join(""),s.targetOrigin)
+},0)
+}}s={targetOrigin:u,iframe:t,buffer:[],post:A,attach:v,detach:x,attached:{count:0}};
+b[u]=s;
+function p(){var D=t.contentWindow;
+if(!D){setTimeout(p,20)
+}else{postMessage0(D,"I",u)
+}}s.handshakeID=setTimeout(function(){b[u]=undefined;
+s.post=function(D){w.readyState=4;
+w.status=0;
+n(w)
 };
-_f9.getResponseHeader=function(_105){
-if(this.status==0){
-throw new Error("Invalid ready state");
+if(s.buffer.length>0){s.post()
+}},30000);
+document.body.appendChild(t);
+if(typeof(postMessage)==="undefined"){p()
+}}return s
+}function d(E){var J=E.origin;
+var F={http:":80",https:":443"};
+var z=J.split(":");
+if(z.length===2){J+=F[z[0]]
+}var D=b[J];
+if(D!==undefined&&D.iframe!==undefined&&E.source==D.iframe.contentWindow){if(E.data=="I"){clearTimeout(D.handshakeID);
+var y;
+while((y=D.buffer.shift())!==undefined){postMessage0(D.iframe.contentWindow,y,D.targetOrigin)
+}D.post=function(N){postMessage0(D.iframe.contentWindow,N,D.targetOrigin)
 }
-var _106=this._responseHeaders;
-return _106[_105];
-};
-_f9.getAllResponseHeaders=function(){
-if(this.status==0){
-throw new Error("Invalid ready state");
-}
-return null;
-};
-function onreadystatechange(_107){
-if(typeof (_107.onreadystatechange)!=="undefined"){
-_107.onreadystatechange();
-}
-switch(_107.readyState){
-case 3:
-if(typeof (_107.onprogress)!=="undefined"){
-_107.onprogress();
-}
+}else{var y=E.data;
+if(y.length>=9){var K=0;
+var q=y.substring(K,K+=1);
+var A=y.substring(K,K+=8);
+var s=a[A];
+if(s!==undefined){switch(q){case"r":var r={};
+var H=f(y.substring(K,K+=2));
+for(var G=0;
+G<H;
+G++){var v=f(y.substring(K,K+=4));
+var u=y.substring(K,K+=v);
+var t=f(y.substring(K,K+=4));
+var B=y.substring(K,K+=t);
+r[u]=B
+}var C=f(y.substring(K,K+=4));
+var M=f(y.substring(K,K+=2));
+var I=y.substring(K,K+=M);
+switch(C){case 301:case 302:case 307:var x=r.Location;
+var A=m(s);
+var D=k(s,x);
+D.attach(A);
+s._pipe=D;
+s._method="GET";
+s._location=x;
+s._redirect=true;
 break;
-case 4:
-if(_107.status<100||_107.status>=500){
-if(typeof (_107.onerror)!=="undefined"){
-_107.onerror();
-}
-}else{
-if(typeof (_107.onprogress)!=="undefined"){
-_107.onprogress();
-}
-if(typeof (_107.onload)!=="undefined"){
-_107.onload();
-}
-}
+case 403:s.status=C;
+n(s);
 break;
-}
-};
-function register(_108){
-var id=toPaddedHex(_f7++,8);
-_f6[id]=_108;
-_108._id=id;
-return id;
-};
-function doSend(_10a,_10b){
-if(typeof (_10b)!=="string"){
-_10b="";
-}
-var _10c=_10a._method.substring(0,10);
-var _10d=_10a._location;
-var _10e=_10a._requestHeaders;
-var _10f=toPaddedHex(_10a.timeout,4);
-var _110=(_10a.onprogress!==undefined)?"t":"f";
-var _111=["s",_10a._id,_10c.length,_10c,toPaddedHex(_10d.length,4),_10d,toPaddedHex(_10e.length,4)];
-for(var i=0;i<_10e.length;i++){
-var _113=_10e[i];
-_111.push(toPaddedHex(_113[0].length,4));
-_111.push(_113[0]);
-_111.push(toPaddedHex(_113[1].length,4));
-_111.push(_113[1]);
-}
-_111.push(toPaddedHex(_10b.length,8),_10b,toPaddedHex(_10f,4),_110);
-_10a._pipe.post(_111.join(""));
-};
-function supplyPipe(_114,_115){
-var uri=new URI(_115);
-var _117=(uri.scheme!=null&&uri.authority!=null);
-var _118=_117?uri.scheme:_f3.scheme;
-var _119=_117?uri.authority:_f3.authority;
-if(_119!=null&&uri.port==null){
-_119=uri.host+":"+_f4[_118];
-}
-var _11a=_118+"://"+_119;
-var pipe=_f5[_11a];
-if(pipe!==undefined){
-if(!("iframe" in pipe&&"contentWindow" in pipe.iframe&&typeof pipe.iframe.contentWindow=="object")){
-pipe=_f5[_11a]=undefined;
-}
-}
-if(pipe===undefined){
-var _11c=document.createElement("iframe");
-_11c.style.position="absolute";
-_11c.style.left="-10px";
-_11c.style.top="10px";
-_11c.style.visibility="hidden";
-_11c.style.width="0px";
-_11c.style.height="0px";
-var _11d=new URI(_11a);
-_11d.query=".kr=xs&.kv=10.05";
-_11d.path="/";
-_11c.src=_11d.toString();
-function post(_11e){
-this.buffer.push(_11e);
-};
-function attach(id){
-var _120=this.attached[id];
-if(_120===undefined){
-_120={};
-this.attached[id]=_120;
-}
-if(_120.timerID!==undefined){
-clearTimeout(_120.timerID);
-delete _120.timerID;
-}
-};
-function detach(id){
-var _122=this.attached[id];
-if(_122!==undefined&&_122.timerID===undefined){
-var _123=this;
-_122.timerID=setTimeout(function(){
-delete _123.attached[id];
-var xhr=_f6[id];
-if(xhr._pipe==pipe){
-delete _f6[id];
-delete xhr._id;
-delete xhr._pipe;
-}
-postMessage0(pipe.iframe.contentWindow,["d",id].join(""),pipe.targetOrigin);
-},10000);
-}
-};
-pipe={"targetOrigin":_11a,"iframe":_11c,"buffer":[],"post":post,"attach":attach,"detach":detach,"attached":{count:0}};
-_f5[_11a]=pipe;
-function sendInitWhenReady(){
-var _125=_11c.contentWindow;
-if(!_125){
-setTimeout(sendInitWhenReady,20);
-}else{
-postMessage0(_125,"I",_11a);
-}
-};
-pipe.handshakeID=setTimeout(function(){
-_f5[_11a]=undefined;
-pipe.post=function(_126){
-_114.readyState=4;
-_114.status=0;
-onreadystatechange(_114);
-};
-if(pipe.buffer.length>0){
-pipe.post();
-}
-},30000);
-document.body.appendChild(_11c);
-sendInitWhenReady();
-}
-return pipe;
-};
-function onmessage(_127){
-var _128=_127.origin;
-var _129={"http":":80","https":":443"};
-var _12a=_128.split(":");
-if(_12a.length===2){
-_128+=_129[_12a[0]];
-}
-var pipe=_f5[_128];
-if(pipe!==undefined&&pipe.iframe!==undefined&&_127.source==pipe.iframe.contentWindow){
-if(_127.data=="I"){
-clearTimeout(pipe.handshakeID);
-var _12c;
-while((_12c=pipe.buffer.shift())!==undefined){
-postMessage0(pipe.iframe.contentWindow,_12c,pipe.targetOrigin);
-}
-pipe.post=function(_12d){
-postMessage0(pipe.iframe.contentWindow,_12d,pipe.targetOrigin);
-};
-}else{
-var _12c=_127.data;
-if(_12c.length>=9){
-var _12e=0;
-var type=_12c.substring(_12e,_12e+=1);
-var id=_12c.substring(_12e,_12e+=8);
-var _131=_f6[id];
-if(_131!==undefined){
-switch(type){
-case "r":
-var _132={};
-var _133=fromHex(_12c.substring(_12e,_12e+=2));
-for(var i=0;i<_133;i++){
-var _135=fromHex(_12c.substring(_12e,_12e+=4));
-var _136=_12c.substring(_12e,_12e+=_135);
-var _137=fromHex(_12c.substring(_12e,_12e+=4));
-var _138=_12c.substring(_12e,_12e+=_137);
-_132[_136]=_138;
-}
-var _139=fromHex(_12c.substring(_12e,_12e+=4));
-var _13a=fromHex(_12c.substring(_12e,_12e+=2));
-var _13b=_12c.substring(_12e,_12e+=_13a);
-switch(_139){
-case 301:
-case 302:
-case 307:
-var _13c=_132["Location"];
-var id=register(_131);
-var pipe=supplyPipe(_131,_13c);
-pipe.attach(id);
-_131._pipe=pipe;
-_131._method="GET";
-_131._location=_13c;
-_131._redirect=true;
+default:s._responseHeaders=r;
+s.status=C;
+s.statusText=I;
+break
+}break;
+case"p":var p=parseInt(y.substring(K,K+=1));
+if(s._id===A){s.readyState=p;
+var L=f(y.substring(K,K+=8));
+var w=y.substring(K,K+=L);
+if(w.length>0){s.responseText+=w
+}n(s)
+}else{if(s._redirect){s._redirect=false;
+l(s,"")
+}}if(p==4){D.detach(A)
+}break;
+case"e":if(s._id===A){s.status=0;
+s.statusText="";
+s.readyState=4;
+n(s)
+}D.detach(A);
 break;
-default:
-_131._responseHeaders=_132;
-_131.status=_139;
-_131.statusText=_13b;
-break;
-}
-break;
-case "p":
-var _13d=parseInt(_12c.substring(_12e,_12e+=1));
-if(_131._id===id){
-_131.readyState=_13d;
-var _13e=fromHex(_12c.substring(_12e,_12e+=8));
-var _13f=_12c.substring(_12e,_12e+=_13e);
-if(_13f.length>0){
-_131.responseText+=_13f;
-}
-onreadystatechange(_131);
-}else{
-if(_131._redirect){
-_131._redirect=false;
-doSend(_131,"");
-}
-}
-if(_13d==4){
-pipe.detach(id);
-}
-break;
-case "e":
-if(_131._id===id){
-_131.status=0;
-_131.statusText="";
-_131.readyState=4;
-onreadystatechange(_131);
-}
-pipe.detach(id);
-break;
-case "t":
-if(_131._id===id){
-_131.status=0;
-_131.statusText="";
-_131.readyState=4;
-if(typeof (_131.ontimeout)!=="undefined"){
-_131.ontimeout();
-}
-}
-pipe.detach(id);
-break;
-}
-}
-}
-}
-}else{
-}
-};
-function fromHex(_140){
-return parseInt(_140,16);
-};
-function toPaddedHex(_141,_142){
-var hex=_141.toString(16);
-var _144=[];
-_142-=hex.length;
-while(_142-->0){
-_144.push("0");
-}
-_144.push(hex);
-return _144.join("");
-};
-window.addEventListener("message",onmessage,false);
-return XMLHttpRequest0;
+case"t":if(s._id===A){s.status=0;
+s.statusText="";
+s.readyState=4;
+if(typeof(s.ontimeout)!=="undefined"){s.ontimeout()
+}}D.detach(A);
+break
+}}}}}else{}}function f(p){return parseInt(p,16)
+}function j(r,p){var q=r.toString(16);
+var s=[];
+p-=q.length;
+while(p-->0){s.push("0")
+}s.push(q);
+return s.join("")
+}window.addEventListener("message",d,false);
+return o
 })();
-ByteOrder=function(){
+ByteOrder=function(){};
+(function(){var g=ByteOrder.prototype;
+g.toString=function(){throw new Error("Abstract")
 };
-(function(){
-var _145=ByteOrder.prototype;
-_145.toString=function(){
-throw new Error("Abstract");
+var d=function(n){return(n&255)
 };
-var _146=function(v){
-return (v&255);
+var j=function(n){return(n&128)?(n|-256):n
 };
-var _148=function(_149){
-return (_149&128)?(_149|-256):_149;
+var c=function(n){return[((n>>8)&255),(n&255)]
 };
-var _14a=function(v){
-return [((v>>8)&255),(v&255)];
+var m=function(n,o){return(j(n)<<8)|(o&255)
 };
-var _14c=function(_14d,_14e){
-return (_148(_14d)<<8)|(_14e&255);
+var b=function(n,o){return((n&255)<<8)|(o&255)
 };
-var _14f=function(_150,_151){
-return ((_150&255)<<8)|(_151&255);
+var e=function(n,o,p){return((n&255)<<16)|((o&255)<<8)|(p&255)
 };
-var _152=function(_153,_154,_155){
-return ((_153&255)<<16)|((_154&255)<<8)|(_155&255);
+var k=function(n){return[((n>>16)&255),((n>>8)&255),(n&255)]
 };
-var _156=function(v){
-return [((v>>16)&255),((v>>8)&255),(v&255)];
+var l=function(n,o,p){return((n&255)<<16)|((o&255)<<8)|(p&255)
 };
-var _158=function(_159,_15a,_15b){
-return ((_159&255)<<16)|((_15a&255)<<8)|(_15b&255);
+var f=function(n){return[((n>>24)&255),((n>>16)&255),((n>>8)&255),(n&255)]
 };
-var _15c=function(v){
-return [((v>>24)&255),((v>>16)&255),((v>>8)&255),(v&255)];
+var h=function(q,n,o,p){return(j(q)<<24)|((n&255)<<16)|((o&255)<<8)|(p&255)
 };
-var _15e=function(_15f,_160,_161,_162){
-return (_148(_15f)<<24)|((_160&255)<<16)|((_161&255)<<8)|(_162&255);
+var a=function(s,n,p,r){var o=b(s,n);
+var q=b(p,r);
+return(o*65536+q)
 };
-var _163=function(_164,_165,_166,_167){
-var _168=_14f(_164,_165);
-var _169=_14f(_166,_167);
-return (_168*65536+_169);
+ByteOrder.BIG_ENDIAN=(function(){var o=function(){};
+o.prototype=new ByteOrder();
+var n=o.prototype;
+n._toUnsignedByte=d;
+n._toByte=j;
+n._fromShort=c;
+n._toShort=m;
+n._toUnsignedShort=b;
+n._toUnsignedMediumInt=e;
+n._fromMediumInt=k;
+n._toMediumInt=l;
+n._fromInt=f;
+n._toInt=h;
+n._toUnsignedInt=a;
+n.toString=function(){return"<ByteOrder.BIG_ENDIAN>"
 };
-ByteOrder.BIG_ENDIAN=(function(){
-var _16a=function(){
-};
-_16a.prototype=new ByteOrder();
-var _16b=_16a.prototype;
-_16b._toUnsignedByte=_146;
-_16b._toByte=_148;
-_16b._fromShort=_14a;
-_16b._toShort=_14c;
-_16b._toUnsignedShort=_14f;
-_16b._toUnsignedMediumInt=_152;
-_16b._fromMediumInt=_156;
-_16b._toMediumInt=_158;
-_16b._fromInt=_15c;
-_16b._toInt=_15e;
-_16b._toUnsignedInt=_163;
-_16b.toString=function(){
-return "<ByteOrder.BIG_ENDIAN>";
-};
-return new _16a();
+return new o()
 })();
-ByteOrder.LITTLE_ENDIAN=(function(){
-var _16c=function(){
+ByteOrder.LITTLE_ENDIAN=(function(){var o=function(){};
+o.prototype=new ByteOrder();
+var n=o.prototype;
+n._toByte=j;
+n._toUnsignedByte=d;
+n._fromShort=function(p){return c(p).reverse()
 };
-_16c.prototype=new ByteOrder();
-var _16d=_16c.prototype;
-_16d._toByte=_148;
-_16d._toUnsignedByte=_146;
-_16d._fromShort=function(v){
-return _14a(v).reverse();
+n._toShort=function(p,q){return m(q,p)
 };
-_16d._toShort=function(_16f,_170){
-return _14c(_170,_16f);
+n._toUnsignedShort=function(p,q){return b(q,p)
 };
-_16d._toUnsignedShort=function(_171,_172){
-return _14f(_172,_171);
+n._toUnsignedMediumInt=function(p,q,r){return e(r,q,p)
 };
-_16d._toUnsignedMediumInt=function(_173,_174,_175){
-return _152(_175,_174,_173);
+n._fromMediumInt=function(p){return k(p).reverse()
 };
-_16d._fromMediumInt=function(v){
-return _156(v).reverse();
+n._toMediumInt=function(s,t,u,p,q,r){return l(r,q,p,u,t,s)
 };
-_16d._toMediumInt=function(_177,_178,_179,_17a,_17b,_17c){
-return _158(_17c,_17b,_17a,_179,_178,_177);
+n._fromInt=function(p){return f(p).reverse()
 };
-_16d._fromInt=function(v){
-return _15c(v).reverse();
+n._toInt=function(s,p,q,r){return h(r,q,p,s)
 };
-_16d._toInt=function(_17e,_17f,_180,_181){
-return _15e(_181,_180,_17f,_17e);
+n._toUnsignedInt=function(s,p,q,r){return a(r,q,p,s)
 };
-_16d._toUnsignedInt=function(_182,_183,_184,_185){
-return _163(_185,_184,_183,_182);
+n.toString=function(){return"<ByteOrder.LITTLE_ENDIAN>"
 };
-_16d.toString=function(){
-return "<ByteOrder.LITTLE_ENDIAN>";
-};
-return new _16c();
+return new o()
+})()
 })();
-})();
-function ByteBuffer(_186){
-this.array=_186||[];
+function ByteBuffer(a){this.array=a||[];
 this._mark=-1;
 this.limit=this.capacity=this.array.length;
-this.order=ByteOrder.BIG_ENDIAN;
+this.order=ByteOrder.BIG_ENDIAN
+}(function(){ByteBuffer.allocate=function(f){var g=new ByteBuffer();
+g.capacity=f;
+g.limit=f;
+return g
 };
-(function(){
-ByteBuffer.allocate=function(_187){
-var buf=new ByteBuffer();
-buf.capacity=_187;
-buf.limit=_187;
-return buf;
+ByteBuffer.wrap=function(f){return new ByteBuffer(f)
 };
-ByteBuffer.wrap=function(_189){
-return new ByteBuffer(_189);
+var a=ByteBuffer.prototype;
+a.autoExpand=true;
+a.capacity=0;
+a.position=0;
+a.limit=0;
+a.order=ByteOrder.BIG_ENDIAN;
+a.array=[];
+a.mark=function(){this._mark=this.position;
+return this
 };
-var _18a=ByteBuffer.prototype;
-_18a.autoExpand=true;
-_18a.capacity=0;
-_18a.position=0;
-_18a.limit=0;
-_18a.order=ByteOrder.BIG_ENDIAN;
-_18a.array=[];
-_18a.mark=function(){
-this._mark=this.position;
-return this;
+a.reset=function(){var f=this._mark;
+if(f<0){throw new Error("Invalid mark")
+}this.position=f;
+return this
 };
-_18a.reset=function(){
-var m=this._mark;
-if(m<0){
-throw new Error("Invalid mark");
-}
-this.position=m;
-return this;
-};
-_18a.compact=function(){
-this.array.splice(0,this.position);
+a.compact=function(){this.array.splice(0,this.position);
 this.limit-=this.position;
 this.position=0;
-return this;
+return this
 };
-_18a.duplicate=function(){
-var buf=new ByteBuffer(this.array);
-buf.position=this.position;
-buf.limit=this.limit;
-buf.capacity=this.capacity;
-return buf;
+a.duplicate=function(){var f=new ByteBuffer(this.array);
+f.position=this.position;
+f.limit=this.limit;
+f.capacity=this.capacity;
+return f
 };
-_18a.fill=function(size){
-_autoExpand(this,size);
-while(size-->0){
-this.put(0);
-}
-return this;
+a.fill=function(f){d(this,f);
+while(f-->0){this.put(0)
+}return this
 };
-_18a.fillWith=function(b,size){
-_autoExpand(this,size);
-while(size-->0){
-this.put(b);
-}
-return this;
+a.fillWith=function(f,g){d(this,g);
+while(g-->0){this.put(f)
+}return this
 };
-_18a.indexOf=function(b){
-var _191=this.limit;
-var _192=this.array;
-for(var i=this.position;i<_191;i++){
-if(_192[i]==b){
-return i;
-}
-}
-return -1;
+a.indexOf=function(f){var g=this.limit;
+var j=this.array;
+for(var h=this.position;
+h<g;
+h++){if(j[h]==f){return h
+}}return -1
 };
-_18a.put=function(v){
-_autoExpand(this,1);
-this.putAt(this.position++,v);
-return this;
+a.put=function(f){d(this,1);
+this.putAt(this.position++,f);
+return this
 };
-_18a.putAt=function(_195,v){
-_checkForWriteAt(this,_195,1);
-this.array[_195]=this.order._toUnsignedByte(v);
-return this;
+a.putAt=function(g,f){b(this,g,1);
+this.array[g]=this.order._toUnsignedByte(f);
+return this
 };
-_18a.putUnsigned=function(v){
-_autoExpand(this,1);
-this.putUnsignedAt(this.position,v&255);
+a.putUnsigned=function(f){d(this,1);
+this.putUnsignedAt(this.position,f&255);
 this.position+=1;
-return this;
+return this
 };
-_18a.putUnsignedAt=function(_198,v){
-_checkForWriteAt(this,_198,1);
-this.putAt(_198,v&255);
-return this;
+a.putUnsignedAt=function(g,f){b(this,g,1);
+this.putAt(g,f&255);
+return this
 };
-_18a.putShort=function(v){
-_autoExpand(this,2);
-this.putShortAt(this.position,v);
+a.putShort=function(f){d(this,2);
+this.putShortAt(this.position,f);
 this.position+=2;
-return this;
+return this
 };
-_18a.putShortAt=function(_19b,v){
-_checkForWriteAt(this,_19b,2);
-this.putBytesAt(_19b,this.order._fromShort(v));
-return this;
+a.putShortAt=function(g,f){b(this,g,2);
+this.putBytesAt(g,this.order._fromShort(f));
+return this
 };
-_18a.putUnsignedShort=function(v){
-_autoExpand(this,2);
-this.putUnsignedShortAt(this.position,v&65535);
+a.putUnsignedShort=function(f){d(this,2);
+this.putUnsignedShortAt(this.position,f&65535);
 this.position+=2;
-return this;
+return this
 };
-_18a.putUnsignedShortAt=function(_19e,v){
-_checkForWriteAt(this,_19e,2);
-this.putShortAt(_19e,v&65535);
-return this;
+a.putUnsignedShortAt=function(g,f){b(this,g,2);
+this.putShortAt(g,f&65535);
+return this
 };
-_18a.putMediumInt=function(v){
-_autoExpand(this,3);
-this.putMediumIntAt(this.position,v);
+a.putMediumInt=function(f){d(this,3);
+this.putMediumIntAt(this.position,f);
 this.position+=3;
-return this;
+return this
 };
-_18a.putMediumIntAt=function(_1a1,v){
-this.putBytesAt(_1a1,this.order._fromMediumInt(v));
-return this;
+a.putMediumIntAt=function(g,f){this.putBytesAt(g,this.order._fromMediumInt(f));
+return this
 };
-_18a.putInt=function(v){
-_autoExpand(this,4);
-this.putIntAt(this.position,v);
+a.putInt=function(f){d(this,4);
+this.putIntAt(this.position,f);
 this.position+=4;
-return this;
+return this
 };
-_18a.putIntAt=function(_1a4,v){
-_checkForWriteAt(this,_1a4,4);
-this.putBytesAt(_1a4,this.order._fromInt(v));
-return this;
+a.putIntAt=function(g,f){b(this,g,4);
+this.putBytesAt(g,this.order._fromInt(f));
+return this
 };
-_18a.putUnsignedInt=function(v){
-_autoExpand(this,4);
-this.putUnsignedIntAt(this.position,v&4294967295);
+a.putUnsignedInt=function(f){d(this,4);
+this.putUnsignedIntAt(this.position,f&4294967295);
 this.position+=4;
-return this;
+return this
 };
-_18a.putUnsignedIntAt=function(_1a7,v){
-_checkForWriteAt(this,_1a7,4);
-this.putIntAt(_1a7,v&4294967295);
-return this;
+a.putUnsignedIntAt=function(g,f){b(this,g,4);
+this.putIntAt(g,f&4294967295);
+return this
 };
-_18a.putString=function(v,cs){
-cs.encode(v,this);
-return this;
+a.putString=function(f,g){g.encode(f,this);
+return this
 };
-_18a.putPrefixedString=function(_1ab,v,cs){
-if(typeof (cs)==="undefined"||typeof (cs.encode)==="undefined"){
-throw new Error("ByteBuffer.putPrefixedString: character set parameter missing");
-}
-if(_1ab===0){
-return this;
-}
-_autoExpand(this,_1ab);
-var len=v.length;
-switch(_1ab){
-case 1:
-this.put(len);
+a.putPrefixedString=function(g,h,j){if(typeof(j)==="undefined"||typeof(j.encode)==="undefined"){throw new Error("ByteBuffer.putPrefixedString: character set parameter missing")
+}if(g===0){return this
+}d(this,g);
+var f=h.length;
+switch(g){case 1:this.put(f);
 break;
-case 2:
-this.putShort(len);
+case 2:this.putShort(f);
 break;
-case 4:
-this.putInt(len);
-break;
-}
-cs.encode(v,this);
-return this;
+case 4:this.putInt(f);
+break
+}j.encode(h,this);
+return this
 };
-_18a.putBytes=function(v){
-_autoExpand(this,v.length);
-this.putBytesAt(this.position,v);
-this.position+=v.length;
-return this;
+a.putBytes=function(f){d(this,f.length);
+this.putBytesAt(this.position,f);
+this.position+=f.length;
+return this
 };
-_18a.putBytesAt=function(_1b0,v){
-_checkForWriteAt(this,_1b0,v.length);
-for(var j=0,k=_1b0,len=v.length;j<len;j++,k++){
-this.putAt(k,v[j]);
-}
-return this;
+a.putBytesAt=function(m,h){b(this,m,h.length);
+for(var l=0,g=m,f=h.length;
+l<f;
+l++,g++){this.putAt(g,h[l])
+}return this
 };
-_18a.putBuffer=function(v){
-this.putBytes(v.array.slice(v.position,v.limit));
-return this;
+a.putBuffer=function(f){this.putBytes(f.array.slice(f.position,f.limit));
+return this
 };
-_18a.putBufferAt=function(_1b6,v){
-this.putBytesAt(_1b6,v.array.slice(v.position,v.limit));
-return this;
+a.putBufferAt=function(g,f){this.putBytesAt(g,f.array.slice(f.position,f.limit));
+return this
 };
-_18a.get=function(){
-_checkForRead(this,1);
-return this.getAt(this.position++);
+a.get=function(){e(this,1);
+return this.getAt(this.position++)
 };
-_18a.getAt=function(_1b8){
-_checkForReadAt(this,_1b8,1);
-return this.order._toByte(this.array[_1b8]);
+a.getAt=function(f){c(this,f,1);
+return this.order._toByte(this.array[f])
 };
-_18a.getUnsigned=function(){
-_checkForRead(this,1);
-var val=this.getUnsignedAt(this.position);
+a.getUnsigned=function(){e(this,1);
+var f=this.getUnsignedAt(this.position);
 this.position+=1;
-return val;
+return f
 };
-_18a.getUnsignedAt=function(_1ba){
-_checkForReadAt(this,_1ba,1);
-return this.order._toUnsignedByte(this.array[_1ba]);
+a.getUnsignedAt=function(f){c(this,f,1);
+return this.order._toUnsignedByte(this.array[f])
 };
-_18a.getBytes=function(size){
-_checkForRead(this,size);
-var _1bc=new Array();
-for(var i=0;i<size;i++){
-_1bc.push(this.order._toByte(this.array[i+this.position]));
-}
-this.position+=size;
-return _1bc;
+a.getBytes=function(h){e(this,h);
+var f=new Array();
+for(var g=0;
+g<h;
+g++){f.push(this.order._toByte(this.array[g+this.position]))
+}this.position+=h;
+return f
 };
-_18a.getBytesAt=function(_1be,size){
-_checkForReadAt(this,_1be,size);
-var _1c0=new Array();
-this.position=_1be;
-for(var i=0;i<size;i++){
-_1c0.push(this.order._toByte(this.array[i+this.position]));
-}
-this.position+=size;
-return _1c0;
+a.getBytesAt=function(g,j){c(this,g,j);
+var f=new Array();
+this.position=g;
+for(var h=0;
+h<j;
+h++){f.push(this.order._toByte(this.array[h+this.position]))
+}this.position+=j;
+return f
 };
-_18a.getShort=function(){
-_checkForRead(this,2);
-var val=this.getShortAt(this.position);
+a.getShort=function(){e(this,2);
+var f=this.getShortAt(this.position);
 this.position+=2;
-return val;
+return f
 };
-_18a.getShortAt=function(_1c3){
-_checkForReadAt(this,_1c3,2);
-var _1c4=this.array;
-return this.order._toShort(_1c4[_1c3++],_1c4[_1c3++]);
+a.getShortAt=function(f){c(this,f,2);
+var g=this.array;
+return this.order._toShort(g[f++],g[f++])
 };
-_18a.getUnsignedShort=function(){
-_checkForRead(this,2);
-var val=this.getUnsignedShortAt(this.position);
+a.getUnsignedShort=function(){e(this,2);
+var f=this.getUnsignedShortAt(this.position);
 this.position+=2;
-return val;
+return f
 };
-_18a.getUnsignedShortAt=function(_1c6){
-_checkForReadAt(this,_1c6,2);
-var _1c7=this.array;
-return this.order._toUnsignedShort(_1c7[_1c6++],_1c7[_1c6++]);
+a.getUnsignedShortAt=function(f){c(this,f,2);
+var g=this.array;
+return this.order._toUnsignedShort(g[f++],g[f++])
 };
-_18a.getUnsignedMediumInt=function(){
-var _1c8=this.array;
-return this.order._toUnsignedMediumInt(_1c8[this.position++],_1c8[this.position++],_1c8[this.position++]);
+a.getUnsignedMediumInt=function(){var f=this.array;
+return this.order._toUnsignedMediumInt(f[this.position++],f[this.position++],f[this.position++])
 };
-_18a.getMediumInt=function(){
-var val=this.getMediumIntAt(this.position);
+a.getMediumInt=function(){var f=this.getMediumIntAt(this.position);
 this.position+=3;
-return val;
+return f
 };
-_18a.getMediumIntAt=function(i){
-var _1cb=this.array;
-return this.order._toMediumInt(_1cb[i++],_1cb[i++],_1cb[i++]);
+a.getMediumIntAt=function(f){var g=this.array;
+return this.order._toMediumInt(g[f++],g[f++],g[f++])
 };
-_18a.getInt=function(){
-_checkForRead(this,4);
-var val=this.getIntAt(this.position);
+a.getInt=function(){e(this,4);
+var f=this.getIntAt(this.position);
 this.position+=4;
-return val;
+return f
 };
-_18a.getIntAt=function(_1cd){
-_checkForReadAt(this,_1cd,4);
-var _1ce=this.array;
-return this.order._toInt(_1ce[_1cd++],_1ce[_1cd++],_1ce[_1cd++],_1ce[_1cd++]);
+a.getIntAt=function(f){c(this,f,4);
+var g=this.array;
+return this.order._toInt(g[f++],g[f++],g[f++],g[f++])
 };
-_18a.getUnsignedInt=function(){
-_checkForRead(this,4);
-var val=this.getUnsignedIntAt(this.position);
+a.getUnsignedInt=function(){e(this,4);
+var f=this.getUnsignedIntAt(this.position);
 this.position+=4;
-return val;
+return f
 };
-_18a.getUnsignedIntAt=function(_1d0){
-_checkForReadAt(this,_1d0,4);
-var _1d1=this.array;
-return this.order._toUnsignedInt(_1d1[_1d0++],_1d1[_1d0++],_1d1[_1d0++],_1d1[_1d0++]);
-return val;
+a.getUnsignedIntAt=function(f){c(this,f,4);
+var g=this.array;
+return this.order._toUnsignedInt(g[f++],g[f++],g[f++],g[f++]);
+return val
 };
-_18a.getPrefixedString=function(_1d2,cs){
-var len=0;
-switch(_1d2||2){
-case 1:
-len=this.getUnsigned();
+a.getPrefixedString=function(g,h){var f=0;
+switch(g||2){case 1:f=this.getUnsigned();
 break;
-case 2:
-len=this.getUnsignedShort();
+case 2:f=this.getUnsignedShort();
 break;
-case 4:
-len=this.getInt();
-break;
-}
-if(len===0){
-return "";
-}
-var _1d5=this.limit;
-try{
-this.limit=this.position+len;
-return cs.decode(this);
-}
-finally{
-this.limit=_1d5;
-}
+case 4:f=this.getInt();
+break
+}if(f===0){return""
+}var j=this.limit;
+try{this.limit=this.position+f;
+return h.decode(this)
+}finally{this.limit=j
+}};
+a.getString=function(g){var f=this.position;
+var h=this.limit;
+var j=this.array;
+while(f<h&&j[f]!==0){f++
+}try{this.limit=f;
+return g.decode(this)
+}finally{if(f!=h){this.limit=h;
+this.position=f+1
+}}};
+a.slice=function(){return new ByteBuffer(this.array.slice(this.position,this.limit))
 };
-_18a.getString=function(cs){
-var _1d7=this.position;
-var _1d8=this.limit;
-var _1d9=this.array;
-while(_1d7<_1d8&&_1d9[_1d7]!==0){
-_1d7++;
-}
-try{
-this.limit=_1d7;
-return cs.decode(this);
-}
-finally{
-if(_1d7!=_1d8){
-this.limit=_1d8;
-this.position=_1d7+1;
-}
-}
-};
-_18a.slice=function(){
-return new ByteBuffer(this.array.slice(this.position,this.limit));
-};
-_18a.flip=function(){
-this.limit=this.position;
+a.flip=function(){this.limit=this.position;
 this.position=0;
 this._mark=-1;
-return this;
+return this
 };
-_18a.rewind=function(){
-this.position=0;
+a.rewind=function(){this.position=0;
 this._mark=-1;
-return this;
+return this
 };
-_18a.clear=function(){
-this.position=0;
+a.clear=function(){this.position=0;
 this.limit=this.capacity;
 this._mark=-1;
-return this;
+return this
 };
-_18a.remaining=function(){
-return (this.limit-this.position);
+a.remaining=function(){return(this.limit-this.position)
 };
-_18a.hasRemaining=function(){
-return (this.limit>this.position);
+a.hasRemaining=function(){return(this.limit>this.position)
 };
-_18a.skip=function(size){
-this.position+=size;
-return this;
+a.skip=function(f){this.position+=f;
+return this
 };
-_18a.getHexDump=function(){
-var _1db=this.array;
-var pos=this.position;
-var _1dd=this.limit;
-if(pos==_1dd){
-return "empty";
-}
-var _1de=[];
-for(var i=pos;i<_1dd;i++){
-var hex=(_1db[i]||0).toString(16);
-if(hex.length==1){
-hex="0"+hex;
-}
-_1de.push(hex);
-}
-return _1de.join(" ");
+a.getHexDump=function(){var l=this.array;
+var k=this.position;
+var f=this.limit;
+if(k==f){return"empty"
+}var j=[];
+for(var g=k;
+g<f;
+g++){var h=(l[g]||0).toString(16);
+if(h.length==1){h="0"+h
+}j.push(h)
+}return j.join(" ")
 };
-_18a.toString=_18a.getHexDump;
-_18a.expand=function(_1e1){
-return this.expandAt(this.position,_1e1);
+a.toString=a.getHexDump;
+a.expand=function(f){return this.expandAt(this.position,f)
 };
-_18a.expandAt=function(i,_1e3){
-var end=i+_1e3;
-if(end>this.capacity){
-this.capacity=end;
-}
-if(end>this.limit){
-this.limit=end;
-}
-return this;
+a.expandAt=function(g,h){var f=g+h;
+if(f>this.capacity){this.capacity=f
+}if(f>this.limit){this.limit=f
+}return this
 };
-function _autoExpand(_1e5,_1e6){
-if(_1e5.autoExpand){
-_1e5.expand(_1e6);
-}
-return _1e5;
-};
-function _checkForRead(_1e7,_1e8){
-var end=_1e7.position+_1e8;
-if(end>_1e7.limit){
-throw new Error("Buffer underflow");
-}
-return _1e7;
-};
-function _checkForReadAt(_1ea,_1eb,_1ec){
-var end=_1eb+_1ec;
-if(_1eb<0||end>_1ea.limit){
-throw new Error("Index out of bounds");
-}
-return _1ea;
-};
-function _checkForWriteAt(_1ee,_1ef,_1f0){
-var end=_1ef+_1f0;
-if(_1ef<0||end>_1ee.limit){
-throw new Error("Index out of bounds");
-}
-return _1ee;
-};
+function d(g,f){if(g.autoExpand){g.expand(f)
+}return g
+}function e(h,g){var f=h.position+g;
+if(f>h.limit){throw new Error("Buffer underflow")
+}return h
+}function c(j,g,h){var f=g+h;
+if(g<0||f>j.limit){throw new Error("Index out of bounds")
+}return j
+}function b(j,g,h){var f=g+h;
+if(g<0||f>j.limit){throw new Error("Index out of bounds")
+}return j
+}})();
+function Charset(){}(function(){var a=Charset.prototype;
+a.decode=function(b){};
+a.encode=function(b){};
+Charset.UTF8=(function(){function d(){}d.prototype=new Charset();
+var c=d.prototype;
+c.decode=function(h){var k=h.remaining()<10000;
+var g=[];
+while(h.hasRemaining()){var j=h.remaining();
+var f=h.getUnsigned();
+var l=b(f);
+if(j<l){h.skip(-1);
+break
+}var e=null;
+switch(l){case 1:e=f;
+break;
+case 2:e=((f&31)<<6)|(h.getUnsigned()&63);
+break;
+case 3:e=((f&15)<<12)|((h.getUnsigned()&63)<<6)|(h.getUnsigned()&63);
+break;
+case 4:e=((f&7)<<18)|((h.getUnsigned()&63)<<12)|((h.getUnsigned()&63)<<6)|(h.getUnsigned()&63);
+break
+}if(k){g.push(e)
+}else{g.push(String.fromCharCode(e))
+}}if(k){return String.fromCharCode.apply(null,g)
+}else{return g.join("")
+}};
+c.encode=function(h,f){for(var g=0;
+g<h.length;
+g++){var e=h.charCodeAt(g);
+if(e<128){f.put(e)
+}else{if(e<2048){f.put((e>>6)|192);
+f.put((e&63)|128)
+}else{if(e<65536){f.put((e>>12)|224);
+f.put(((e>>6)&63)|128);
+f.put((e&63)|128)
+}else{if(e<1114112){f.put((e>>18)|240);
+f.put(((e>>12)&63)|128);
+f.put(((e>>6)&63)|128);
+f.put((e&63)|128)
+}else{throw new Error("Invalid UTF-8 string")
+}}}}}};
+function b(e){if((e&128)===0){return 1
+}if((e&32)===0){return 2
+}if((e&16)===0){return 3
+}if((e&8)===0){return 4
+}throw new Error("Invalid UTF-8 bytes")
+}return new d()
+})()
 })();
-function Charset(){
+(function(){var r="AmqpClient";
+var m=function(v){this._name=v;
+this._level=m.Level.INFO
 };
-(function(){
-var _1f2=Charset.prototype;
-_1f2.decode=function(buf){
+(function(){m.Level={OFF:8,SEVERE:7,WARNING:6,INFO:5,CONFIG:4,FINE:3,FINER:2,FINEST:1,ALL:0};
+var B;
+var D=document.getElementsByTagName("meta");
+for(var y=0;
+y<D.length;
+y++){if(D[y].name==="kaazing:logging"){B=D[y].content;
+break
+}}m._logConf={};
+if(B){var A=B.split(",");
+for(var y=0;
+y<A.length;
+y++){var w=A[y].split("=");
+m._logConf[w[0]]=w[1]
+}}var v={};
+m.getLogger=function(F){var E=v[F];
+if(E===undefined){E=new m(F);
+v[F]=E
+}return E
 };
-_1f2.encode=function(text){
+var z=m.prototype;
+z.setLevel=function(E){if(E&&E>=m.Level.ALL&&E<=m.Level.OFF){this._level=E
+}};
+z.isLoggable=function(G){for(var F in m._logConf){if(this._name.match(F)){var E=m._logConf[F];
+if(E){return(m.Level[E]<=G)
+}}}return(this._level<=G)
 };
-Charset.UTF8=(function(){
-function UTF8(){
+var C=function(){};
+var x={};
+x[m.Level.OFF]=C;
+x[m.Level.SEVERE]=(window.console)?(console.error||console.log||C):C;
+x[m.Level.WARNING]=(window.console)?(console.warn||console.log||C):C;
+x[m.Level.INFO]=(window.console)?(console.info||console.log||C):C;
+x[m.Level.CONFIG]=(window.console)?(console.info||console.log||C):C;
+x[m.Level.FINE]=(window.console)?(console.debug||console.log||C):C;
+x[m.Level.FINER]=(window.console)?(console.debug||console.log||C):C;
+x[m.Level.FINEST]=(window.console)?(console.debug||console.log||C):C;
+x[m.Level.ALL]=(window.console)?(console.log||C):C;
+z.config=function(F,E){this.log(m.Level.CONFIG,F,E)
 };
-UTF8.prototype=new Charset();
-var _1f5=UTF8.prototype;
-_1f5.decode=function(buf){
-var _1f7=[];
-while(buf.hasRemaining()){
-var _1f8=buf.remaining();
-var _1f9=buf.getUnsigned();
-var _1fa=charByteCount(_1f9);
-if(_1f8<_1fa){
-buf.skip(-1);
-break;
-}
-var _1fb=null;
-switch(_1fa){
-case 1:
-_1fb=_1f9;
-break;
-case 2:
-_1fb=((_1f9&31)<<6)|(buf.getUnsigned()&63);
-break;
-case 3:
-_1fb=((_1f9&15)<<12)|((buf.getUnsigned()&63)<<6)|(buf.getUnsigned()&63);
-break;
-case 4:
-_1fb=((_1f9&7)<<18)|((buf.getUnsigned()&63)<<12)|((buf.getUnsigned()&63)<<6)|(buf.getUnsigned()&63);
-break;
-}
-_1f7.push(_1fb);
-}
-return String.fromCharCode.apply(null,_1f7);
+z.entering=function(G,E,H){if(this.isLoggable(m.Level.FINER)){if(browser=="chrome"||browser=="safari"){G=console
+}var F=x[m.Level.FINER];
+if(H){if(typeof(F)=="object"){F("ENTRY "+E,H)
+}else{F.call(G,"ENTRY "+E,H)
+}}else{if(typeof(F)=="object"){F("ENTRY "+E)
+}else{F.call(G,"ENTRY "+E)
+}}}};
+z.exiting=function(H,E,G){if(this.isLoggable(m.Level.FINER)){var F=x[m.Level.FINER];
+if(browser=="chrome"||browser=="safari"){H=console
+}if(G){if(typeof(F)=="object"){F("RETURN "+E,G)
+}else{F.call(H,"RETURN "+E,G)
+}}else{if(typeof(F)=="object"){F("RETURN "+E)
+}else{F.call(H,"RETURN "+E)
+}}}};
+z.fine=function(F,E){this.log(m.Level.FINE,F,E)
 };
-_1f5.encode=function(str,buf){
-for(var i=0;i<str.length;i++){
-var _1ff=str.charCodeAt(i);
-if(_1ff<128){
-buf.put(_1ff);
-}else{
-if(_1ff<2048){
-buf.put((_1ff>>6)|192);
-buf.put((_1ff&63)|128);
-}else{
-if(_1ff<65536){
-buf.put((_1ff>>12)|224);
-buf.put(((_1ff>>6)&63)|128);
-buf.put((_1ff&63)|128);
-}else{
-if(_1ff<1114112){
-buf.put((_1ff>>18)|240);
-buf.put(((_1ff>>12)&63)|128);
-buf.put(((_1ff>>6)&63)|128);
-buf.put((_1ff&63)|128);
-}else{
-throw new Error("Invalid UTF-8 string");
-}
-}
-}
-}
-}
+z.finer=function(F,E){this.log(m.Level.FINER,F,E)
 };
-function charByteCount(b){
-if((b&128)===0){
-return 1;
-}
-if((b&32)===0){
-return 2;
-}
-if((b&16)===0){
-return 3;
-}
-if((b&8)===0){
-return 4;
-}
-throw new Error("Invalid UTF-8 bytes");
+z.finest=function(F,E){this.log(m.Level.FINEST,F,E)
 };
-return new UTF8();
+z.info=function(F,E){this.log(m.Level.INFO,F,E)
+};
+z.log=function(H,G,F){if(this.isLoggable(H)){var E=x[H];
+if(browser=="chrome"||browser=="safari"){G=console
+}if(typeof(E)=="object"){E(F)
+}else{E.call(G,F)
+}}};
+z.severe=function(F,E){this.log(m.Level.SEVERE,F,E)
+};
+z.warning=function(F,E){this.log(m.Level.WARNING,F,E)
+}
 })();
-})();
-(function(){
-var _201="AmqpClient";
-var _202=function(name){
-this._name=name;
-this._level=_202.Level.INFO;
+var c=m.getLogger("com.kaazing.gateway.client.loader.Utils");
+var k=function(z){c.entering(this,"Utils.getMetaValue",z);
+var x=document.getElementsByTagName("meta");
+for(var y=0;
+y<x.length;
+y++){if(x[y].name===z){var w=x[y].content;
+c.exiting(this,"Utils.getMetaValue",w);
+return w
+}}c.exiting(this,"Utils.getMetaValue")
 };
-(function(){
-_202.Level={OFF:8,SEVERE:7,WARNING:6,INFO:5,CONFIG:4,FINE:3,FINER:2,FINEST:1,ALL:0};
-var _204;
-var tags=document.getElementsByTagName("meta");
-for(var i=0;i<tags.length;i++){
-if(tags[i].name==="kaazing:logging"){
-_204=tags[i].content;
+var g=function(x){c.entering(this,"Utils.arrayCopy",x);
+var v=[];
+for(var w=0;
+w<x.length;
+w++){v.push(x[w])
+}return v
+};
+var q=function(z,y){c.entering(this,"Utils.arrayFilter",{array:z,callback:y});
+var v=[];
+for(var x=0;
+x<z.length;
+x++){var w=z[x];
+if(y(w)){v.push(z[x])
+}}return v
+};
+var d=function(x,v){c.entering(this,"Utils.indexOf",{array:x,searchElement:v});
+for(var w=0;
+w<x.length;
+w++){if(x[w]==v){c.exiting(this,"Utils.indexOf",w);
+return w
+}}c.exiting(this,"Utils.indexOf",-1);
+return -1
+};
+var o=function(A){c.entering(this,"Utils.decodeByteString",A);
+var w=[];
+for(var z=0;
+z<A.length;
+z++){w.push(A.charCodeAt(z)&255)
+}var y=new ByteBuffer(w);
+var x=j(y,Charset.UTF8);
+c.exiting(this,"Utils.decodeByteString",x);
+return x
+};
+var h=function(z){c.entering(this,"Utils.decodeArrayBuffer",z);
+var w=new Uint8Array(z);
+var v=[];
+for(var x=0;
+x<w.length;
+x++){v.push(w[x])
+}var w=new ByteBuffer(v);
+var y=j(w,Charset.UTF8);
+c.exiting(this,"Utils.decodeArrayBuffer",y);
+return y
+};
+var n=function(y){c.entering(this,"Utils.decodeArrayBuffer2ByteBuffer");
+var w=new Uint8Array(y);
+var v=[];
+for(var x=0;
+x<w.length;
+x++){v.push(w[x])
+}c.exiting(this,"Utils.decodeArrayBuffer2ByteBuffer");
+return new ByteBuffer(v)
+};
+var p=String.fromCharCode(127);
+var t=String.fromCharCode(0);
+var l="\n";
+var u=function(y){c.entering(this,"Utils.encodeEscapedByte",y);
+var w=[];
+while(y.remaining()){var A=y.getUnsigned();
+var z=String.fromCharCode(A);
+switch(z){case p:w.push(p);
+w.push(p);
 break;
-}
-}
-_202._logConf={};
-if(_204){
-var _207=_204.split(",");
-for(var i=0;i<_207.length;i++){
-var _208=_207[i].split("=");
-_202._logConf[_208[0]]=_208[1];
-}
-}
-var _209={};
-_202.getLogger=function(name){
-var _20b=_209[name];
-if(_20b===undefined){
-_20b=new _202(name);
-_209[name]=_20b;
-}
-return _20b;
-};
-var _20c=_202.prototype;
-_20c.setLevel=function(_20d){
-if(_20d&&_20d>=_202.Level.ALL&&_20d<=_202.Level.OFF){
-this._level=_20d;
-}
-};
-_20c.isLoggable=function(_20e){
-for(var _20f in _202._logConf){
-if(this._name.match(_20f)){
-var _210=_202._logConf[_20f];
-if(_210){
-return (_202.Level[_210]<=_20e);
-}
-}
-}
-return (this._level<=_20e);
-};
-var noop=function(){
-};
-var _212={};
-_212[_202.Level.OFF]=noop;
-_212[_202.Level.SEVERE]=(window.console)?(console.error||console.log||noop):noop;
-_212[_202.Level.WARNING]=(window.console)?(console.warn||console.log||noop):noop;
-_212[_202.Level.INFO]=(window.console)?(console.info||console.log||noop):noop;
-_212[_202.Level.CONFIG]=(window.console)?(console.info||console.log||noop):noop;
-_212[_202.Level.FINE]=(window.console)?(console.debug||console.log||noop):noop;
-_212[_202.Level.FINER]=(window.console)?(console.debug||console.log||noop):noop;
-_212[_202.Level.FINEST]=(window.console)?(console.debug||console.log||noop):noop;
-_212[_202.Level.ALL]=(window.console)?(console.log||noop):noop;
-_20c.config=function(_213,_214){
-this.log(_202.Level.CONFIG,_213,_214);
-};
-_20c.entering=function(_215,name,_217){
-if(this.isLoggable(_202.Level.FINER)){
-if(browser=="chrome"||browser=="safari"){
-_215=console;
-}
-var _218=_212[_202.Level.FINER];
-if(_217){
-if(typeof (_218)=="object"){
-_218("ENTRY "+name,_217);
-}else{
-_218.call(_215,"ENTRY "+name,_217);
-}
-}else{
-if(typeof (_218)=="object"){
-_218("ENTRY "+name);
-}else{
-_218.call(_215,"ENTRY "+name);
-}
-}
-}
-};
-_20c.exiting=function(_219,name,_21b){
-if(this.isLoggable(_202.Level.FINER)){
-var _21c=_212[_202.Level.FINER];
-if(browser=="chrome"||browser=="safari"){
-_219=console;
-}
-if(_21b){
-if(typeof (_21c)=="object"){
-_21c("RETURN "+name,_21b);
-}else{
-_21c.call(_219,"RETURN "+name,_21b);
-}
-}else{
-if(typeof (_21c)=="object"){
-_21c("RETURN "+name);
-}else{
-_21c.call(_219,"RETURN "+name);
-}
-}
-}
-};
-_20c.fine=function(_21d,_21e){
-this.log(_202.Level.FINE,_21d,_21e);
-};
-_20c.finer=function(_21f,_220){
-this.log(_202.Level.FINER,_21f,_220);
-};
-_20c.finest=function(_221,_222){
-this.log(_202.Level.FINEST,_221,_222);
-};
-_20c.info=function(_223,_224){
-this.log(_202.Level.INFO,_223,_224);
-};
-_20c.log=function(_225,_226,_227){
-if(this.isLoggable(_225)){
-var _228=_212[_225];
-if(browser=="chrome"||browser=="safari"){
-_226=console;
-}
-if(typeof (_228)=="object"){
-_228(_227);
-}else{
-_228.call(_226,_227);
-}
-}
-};
-_20c.severe=function(_229,_22a){
-this.log(_202.Level.SEVERE,_229,_22a);
-};
-_20c.warning=function(_22b,_22c){
-this.log(_202.Level.WARNING,_22b,_22c);
-};
-})();
-var _22d=function(key){
-var tags=document.getElementsByTagName("meta");
-for(var i=0;i<tags.length;i++){
-if(tags[i].name===key){
-var v=tags[i].content;
-return v;
-}
-}
-};
-var _232=function(_233){
-var _234=[];
-for(var i=0;i<_233.length;i++){
-_234.push(_233[i]);
-}
-return _234;
-};
-var _236=function(_237,_238){
-var _239=[];
-for(var i=0;i<_237.length;i++){
-var elt=_237[i];
-if(_238(elt)){
-_239.push(_237[i]);
-}
-}
-return _239;
-};
-var _23c=function(_23d,_23e){
-for(var i=0;i<_23d.length;i++){
-if(_23d[i]==_23e){
-return i;
-}
-}
-return -1;
-};
-var _240=function(s){
-var a=[];
-for(var i=0;i<s.length;i++){
-a.push(s.charCodeAt(i)&255);
-}
-var buf=new ByteBuffer(a);
-var v=buf.getString(Charset.UTF8);
-return v;
-};
-var _246=String.fromCharCode(127);
-var NULL=String.fromCharCode(0);
-var _248="\n";
-var _249=function(buf){
-var a=[];
-while(buf.remaining()){
-var n=buf.getUnsigned();
-var chr=String.fromCharCode(n);
-switch(chr){
-case _246:
-a.push(_246);
-a.push(_246);
+case t:w.push(p);
+w.push("0");
 break;
-case NULL:
-a.push(_246);
-a.push("0");
+case l:w.push(p);
+w.push("n");
 break;
-case _248:
-a.push(_246);
-a.push("n");
-break;
-default:
-a.push(chr);
-}
-}
-var v=a.join("");
-return v;
+default:w.push(z)
+}}var x=w.join("");
+c.exiting(this,"Utils.encodeEscapedBytes",x);
+return x
 };
-var _24f=function(buf,_251){
-if(_251){
-return _249(buf);
-}else{
-var _252=[];
-while(buf.remaining()){
-var n=buf.getUnsigned();
-_252.push(String.fromCharCode(n));
-}
-var _254=_252.join("");
-return _254;
-}
+var s=function(w,x){c.entering(this,"Utils.encodeByteString",{buf:w,requiresEscaping:x});
+if(x){return u(w)
+}else{var v=[];
+while(w.remaining()){var z=w.getUnsigned();
+v.push(String.fromCharCode(z))
+}var y=v.join("");
+c.exiting(this,"Utils.encodeByteString",y);
+return y
+}};
+var j=function(w,x){var v=w.position;
+var y=w.limit;
+var z=w.array;
+while(v<y){v++
+}try{w.limit=v;
+return x.decode(w)
+}finally{if(v!=y){w.limit=y;
+w.position=v+1
+}}};
+var b=window.WebSocket;
+var a=(function(){var v=m.getLogger("WebSocketNativeProxy");
+var E=function(){this.parent;
+this._listener
 };
-var _255=window.WebSocket;
-var _256=function(_257,_258){
-if(typeof (_255)==="undefined"){
-doError(this);
-return;
-}
-if(_257.indexOf("javascript:")==0){
-_257=_257.substr("javascript:".length);
-}
-var _259=_257.indexOf("?");
-if(_259!=-1){
-_257+="&.kl=Y";
-}else{
-_257+="?.kl=Y";
-}
-this._balanced=false;
+var x=(browser=="safari"&&typeof(b.CLOSING)=="undefined");
+var C=E.prototype;
+C.connect=function(I,L){v.entering(this,"WebSocketNativeProxy.<init>",{location:I,protocol:L});
+if(typeof(b)==="undefined"){D(this);
+return
+}if(I.indexOf("javascript:")==0){I=I.substr("javascript:".length)
+}var J=I.indexOf("?");
+if(J!=-1){if(!/[\?&]\.kl=Y/.test(I.substring(J))){I+="&.kl=Y"
+}}else{I+="?.kl=Y"
+}if(x){I+="&encoding=utf8"
+}this._balanced=false;
 this._sendQueue=[];
-try{
-if(_258){
-this._delegate=new _255(_257,_258);
-}else{
-this._delegate=new _255(_257);
+try{if(L){this._requestedProtocol=L;
+this._delegate=new b(I,L)
+}else{this._delegate=new b(I)
+}this._delegate.binaryType="arraybuffer"
+}catch(K){v.severe(this,"WebSocketNativeProxy.<init> "+K);
+D(this);
+return
+}z(this)
+};
+C.onerror=function(){};
+C.onmessage=function(){};
+C.onopen=function(){};
+C.onclose=function(){};
+C.close=function(){v.entering(this,"WebSocketNativeProxy.close");
+this._delegate.close()
+};
+C.send=function(I){v.entering(this,"WebSocketNativeProxy.send",I);
+if(this._balanced==true){G(this,I)
+}else{this._sendQueue.push(I)
+}};
+C.setListener=function(I){this._listener=I
+};
+function G(L,K){v.entering(this,"WebSocketNativeProxy.doSend",K);
+if(typeof(K)=="string"){L._delegate.send(K)
+}else{if(K.constructor==ByteBuffer){if(x){var M=s(K);
+L._delegate.send(M)
+}else{var I=new Uint8Array(K.remaining());
+for(var J=0;
+J<I.byteLength;
+J++){I[J]=K.getUnsigned()
+}L._delegate.send(I.buffer)
+}}else{v.severe(this,"WebSocketNativeProxy.doSend called with unkown type "+typeof(K));
+throw new Error("Cannot call send() with that type")
+}}}function D(J,I){v.entering(this,"WebSocketNativeProxy.doError",I);
+setTimeout(function(){J._listener.connectionFailed(J.parent)
+},0)
+}function y(L,K){var I;
+if(typeof K.data.byteLength!=="undefined"){I=n(K.data)
+}else{I=ByteBuffer.allocate(K.data.length);
+if(L.parent._isBinary&&L.parent._balanced){for(var J=0;
+J<K.data.length;
+J++){I.put(K.data.charCodeAt(J))
+}}else{I.putString(K.data,Charset.UTF8)
+}I.flip()
+}return I
+}function H(O,N){v.entering(this,"WebSocketNativeProxy.messageHandler",N);
+if(O._balanced==true){if(typeof N.data.byteLength!=="undefined"){N.decoder=h
+}O._listener.messageReceived(O.parent,y(O,N))
+}else{var M=N.data;
+if(typeof N.data.byteLength!=="undefined"){M=h(N.data)
+}if(M.match("^\uf0ff")=="\uf0ff"){var K=M.substring(1);
+if(K.match("^R")=="R"){var J=K.substring(1);
+if(J&&J!=""){v.finest(this,"WebSocketNativeProxy.messageHandler: redirectLoc = "+J);
+var L=J.indexOf("?");
+if(L!=-1){J+="&.kl=Y"
+}else{J+="?.kl=Y"
+}if(x){J+="&encoding=utf8"
+}F(O);
+O.close();
+O._delegate=new b(J);
+O._delegate.binaryType="arraybuffer";
+z(O)
+}else{v.warning(this,"WebSocketNativeProxy.messageHandler: No balancees");
+O.close()
+}}else{if(K.match("^N$")=="N"){v.finest(this,"WebSocketNativeProxy.messageHandler: Not balancer - service gateway");
+O._balanced=true;
+O._listener.connectionOpened(O.parent,O.parent.protocol);
+var I;
+while(I=O._sendQueue.shift()){G(O,I)
+}}else{v.warning(this,"WebSocketNativeProxy.messageHandler: Unknown balancer control frame command "+N.data);
+O._balanced=true;
+O._listener.messageReceived(O.parent,y(O,N))
+}}}else{v.warning(this,"WebSocketNativeProxy.messageHandler: Unknown balancer control frame "+N.data);
+O._balanced=true;
+O._listener.messageReceived(O.parent,y(O,N))
+}}}function w(J,I){v.entering(this,"WebSocketNativeProxy.closeHandler",I);
+F(J);
+J._listener.connectionClosed(J.parent)
+}function B(J,I){v.entering(this,"WebSocketNativeProxy.errorHandler",I);
+F(J);
+J._listener.connectionFailed(J.parent)
+}function A(J,I){v.entering(this,"WebSocketNativeProxy.openHandler",I);
+J.parent.protocol=J._delegate.protocol;
+if(browser=="safari"){J.parent.protocol=J._requestedProtocol
+}}function z(J){v.entering(this,"WebSocketNativeProxy.bindHandlers");
+var I=J._delegate;
+I.onopen=function(K){A(J,K)
+};
+I.onmessage=function(K){H(J,K)
+};
+I.onclose=function(K){w(J,K)
+};
+I.onerror=function(K){B(J,K)
+};
+J.readyState=function(){return I.readyState
 }
-}
-catch(e){
-doError(this);
-return;
-}
-bindHandlers(this);
+}function F(J){v.entering(this,"WebSocketNativeProxy.unbindHandlers");
+var I=J._delegate;
+I.onmessage=undefined;
+I.onclose=undefined;
+I.onopen=undefined;
+I.onerror=undefined;
+J.readyState=3
+}return E
+})();
+var f=(function(){var y=m.getLogger("WebSocketEmulatedFlashProxy");
+var z=function(){this.parent;
+this._listener
 };
-var _25a=_256.prototype;
-_25a.onerror=function(){
+var v=z.prototype;
+v.connect=function(B,D){y.entering(this,"WebSocketEmulatedFlashProxy.<init>",B);
+this.URL=B;
+try{w(this,B,D)
+}catch(C){y.severe(this,"WebSocketEmulatedFlashProxy.<init> "+C);
+x(this,C)
+}this.constructor=z;
+y.exiting(this,"WebSocketEmulatedFlashProxy.<init>")
 };
-_25a.onmessage=function(){
+v.setListener=function(B){this._listener=B
 };
-_25a.onopen=function(){
+z._flashBridge={};
+z._flashBridge.readyWaitQueue=[];
+z._flashBridge.failWaitQueue=[];
+z._flashBridge.flashHasLoaded=false;
+z._flashBridge.flashHasFailed=false;
+v.URL="";
+v.readyState=0;
+v.bufferedAmount=0;
+v.connectionOpened=function(C,D){var D=D.split("\n");
+for(var B=0;
+B<D.length;
+B++){var E=D[B].split(":");
+C.responseHeaders[E[0]]=E[1]
+}this._listener.connectionOpened(C,"")
 };
-_25a.onclose=function(){
+v.connectionClosed=function(B){this._listener.connectionClosed(B)
 };
-_25a.close=function(){
-this._delegate.close();
+v.connectionFailed=function(B){this._listener.connectionFailed(B)
 };
-_25a.send=function(_25b){
-if(this._balanced==true){
-doSend(this,_25b);
-}else{
-this._sendQueue.push(_25b);
-}
+v.messageReceived=function(B,C){this._listener.messageReceived(B,C)
 };
-function doSend(_25c,_25d){
-if(typeof (_25d)=="string"){
-_25c._delegate.send(_25d);
-}else{
-if(_25d.constructor==ByteBuffer){
-var _25e=_24f(_25d);
-_25c._delegate.send(_25e);
-}else{
-throw new Error("Cannot call send() with that type");
-}
-}
+v.redirected=function(C,B){this._listener.redirected(C,B)
 };
-function doError(_25f,e){
-setTimeout(function(){
-if(_25f.onerror){
-_25f.onerror(e);
-}
-},0);
+v.authenticationRequested=function(D,B,C){this._listener.authenticationRequested(D,B,C)
 };
-function messageHandler(_261,e){
-if(_261._balanced==true){
-_261.onmessage(e);
-}else{
-if(e.data.match("^\uf0ff")=="\uf0ff"){
-var rest=e.data.substring(1);
-if(rest.match("^R")=="R"){
-var _264=rest.substring(1);
-if(_264&&_264!=""){
-var _265=_264.indexOf("?");
-if(_265!=-1){
-_264+="&.kl=Y";
-}else{
-_264+="?.kl=Y";
-}
-unbindHandlers(_261);
-_261.close();
-_261._delegate=new _255(_264);
-bindHandlers(_261);
-}else{
-_261.close();
-}
-}else{
-if(rest.match("^N$")=="N"){
-_261._balanced=true;
-var _266;
-while(_266=_261._sendQueue.shift()){
-doSend(_261,_266);
-}
-}else{
-_261._balanced=true;
-_261.onmessage(e);
-}
-}
-}else{
-_261._balanced=true;
-_261.onmessage(e);
-}
-}
-};
-function closeHandler(_267,e){
-if(_267.onclose) _267.onclose(e);
-};
-function errorHandler(_269,e){
-_269.onerror(e);
-};
-function openHandler(_26b,e){
-_26b.onopen(e);
-};
-function bindHandlers(_26d){
-var _26e=_26d._delegate;
-_26e.onopen=function(e){
-openHandler(_26d,e);
-};
-_26e.onmessage=function(e){
-messageHandler(_26d,e);
-};
-_26e.onclose=function(e){
-closeHandler(_26d,e);
-};
-_26e.onerror=function(e){
-errorHandler(_26d,e);
-};
-};
-function unbindHandlers(_273){
-var _274=_273._delegate;
-_274.onmessage=undefined;
-_274.onclose=undefined;
-_274.onopen=undefined;
-_274.onerror=undefined;
-};
-var _275=function(_276,_277){
-var _278;
-if(_276.indexOf("?")==-1){
-_278="?";
-}else{
-_278="&";
-}
-_276=_276+_278+"encoding=utf8";
-return new _256(_276,_277);
-};
-var _279=(function(){
-var _27a=function(_27b){
-this.URL=_27b;
-var _27c=this;
-try{
-_27d(_27c,_27b);
-}
-catch(e){
-doError(_27c,e);
-}
-this.constructor=_27a;
-};
-var _27e=_27a.prototype;
-_27a._flashBridge={};
-_27a._flashBridge.readyWaitQueue=[];
-_27a._flashBridge.failWaitQueue=[];
-_27a._flashBridge.flashHasLoaded=false;
-_27a._flashBridge.flashHasFailed=false;
-_27e.URL="";
-_27e.readyState=0;
-_27e.bufferedAmount=0;
-_27e.onopen=function(){
-};
-_27e.onmessage=function(_27f){
-};
-_27e.onclose=function(){
-};
-_27e.onerror=function(){
-};
-_27e.send=function(data){
-switch(this.readyState){
-case 0:
+v.send=function(D){y.entering(this,"WebSocketEmulatedFlashProxy.send",D);
+switch(this.readyState){case 0:y.severe(this,"WebSocketEmulatedFlashProxy.send: readyState is 0");
 throw new Error("INVALID_STATE_ERR");
 break;
-case 1:
-if(data===null){
-throw new Error("data is null");
-}
-if(typeof (data)=="string"){
-_27a._flashBridge.sendText(this._instanceId,data);
-}else{
-if(typeof (data.array)=="object"){
-var _281;
-var a=[];
-var b;
-while(data.remaining()){
-b=data.get();
-a.push(String.fromCharCode(b));
-}
-var _281=a.join("");
-_27a._flashBridge.sendByteString(this._instanceId,_281);
-return;
-}else{
-throw new Error("Invalid type");
-}
-}
-_284(this);
+case 1:if(D===null){y.severe(this,"WebSocketEmulatedFlashProxy.send: Data is null");
+throw new Error("data is null")
+}if(typeof(D)=="string"){z._flashBridge.sendText(this._instanceId,D)
+}else{if(typeof(D.array)=="object"){var E;
+var C=[];
+var B;
+while(D.remaining()){B=D.get();
+C.push(String.fromCharCode(B))
+}var E=C.join("");
+z._flashBridge.sendByteString(this._instanceId,E);
+return
+}else{y.severe(this,"WebSocketEmulatedFlashProxy.send: Data is on invalid type "+typeof(D));
+throw new Error("Invalid type")
+}}A(this);
 return true;
 break;
-case 2:
-return false;
+case 2:return false;
 break;
-default:
-throw new Error("INVALID_STATE_ERR");
-}
+default:y.severe(this,"WebSocketEmulatedFlashProxy.send: Invalid readyState "+this.readyState);
+throw new Error("INVALID_STATE_ERR")
+}};
+v.close=function(){y.entering(this,"WebSocketEmulatedFlashProxy.close");
+switch(this.readyState){case 1:case 2:z._flashBridge.disconnect(this._instanceId);
+break
+}};
+v.disconnect=v.close;
+var A=function(B){y.entering(this,"WebSocketEmulatedFlashProxy.updateBufferedAmount");
+B.bufferedAmount=z._flashBridge.getBufferedAmount(B._instanceId);
+if(B.bufferedAmount!=0){setTimeout(function(){A(B)
+},1000)
+}};
+var w=function(E,C,G){y.entering(this,"WebSocketEmulatedFlashProxy.registerWebSocket",C);
+var B=function(J,I){I[J]=E;
+E._instanceId=J
 };
-_27e.close=function(){
-switch(this.readyState){
-case 1:
-case 2:
-_27a._flashBridge.disconnect(this._instanceId);
-break;
-}
+var H=function(){x(E)
 };
-_27e.disconnect=_27e.close;
-var _284=function(_285){
-_285.bufferedAmount=_27a._flashBridge.getBufferedAmount(_285._instanceId);
-if(_285.bufferedAmount!=0){
-setTimeout(function(){
-_284(_285);
-},1000);
-}
+var F=[];
+if(E.parent.requestHeaders&&E.parent.requestHeaders.length>0){for(var D=0;
+D<E.parent.requestHeaders.length;
+D++){F.push(E.parent.requestHeaders[D].label+":"+E.parent.requestHeaders[D].value)
+}}z._flashBridge.registerWebSocketEmulated(C,F.join("\n"),B,H)
 };
-var _27d=function(_286,_287){
-var _288=function(key,_28a){
-_28a[key]=_286;
-_286._instanceId=key;
-};
-var _28b=function(){
-doError(_286);
-};
-_27a._flashBridge.registerWebSocketEmulated(_287,_288,_28b);
-};
-function doError(_28c,e){
-setTimeout(function(){
-if(_28c.onerror){
-_28c.onerror(e);
-}
-},0);
-};
-return _27a;
+function x(C,B){y.entering(this,"WebSocketEmulatedFlashProxy.doError",B);
+setTimeout(function(){C._listener.connectionFailed(C.parent)
+},0)
+}return z
 })();
-var _28e=(function(){
-var _28f=function(_290){
-this.URL=_290;
-var _291=this;
-try{
-_292(_291,_290);
-}
-catch(e){
-doError(_291,e);
-}
-this.constructor=_28f;
+var e=(function(){var y=m.getLogger("WebSocketRtmpFlashProxy");
+var A=function(){this.parent;
+this._listener
 };
-var _293=_28f.prototype;
-_279._flashBridge={};
-_279._flashBridge.readyWaitQueue=[];
-_279._flashBridge.failWaitQueue=[];
-_279._flashBridge.flashHasLoaded=false;
-_279._flashBridge.flashHasFailed=false;
-_293.URL="";
-_293.readyState=0;
-_293.bufferedAmount=0;
-_293.onopen=function(){
+var v=A.prototype;
+v.connect=function(B,D){y.entering(this,"WebSocketRtmpFlashProxy.<init>",B);
+this.URL=B;
+try{w(this,B,D)
+}catch(C){y.severe(this,"WebSocketRtmpFlashProxy.<init> "+C);
+x(this,C)
+}this.constructor=A;
+y.exiting(this,"WebSocketRtmpFlashProxy.<init>")
 };
-_293.onmessage=function(_294){
+v.setListener=function(B){this._listener=B
 };
-_293.onclose=function(){
+f._flashBridge={};
+f._flashBridge.readyWaitQueue=[];
+f._flashBridge.failWaitQueue=[];
+f._flashBridge.flashHasLoaded=false;
+f._flashBridge.flashHasFailed=false;
+v.URL="";
+v.readyState=0;
+v.bufferedAmount=0;
+v.connectionOpened=function(C,D){var D=D.split("\n");
+for(var B=0;
+B<D.length;
+B++){var E=D[B].split(":");
+C.responseHeaders[E[0]]=E[1]
+}this._listener.connectionOpened(C,"")
 };
-_293.onerror=function(){
+v.connectionClosed=function(B){this._listener.connectionClosed(B)
 };
-_293.send=function(data){
-switch(this.readyState){
-case 0:
+v.connectionFailed=function(B){this._listener.connectionFailed(B)
+};
+v.messageReceived=function(B,C){this._listener.messageReceived(B,C)
+};
+v.redirected=function(C,B){this._listener.redirected(C,B)
+};
+v.authenticationRequested=function(D,B,C){this._listener.authenticationRequested(D,B,C)
+};
+v.send=function(D){y.entering(this,"WebSocketRtmpFlashProxy.send",D);
+switch(this.readyState){case 0:y.severe(this,"WebSocketRtmpFlashProxy.send: readyState is 0");
 throw new Error("INVALID_STATE_ERR");
 break;
-case 1:
-if(data===null){
-throw new Error("data is null");
-}
-if(typeof (data)=="string"){
-_279._flashBridge.sendText(this._instanceId,data);
-}else{
-if(typeof (data.array)=="object"){
-var _296;
-var a=[];
-var b;
-while(data.remaining()){
-b=data.get();
-a.push(String.fromCharCode(b));
-}
-var _296=a.join("");
-_279._flashBridge.sendByteString(this._instanceId,_296);
-return;
-}else{
-throw new Error("Invalid type");
-}
-}
-_299(this);
+case 1:if(D===null){y.severe(this,"WebSocketRtmpFlashProxy.send: Data is null");
+throw new Error("data is null")
+}if(typeof(D)=="string"){f._flashBridge.sendText(this._instanceId,D)
+}else{if(typeof(D.array)=="object"){var E;
+var C=[];
+var B;
+while(D.remaining()){B=D.get();
+C.push(String.fromCharCode(B))
+}var E=C.join("");
+f._flashBridge.sendByteString(this._instanceId,E);
+return
+}else{y.severe(this,"WebSocketRtmpFlashProxy.send: Data is on invalid type "+typeof(D));
+throw new Error("Invalid type")
+}}z(this);
 return true;
 break;
-case 2:
-return false;
+case 2:return false;
 break;
-default:
-throw new Error("INVALID_STATE_ERR");
-}
+default:y.severe(this,"WebSocketRtmpFlashProxy.send: Invalid readyState "+this.readyState);
+throw new Error("INVALID_STATE_ERR")
+}};
+v.close=function(){y.entering(this,"WebSocketRtmpFlashProxy.close");
+switch(this.readyState){case 1:case 2:f._flashBridge.disconnect(this._instanceId);
+break
+}};
+v.disconnect=v.close;
+var z=function(B){y.entering(this,"WebSocketRtmpFlashProxy.updateBufferedAmount");
+B.bufferedAmount=f._flashBridge.getBufferedAmount(B._instanceId);
+if(B.bufferedAmount!=0){setTimeout(function(){z(B)
+},1000)
+}};
+var w=function(E,C,G){y.entering(this,"WebSocketRtmpFlashProxy.registerWebSocket",C);
+var B=function(J,I){I[J]=E;
+E._instanceId=J
 };
-_293.close=function(){
-switch(this.readyState){
-case 1:
-case 2:
-_279._flashBridge.disconnect(this._instanceId);
-break;
-}
+var H=function(){x(E)
 };
-_293.disconnect=_293.close;
-var _299=function(_29a){
-_29a.bufferedAmount=_279._flashBridge.getBufferedAmount(_29a._instanceId);
-if(_29a.bufferedAmount!=0){
-setTimeout(function(){
-_299(_29a);
-},1000);
-}
+var F=[];
+if(E.parent.requestHeaders&&E.parent.requestHeaders.length>0){for(var D=0;
+D<E.parent.requestHeaders.length;
+D++){F.push(E.parent.requestHeaders[D].label+":"+E.parent.requestHeaders[D].value)
+}}f._flashBridge.registerWebSocketRtmp(C,F.join("\n"),B,H)
 };
-var _292=function(_29b,_29c){
-var _29d=function(key,_29f){
-_29f[key]=_29b;
-_29b._instanceId=key;
-};
-var _2a0=function(){
-doError(_29b);
-};
-_279._flashBridge.registerWebSocketRtmp(_29c,_29d,_2a0);
-};
-function doError(_2a1,e){
-setTimeout(function(){
-if(_2a1.onerror){
-_2a1.onerror(e);
-}
-},0);
-};
-return _28f;
+function x(C,B){y.entering(this,"WebSocketRtmpFlashProxy.doError",B);
+setTimeout(function(){C._listener.connectionFailed(C.parent)
+},0)
+}return A
 })();
-(function(){
-var _2a3={};
-_279._flashBridge.registerWebSocketEmulated=function(_2a4,_2a5,_2a6){
-var _2a7=function(){
-var key=_279._flashBridge.doRegisterWebSocketEmulated(_2a4);
-_2a5(key,_2a3);
+(function(){var w=m.getLogger("com.kaazing.gateway.client.loader.FlashBridge");
+var v={};
+f._flashBridge.registerWebSocketEmulated=function(y,B,C,z){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.registerWebSocketEmulated",{location:y,callback:C,errback:z});
+var A=function(){var D=f._flashBridge.doRegisterWebSocketEmulated(y,B);
+C(D,v)
 };
-if(_279._flashBridge.flashHasLoaded){
-if(_279._flashBridge.flashHasFailed){
-_2a6();
-}else{
-_2a7();
+if(f._flashBridge.flashHasLoaded){if(f._flashBridge.flashHasFailed){z()
+}else{A()
+}}else{this.readyWaitQueue.push(A);
+this.failWaitQueue.push(z)
+}w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.registerWebSocketEmulated")
+};
+f._flashBridge.doRegisterWebSocketEmulated=function(y,A){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.doRegisterWebSocketEmulated",{location:y,headers:A});
+var z=f._flashBridge.elt.registerWebSocketEmulated(y,A);
+w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.doRegisterWebSocketEmulated",z);
+return z
+};
+f._flashBridge.registerWebSocketRtmp=function(y,B,C,z){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.registerWebSocketRtmp",{location:y,callback:C,errback:z});
+var A=function(){var D=f._flashBridge.doRegisterWebSocketRtmp(y,B);
+C(D,v)
+};
+if(f._flashBridge.flashHasLoaded){if(f._flashBridge.flashHasFailed){z()
+}else{A()
+}}else{this.readyWaitQueue.push(A);
+this.failWaitQueue.push(z)
+}w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.registerWebSocketEmulated")
+};
+f._flashBridge.doRegisterWebSocketRtmp=function(y,A){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.doRegisterWebSocketRtmp",{location:y,protocol:A});
+var z=f._flashBridge.elt.registerWebSocketRtmp(y,A);
+w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.doRegisterWebSocketRtmp",z);
+return z
+};
+f._flashBridge.onready=function(){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.onready");
+var z=f._flashBridge.readyWaitQueue;
+for(var y=0;
+y<z.length;
+y++){var A=z[y];
+A()
+}w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.onready")
+};
+f._flashBridge.onfail=function(){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.onfail");
+var A=f._flashBridge.failWaitQueue;
+for(var z=0;
+z<A.length;
+z++){var y=A[z];
+y()
+}w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.onfail")
+};
+f._flashBridge.connectionOpened=function(y,z){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.connectionOpened",y);
+v[y].readyState=1;
+v[y].connectionOpened(v[y].parent,z);
+x();
+w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.connectionOpened")
+};
+f._flashBridge.connectionClosed=function(y){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.connectionClosed",y);
+v[y].readyState=2;
+v[y].connectionClosed(v[y].parent);
+w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.connectionClosed")
+};
+f._flashBridge.connectionFailed=function(y){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.connectionFailed",y);
+v[y].connectionFailed(v[y].parent);
+w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.connectionFailed")
+};
+f._flashBridge.messageReceived=function(B,C){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.messageReceived",{key:B,data:C});
+var A=v[B];
+if(A.readyState==1){var y=ByteBuffer.allocate(C.length);
+for(var z=0;
+z<C.length;
+z++){y.put(C[z])
+}y.flip();
+A.messageReceived(A.parent,y)
+}w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.messageReceived")
+};
+f._flashBridge.redirected=function(A,y){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.redirected",{key:A,data:y});
+var z=v[A];
+z.redirected(z.parent,y);
+w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.redirected")
+};
+f._flashBridge.authenticationRequested=function(B,y,A){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.authenticationRequested",{key:B,data:y});
+var z=v[B];
+z.authenticationRequested(z.parent,y,A);
+w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.authenticationRequested")
+};
+var x=function(){w.entering(this,"WebSocketEmulatedFlashProxy.killLoadingBar");
+if(browser==="firefox"){var y=document.createElement("iframe");
+y.style.display="none";
+document.body.appendChild(y);
+document.body.removeChild(y)
+}};
+f._flashBridge.sendText=function(y,z){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.sendText",{key:y,message:z});
+this.elt.processTextMessage(y,escape(z));
+setTimeout(x,200)
+};
+f._flashBridge.sendByteString=function(y,z){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.sendByteString",{key:y,message:z});
+this.elt.processBinaryMessage(y,escape(z));
+setTimeout(x,200)
+};
+f._flashBridge.disconnect=function(y){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.disconnect",y);
+this.elt.processClose(y)
+};
+f._flashBridge.getBufferedAmount=function(z){w.entering(this,"WebSocketEmulatedFlashProxy._flashBridge.getBufferedAmount",z);
+var y=this.elt.getBufferedAmount(z);
+w.exiting(this,"WebSocketEmulatedFlashProxy._flashBridge.getBufferedAmount",y);
+return y
 }
-}else{
-this.readyWaitQueue.push(_2a7);
-this.failWaitQueue.push(_2a6);
-}
-};
-_279._flashBridge.doRegisterWebSocketEmulated=function(_2a9,_2aa){
-var key=_279._flashBridge.elt.registerWebSocketEmulated(_2a9,_2aa);
-return key;
-};
-_279._flashBridge.registerWebSocketRtmp=function(_2ac,_2ad,_2ae){
-var _2af=function(){
-var key=_279._flashBridge.doRegisterWebSocketRtmp(_2ac);
-_2ad(key,_2a3);
-};
-if(_279._flashBridge.flashHasLoaded){
-if(_279._flashBridge.flashHasFailed){
-_2ae();
-}else{
-_2af();
-}
-}else{
-this.readyWaitQueue.push(_2af);
-this.failWaitQueue.push(_2ae);
-}
-};
-_279._flashBridge.doRegisterWebSocketRtmp=function(_2b1,_2b2){
-var key=_279._flashBridge.elt.registerWebSocketRtmp(_2b1,_2b2);
-return key;
-};
-_279._flashBridge.onready=function(){
-var _2b4=_279._flashBridge.readyWaitQueue;
-for(var i=0;i<_2b4.length;i++){
-var _2b6=_2b4[i];
-_2b6();
-}
-};
-_279._flashBridge.onfail=function(){
-var _2b7=_279._flashBridge.failWaitQueue;
-for(var i=0;i<_2b7.length;i++){
-var _2b9=_2b7[i];
-_2b9();
-}
-};
-_279._flashBridge.doOpen=function(key){
-_2a3[key].readyState=1;
-_2a3[key].onopen();
-_2bb();
-};
-_279._flashBridge.doClose=function(key){
-_2a3[key].readyState=2;
-_2a3[key].onclose();
-};
-_279._flashBridge.doError=function(key){
-_2a3[key].onerror();
-};
-_279._flashBridge.doMessage=function(key,data){
-var _2c0=_2a3[key];
-if(_2c0.readyState==1){
-var e;
-try{
-e=document.createEvent("Events");
-e.initEvent("message",true,true);
-}
-catch(ie){
-e={type:"message",bubbles:true,cancelable:true};
-}
-e.data=unescape(data);
-e.decoder=_240;
-e.origin=document.domain;
-e.source=null;
-_2c0.onmessage(e);
-}
-};
-var _2bb=function(){
-if(browser==="firefox"){
-var e=document.createElement("iframe");
-e.style.display="none";
-document.body.appendChild(e);
-document.body.removeChild(e);
-}
-};
-_279._flashBridge.sendText=function(key,_2c4){
-this.elt.wsSend(key,escape(_2c4));
-setTimeout(_2bb,200);
-};
-_279._flashBridge.sendByteString=function(key,_2c6){
-this.elt.wsSendByteString(key,escape(_2c6));
-setTimeout(_2bb,200);
-};
-_279._flashBridge.disconnect=function(key){
-this.elt.wsDisconnect(key);
-};
-_279._flashBridge.getBufferedAmount=function(key){
-var v=this.elt.getBufferedAmount(key);
-return v;
-};
 })();
-(function(){
-var _2ca=function(_2cb){
-var self=this;
-var _2cd=3000;
-var ID="Loader";
-var ie=false;
-var _2d0=-1;
-self.elt=null;
-var _2d1=function(){
-var exp=new RegExp(".*"+_2cb+".*.js$");
-var _2d3=document.getElementsByTagName("script");
-for(var i=0;i<_2d3.length;i++){
-if(_2d3[i].src){
-var name=(_2d3[i].src).match(exp);
-if(name){
-name=name.pop();
-var _2d6=name.split("/");
-_2d6.pop();
-if(_2d6.length>0){
-return _2d6.join("/")+"/";
-}else{
-return "";
-}
-}
-}
-}
+(function(){var y=function(aw){var ay=this;
+var aq=3000;
+var av="Loader";
+var al=false;
+var au=-1;
+ay.elt=null;
+var ar=function(){var aD=new RegExp(".*"+aw+".*.js$");
+var az=document.getElementsByTagName("script");
+for(var aB=0;
+aB<az.length;
+aB++){if(az[aB].src){var aA=(az[aB].src).match(aD);
+if(aA){aA=aA.pop();
+var aC=aA.split("/");
+aC.pop();
+if(aC.length>0){return aC.join("/")+"/"
+}else{return""
+}}}}};
+var at=ar();
+var ap=at+"Loader.swf";
+ay.loader=function(){var aB="flash";
+var az=document.getElementsByTagName("meta");
+for(var aA=0;
+aA<az.length;
+aA++){if(az[aA].name==="kaazing:upgrade"){aB=az[aA].content
+}}if(aB!="flash"||!am([9,0,115])){ak()
+}else{au=setTimeout(ak,aq);
+an()
+}};
+ay.clearFlashTimer=function(){clearTimeout(au);
+au="cleared";
+setTimeout(function(){ax(ay.elt.handshake(aw))
+},0)
 };
-var _2d7=_2d1();
-var _2d8=_2d7+"Loader.swf?.kv=10.05";
-self.loader=function(){
-var _2d9="flash";
-var tags=document.getElementsByTagName("meta");
-for(var i=0;i<tags.length;i++){
-if(tags[i].name==="kaazing:upgrade"){
-_2d9=tags[i].content;
-}
-}
-if(_2d9!="flash"||!_2dc([9,0,115])){
-_2dd();
-}else{
-_2d0=setTimeout(_2dd,_2cd);
-_2de();
-}
+var ax=function(az){if(az){f._flashBridge.flashHasLoaded=true;
+f._flashBridge.elt=ay.elt;
+f._flashBridge.onready()
+}else{ak()
+}window.___Loader=undefined
 };
-self.clearFlashTimer=function(){
-clearTimeout(_2d0);
-_2d0="cleared";
-setTimeout(function(){
-_2df(self.elt.handshake(_2cb));
-},0);
+var ak=function(){f._flashBridge.flashHasLoaded=true;
+f._flashBridge.flashHasFailed=true;
+f._flashBridge.onfail()
 };
-var _2df=function(_2e0){
-if(_2e0){
-_279._flashBridge.flashHasLoaded=true;
-_279._flashBridge.elt=self.elt;
-_279._flashBridge.onready();
-}else{
-_2dd();
-}
-window.___Loader=undefined;
+var ao=function(){var aA=null;
+if(typeof(ActiveXObject)!="undefined"){try{al=true;
+var aC=new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
+var az=aC.GetVariable("$version");
+var aD=az.split(" ")[1].split(",");
+aA=[];
+for(var aB=0;
+aB<aD.length;
+aB++){aA[aB]=parseInt(aD[aB])
+}}catch(aF){al=false
+}}if(typeof navigator.plugins!="undefined"){if(typeof navigator.plugins["Shockwave Flash"]!="undefined"){var az=navigator.plugins["Shockwave Flash"].description;
+az=az.replace(/\s*r/g,".");
+var aD=az.split(" ")[2].split(".");
+aA=[];
+for(var aB=0;
+aB<aD.length;
+aB++){aA[aB]=parseInt(aD[aB])
+}}}var aE=navigator.userAgent;
+if(aA!==null&&aA[0]===10&&aA[1]===0&&aE.indexOf("Windows NT 6.0")!==-1){aA=null
+}if(aE.indexOf("MSIE 6.0")==-1&&aE.indexOf("MSIE 7.0")==-1){aA=null
+}return aA
 };
-var _2dd=function(){
-_279._flashBridge.flashHasLoaded=true;
-_279._flashBridge.flashHasFailed=true;
-_279._flashBridge.onfail();
+var am=function(aB){var az=ao();
+if(az==null){return false
+}for(var aA=0;
+aA<Math.max(az.length,aB.length);
+aA++){var aC=az[aA]-aB[aA];
+if(aC!=0){return(aC>0)?true:false
+}}return true
 };
-var _2e1=function(){
-var _2e2=null;
-if(typeof (ActiveXObject)!="undefined"){
-try{
-ie=true;
-var swf=new ActiveXObject("ShockwaveFlash.ShockwaveFlash");
-var _2e4=swf.GetVariable("$version");
-var _2e5=_2e4.split(" ")[1].split(",");
-_2e2=[];
-for(var i=0;i<_2e5.length;i++){
-_2e2[i]=parseInt(_2e5[i]);
-}
-}
-catch(e){
-ie=false;
-}
-}
-if(typeof navigator.plugins!="undefined"){
-if(typeof navigator.plugins["Shockwave Flash"]!="undefined"){
-var _2e4=navigator.plugins["Shockwave Flash"].description;
-_2e4=_2e4.replace(/\s*r/g,".");
-var _2e5=_2e4.split(" ")[2].split(".");
-_2e2=[];
-for(var i=0;i<_2e5.length;i++){
-_2e2[i]=parseInt(_2e5[i]);
-}
-}
-}
-var _2e7=navigator.userAgent;
-if(_2e2!==null&&_2e2[0]===10&&_2e2[1]===0&&_2e7.indexOf("Windows NT 6.0")!==-1){
-_2e2=null;
-}
-return _2e2;
+var an=function(){if(al){var az=document.createElement("div");
+document.body.appendChild(az);
+az.outerHTML='<object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" height="0" width="0" id="'+av+'"><param name="movie" value="'+ap+'"></param></object>';
+ay.elt=document.getElementById(av)
+}else{var az=document.createElement("object");
+az.setAttribute("type","application/x-shockwave-flash");
+az.setAttribute("width",0);
+az.setAttribute("height",0);
+az.setAttribute("id",av);
+az.setAttribute("data",ap);
+document.body.appendChild(az);
+ay.elt=az
+}};
+ay.attachToOnload=function(az){if(window.addEventListener){window.addEventListener("load",az,true)
+}else{if(window.attachEvent){window.attachEvent("onload",az)
+}else{onload=az
+}}};
+if(document.readyState==="complete"){ay.loader()
+}else{ay.attachToOnload(ay.loader)
+}};
+var Q=(function(){var ak=function(al){this.HOST=new ak(0);
+this.USERINFO=new ak(1);
+this.PORT=new ak(2);
+this.PATH=new ak(3);
+this.ordinal=al
 };
-var _2dc=function(_2e8){
-var _2e9=_2e1();
-if(_2e9==null){
-return false;
-}
-for(var i=0;i<Math.max(_2e9.length,_2e8.length);i++){
-var _2eb=_2e9[i]-_2e8[i];
-if(_2eb!=0){
-return (_2eb>0)?true:false;
-}
-}
-return true;
-};
-var _2de=function(){
-if(ie){
-var elt=document.createElement("div");
-document.body.appendChild(elt);
-elt.outerHTML="<object classid=\"clsid:D27CDB6E-AE6D-11cf-96B8-444553540000\" height=\"0\" width=\"0\" id=\""+ID+"\"><param name=\"movie\" value=\""+_2d8+"\"></param></object>";
-self.elt=document.getElementById(ID);
-}else{
-var elt=document.createElement("object");
-elt.setAttribute("type","application/x-shockwave-flash");
-elt.setAttribute("width",0);
-elt.setAttribute("height",0);
-elt.setAttribute("id",ID);
-elt.setAttribute("data",_2d8);
-document.body.appendChild(elt);
-self.elt=elt;
-}
-};
-self.attachToOnload=function(_2ed){
-if(window.addEventListener){
-window.addEventListener("load",_2ed,true);
-}else{
-if(window.attachEvent){
-window.attachEvent("onload",_2ed);
-}else{
-onload=_2ed;
-}
-}
-};
-if(document.readyState==="complete"){
-self.loader();
-}else{
-self.attachToOnload(self.loader);
-}
-};
-var _2ee={};
-(function(){
-var _2ef={8364:128,129:129,8218:130,402:131,8222:132,8230:133,8224:134,8225:135,710:136,8240:137,352:138,8249:139,338:140,141:141,381:142,143:143,144:144,8216:145,8217:146,8220:147,8221:148,8226:149,8211:150,8212:151,732:152,8482:153,353:154,8250:155,339:156,157:157,382:158,376:159};
-var _2f0={128:8364,129:129,130:8218,131:402,132:8222,133:8230,134:8224,135:8225,136:710,137:8240,138:352,139:8249,140:338,141:141,142:381,143:143,144:144,145:8216,146:8217,147:8220,148:8221,149:8226,150:8211,151:8212,152:732,153:8482,154:353,155:8250,156:339,157:157,158:382,159:376};
-_2ee.toCharCode=function(n){
-if(n<128||(n>159&&n<256)){
-return n;
-}else{
-var _2f2=_2f0[n];
-if(typeof (_2f2)=="undefined"){
-throw new Error("could not find: "+n);
-}
-return _2f2;
-}
-};
-_2ee.fromCharCode=function(code){
-if(code<128||(code>159&&code<256)){
-return code;
-}else{
-var _2f4=_2ef[code];
-if(typeof (_2f4)=="undefined"){
-throw new Error("could not find: "+code);
-}
-return _2f4;
-}
-};
-var _2f5=String.fromCharCode(127);
-var NULL=String.fromCharCode(0);
-var _2f7="\n";
-var _2f8=function(s){
-var a=[];
-for(var i=0;i<s.length;i++){
-var code=_2ee.fromCharCode(s.charCodeAt(i));
-if(code==127){
-i++;
-if(i==s.length){
-a.hasRemainder=true;
-break;
-}
-var _2fd=_2ee.fromCharCode(s.charCodeAt(i));
-switch(_2fd){
-case 127:
-a.push(127);
-break;
-case 48:
-a.push(0);
-break;
-case 110:
-a.push(10);
-break;
-case 114:
-a.push(13);
-break;
-default:
-throw new Error("Escaping format error");
-}
-}else{
-a.push(code);
-}
-}
-return a;
-};
-var _2fe=function(buf){
-var a=[];
-while(buf.remaining()){
-var n=buf.getUnsigned();
-var chr=String.fromCharCode(_2ee.toCharCode(n));
-switch(chr){
-case _2f5:
-a.push(_2f5);
-a.push(_2f5);
-break;
-case NULL:
-a.push(_2f5);
-a.push("0");
-break;
-case _2f7:
-a.push(_2f5);
-a.push("n");
-break;
-default:
-a.push(chr);
-}
-}
-return a.join("");
-};
-_2ee.toArray=function(s,_304){
-if(_304){
-return _2f8(s);
-}else{
-var a=[];
-for(var i=0;i<s.length;i++){
-a.push(_2ee.fromCharCode(s.charCodeAt(i)));
-}
-return a;
-}
-};
-_2ee.toByteString=function(buf,_308){
-if(_308){
-return _2fe(buf);
-}else{
-var a=[];
-while(buf.remaining()){
-var n=buf.getUnsigned();
-a.push(String.fromCharCode(_2ee.toCharCode(n)));
-}
-return a.join("");
-}
-};
+return ak
 })();
-var _30b=(function(){
-var _30c=function(_30d){
-this.reconnectImmediately=false;
+var ah=(function(){var ak=function(){};
+ak.getRealm=function(am){var ao=am.authenticationParameters;
+if(ao==null){return null
+}var an=/realm=(\"(.*)\")/i;
+var al=an.exec(ao);
+return(al!=null&&al.length>=3)?al[2]:null
+};
+return ak
+})();
+function D(){this.Keys=new Array()
+}var ac=(function(){var al=function(am){this.weakKeys=am;
+this.elements=[];
+this.dictionary=new D()
+};
+var ak=al.prototype;
+ak.getlength=function(){return this.elements.length
+};
+ak.getItemAt=function(am){return this.dictionary[this.elements[am]]
+};
+ak.get=function(an){var am=this.dictionary[an];
+if(am==undefined){am=null
+}return am
+};
+ak.remove=function(ao){for(var an=0;
+an<this.elements.length;
+an++){var am=(this.weakKeys&&(this.elements[an]==ao));
+var ap=(!this.weakKeys&&(this.elements[an]===ao));
+if(am||ap){this.elements.remove(an);
+this.dictionary[this.elements[an]]=undefined;
+break
+}}};
+ak.put=function(am,an){this.remove(am);
+this.elements.push(am);
+this.dictionary[am]=an
+};
+ak.isEmpty=function(){return this.length==0
+};
+ak.containsKey=function(ao){for(var an=0;
+an<this.elements.length;
+an++){var am=(this.weakKeys&&(this.elements[an]==ao));
+var ap=(!this.weakKeys&&(this.elements[an]===ao));
+if(am||ap){return true
+}}return false
+};
+ak.keySet=function(){return this.elements
+};
+ak.getvalues=function(){var am=[];
+for(var an=0;
+an<this.elements.length;
+an++){am.push(this.dictionary[this.elements[an]])
+}return am
+};
+return al
+})();
+var O=(function(){var al=function(){this.name="";
+this.kind="";
+this.values=[];
+this.children=new ac()
+};
+var ak=al.prototype;
+ak.getWildcardChar=function(){return"*"
+};
+ak.addChild=function(an,ao){if(an==null||an.length==0){throw new ArgumentError("A node may not have a null name.")
+}var am=al.createNode(an,this,ao);
+this.children.put(an,am);
+return am
+};
+ak.hasChild=function(am,an){return null!=this.getChild(am)&&an==this.getChild(am).kind
+};
+ak.getChild=function(am){return this.children.get(am)
+};
+ak.getDistanceFromRoot=function(){var am=0;
+var an=this;
+while(!an.isRootNode()){am++;
+an=an.parent
+}return am
+};
+ak.appendValues=function(){if(this.isRootNode()){throw new ArgumentError("Cannot set a values on the root node.")
+}if(this.values!=null){for(var am=0;
+am<arguments.length;
+am++){var an=arguments[am];
+this.values.push(an)
+}}};
+ak.removeValue=function(am){if(this.isRootNode()){return
+}this.values.remove(am)
+};
+ak.getValues=function(){return this.values
+};
+ak.hasValues=function(){return this.values!=null&&this.values.length>0
+};
+ak.isRootNode=function(){return this.parent==null
+};
+ak.hasChildren=function(){return this.children!=null&&this.children.getlength()>0
+};
+ak.isWildcard=function(){return this.name!=null&&this.name==this.getWildcardChar()
+};
+ak.hasWildcardChild=function(){return this.hasChildren()&&this.children.containsKey(this.getWildcardChar())
+};
+ak.getFullyQualifiedName=function(){var am=new String();
+var ao=[];
+var ap=this;
+while(!ap.isRootNode()){ao.push(ap.name);
+ap=ap.parent
+}ao=ao.reverse();
+for(var an=0;
+an<ao.length;
+an++){am+=ao[an];
+am+="."
+}if(am.length>=1&&am.charAt(am.length-1)=="."){am=am.slice(0,am.length-1)
+}return am.toString()
+};
+ak.getChildrenAsList=function(){return this.children.getvalues()
+};
+ak.findBestMatchingNode=function(ar,aq){var ap=this.findAllMatchingNodes(ar,aq);
+var am=null;
+var at=0;
+for(var an=0;
+an<ap.length;
+an++){var ao=ap[an];
+if(ao.getDistanceFromRoot()>at){at=ao.getDistanceFromRoot();
+am=ao
+}}return am
+};
+ak.findAllMatchingNodes=function(au,at){var aw=[];
+var am=this.getChildrenAsList();
+for(var ar=0;
+ar<am.length;
+ar++){var ao=am[ar];
+var ap=ao.matches(au,at);
+if(ap<0){continue
+}if(ap>=au.length){do{if(ao.hasValues()){aw.push(ao)
+}if(ao.hasWildcardChild()){var an=ao.getChild(this.getWildcardChar());
+if(an.kind!=this.kind){ao=null
+}else{ao=an
+}}else{ao=null
+}}while(ao!=null)
+}else{var av=ao.findAllMatchingNodes(au,ap);
+for(var aq=0;
+aq<av.length;
+aq++){aw.push(av[aq])
+}}}return aw
+};
+ak.matches=function(an,am){if(am<0||am>=an.length){return -1
+}if(this.matchesToken(an[am])){return am+1
+}if(!this.isWildcard()){return -1
+}else{if(this.kind!=an[am].kind){return -1
+}do{am++
+}while(am<an.length&&this.kind==an[am].kind);
+return am
+}};
+ak.matchesToken=function(am){return this.name==am.name&&this.kind==am.kind
+};
+al.createNode=function(am,ao,an){var ap=new al();
+ap.name=am;
+ap.parent=ao;
+ap.kind=an;
+return ap
+};
+return al
+})();
+var x=(function(){var ak=function(al,am){this.kind=am;
+this.name=al
+};
+return ak
+})();
+window.Oid=(function(){var al=function(am){this.rep=am
+};
+var ak=al.prototype;
+ak.asArray=function(){return this.rep
+};
+ak.asString=function(){var an="";
+for(var am=0;
+am<this.rep.length;
+am++){an+=(this.rep[am].toString());
+an+="."
+}if(an.length>0&&an.charAt(an.length-1)=="."){an=an.slice(0,an.length-1)
+}return an
+};
+al.create=function(am){return new al(am.split("."))
+};
+return al
+})();
+var A=(function(){var ak=function(){};
+ak.create=function(ar,an,aq){var ap=ar+":"+an;
+var al=[];
+for(var ao=0;
+ao<ap.length;
+++ao){al.push(ap.charCodeAt(ao))
+}var am="Basic "+Base64.encode(al);
+return new ChallengeResponse(am,aq)
+};
+return ak
+})();
+function ai(){this.canHandle=function(ak){return false
+};
+this.handle=function(ak,al){al(null)
+}
+}window.PasswordAuthentication=(function(){function ak(am,al){this.username=am;
+this.password=al
+}ak.prototype.clear=function(){this.username=null;
+this.password=null
+};
+return ak
+})();
+window.ChallengeRequest=(function(){var ak=function(al,am){if(al==null){throw new Error("location is not defined.")
+}if(am==null){return
+}var an="Application ";
+if(am.indexOf(an)==0){am=am.substring(an.length)
+}this.location=al;
+this.authenticationParameters=null;
+var ao=am.indexOf(" ");
+if(ao==-1){this.authenticationScheme=am
+}else{this.authenticationScheme=am.substring(0,ao);
+if(am.length>ao+1){this.authenticationParameters=am.substring(ao+1)
+}}};
+return ak
+})();
+window.ChallengeResponse=(function(){var al=function(am,an){this.credentials=am;
+this.nextChallengeHandler=an
+};
+var ak=al.prototype;
+ak.clearCredentials=function(){if(this.credentials!=null){this.credentials=null
+}};
+return al
+})();
+window.BasicChallengeHandler=(function(){var al=function(){this.loginHandler=undefined;
+this.loginHandlersByRealm={}
+};
+var ak=al.prototype;
+ak.setRealmLoginHandler=function(am,an){if(am==null){throw new ArgumentError("null realm")
+}if(an==null){throw new ArgumentError("null loginHandler")
+}this.loginHandlersByRealm[am]=an;
+return this
+};
+ak.canHandle=function(am){return am!=null&&"Basic"==am.authenticationScheme
+};
+ak.handle=function(an,aq){if(an.location!=null){var ao=this.loginHandler;
+var am=ah.getRealm(an);
+if(am!=null&&this.loginHandlersByRealm[am]!=null){ao=this.loginHandlersByRealm[am]
+}var ap=this;
+if(ao!=null){ao(function(ar){if(ar!=null&&ar.username!=null){aq(A.create(ar.username,ar.password,ap))
+}else{aq(null)
+}});
+return
+}}aq(null)
+};
+ak.loginHandler=function(am){am(null)
+};
+return al
+})();
+window.DispatchChallengeHandler=(function(){var au=function(){this.rootNode=new O();
+var aw="^(.*)://(.*)";
+this.SCHEME_URI_PATTERN=new RegExp(aw)
+};
+function am(ax,aB,aw){var aA=ar(aB);
+var aC=ax;
+for(var az=0;
+az<aA.length;
+az++){var ay=aA[az];
+if(!aC.hasChild(ay.name,ay.kind)){return
+}else{aC=aC.getChild(ay.name())
+}}aC.removeValue(aw)
+}function ak(ax,aB,aw){var aA=ar(aB);
+var aC=ax;
+for(var az=0;
+az<aA.length;
+az++){var ay=aA[az];
+if(!aC.hasChild(ay.name,ay.kind)){aC=aC.addChild(ay.name,ay.kind)
+}else{aC=aC.getChild(ay.name)
+}}aC.appendValues(aw)
+}function at(az,ax){var aw=new Array();
+if(ax!=null){var ay=an(az,ax);
+if(ay!=null){return ay.values
+}}return aw
+}function aq(aB,aC){var aw=null;
+var ax=aC.location;
+if(ax!=null){var aA=an(aB,ax);
+if(aA!=null){var az=aA.getValues();
+if(az!=null){for(var aD=0;
+aD<az.length;
+aD++){var ay=az[aD];
+if(ay.canHandle(aC)){aw=ay;
+break
+}}}}}return aw
+}function an(ax,aw){var az=ar(aw);
+var ay=0;
+return ax.findBestMatchingNode(az,ay)
+}function ar(aD){var aF=new Array();
+if(aD==null||aD.length==0){return aF
+}var aO=new RegExp("^(([^:/?#]+):(//))?([^/?#]*)?([^?#]*)(\\?([^#]*))?(#(.*))?");
+var ax=aO.exec(aD);
+if(ax==null){return aF
+}var aG=ax[2]||"http";
+var aC=ax[4];
+var aK=ax[5];
+var az=null;
+var aA=null;
+var aE=null;
+var ay=null;
+if(aC!=null){var aI=aC;
+var aB=aI.indexOf("@");
+if(aB>=0){aA=aI.substring(0,aB);
+aI=aI.substring(aB+1);
+var aN=aA.indexOf(":");
+if(aN>=0){aE=aA.substring(0,aN);
+ay=aA.substring(aN+1)
+}}var aw=aI.indexOf(":");
+if(aw>=0){az=aI.substring(aw+1);
+aI=aI.substring(0,aw)
+}}else{throw new ArgumentError("Hostname is required.")
+}var aL=aI.split(/\./);
+aL.reverse();
+for(var aM=0;
+aM<aL.length;
+aM++){aF.push(new x(aL[aM],Q.HOST))
+}if(az!=null){aF.push(new x(az,Q.PORT))
+}else{if(al(aG)>0){aF.push(new x(al(aG).toString(),Q.PORT))
+}}if(aA!=null){if(aE!=null){aF.push(new x(aE,Q.USERINFO))
+}if(ay!=null){aF.push(new x(ay,Q.USERINFO))
+}if(aE==null&&ay==null){aF.push(new x(aA,Q.USERINFO))
+}}if(av(aK)){if(aK.charAt(0)=="/"){aK=aK.substring(1)
+}if(av(aK)){var aP=aK.split("/");
+for(var aJ=0;
+aJ<aP.length;
+aJ++){var aH=aP[aJ];
+aF.push(new x(aH,Q.PATH))
+}}}return aF
+}function al(aw){if(ao[aw.toLowerCase()]!=null){return ao[aw]
+}else{return -1
+}}function ao(){http=80;
+ws=80;
+wss=443;
+https=443
+}function av(aw){return aw!=null&&aw.length>0
+}var ap=au.prototype;
+ap.clear=function(){this.rootNode=new O()
+};
+ap.canHandle=function(aw){return aq(aw)!=null
+};
+ap.handle=function(ax,ay){var aw=aq(this.rootNode,ax);
+if(aw==null){return null
+}return aw.handle(ax,ay)
+};
+ap.register=function(ax,aw){if(ax==null||ax.length==0){throw new Error("Must specify a location to handle challenges upon.")
+}if(aw==null){throw new Error("Must specify a handler to handle challenges.")
+}ak(this.rootNode,ax,aw);
+return this
+};
+ap.unregister=function(ax,aw){if(ax==null||ax.length==0){throw new Error("Must specify a location to un-register challenge handlers upon.")
+}if(aw==null){throw new Error("Must specify a handler to un-register.")
+}am(this.rootNode,ax,aw);
+return this
+};
+return au
+})();
+window.NegotiableChallengeHandler=(function(){var al=function(){this.candidateChallengeHandlers=new Array()
+};
+var am=function(an){var ao=new Array();
+for(var ap=0;
+ap<an.length;
+ap++){ao.push(Oid.create(an[ap]).asArray())
+}var aq=GssUtils.sizeOfSpnegoInitialContextTokenWithOids(null,ao);
+var ar=ByteBuffer.allocate(aq);
+ar.skip(aq);
+GssUtils.encodeSpnegoInitialContextTokenWithOids(null,ao,ar);
+return ByteArrayUtils.arrayToByteArray(Base64Util.encodeBuffer(ar))
+};
+var ak=al.prototype;
+ak.register=function(ao){if(ao==null){throw new Error("handler is null")
+}for(var an=0;
+an<this.candidateChallengeHandlers.length;
+an++){if(ao===this.candidateChallengeHandlers[an]){return this
+}}this.candidateChallengeHandlers.push(ao);
+return this
+};
+ak.canHandle=function(an){return an!=null&&an.authenticationScheme=="Negotiate"&&an.authenticationParameters==null
+};
+ak.handle=function(ar,au){if(ar==null){throw Error(new ArgumentError("challengeRequest is null"))
+}var aw=new ac();
+for(var aq=0;
+aq<candidateChallengeHandlers.length;
+aq++){var av=candidateChallengeHandlers[aq];
+if(av.canHandle(ar)){try{var ao=av.getSupportedOids();
+for(var ap=0;
+ap<ao.length;
+ap++){var an=new Oid(ao[ap]).asString();
+if(!aw.containsKey(an)){aw.put(an,av)
+}}}catch(at){}}}if(aw.isEmpty()){au(null);
+return
+}};
+return al
+})();
+window.NegotiableChallengeHandler=(function(){var ak=function(){this.loginHandler=undefined
+};
+ak.prototype.getSupportedOids=function(){return new Array()
+};
+return ak
+})();
+window.NegotiableChallengeHandler=(function(){var ak=function(){this.loginHandler=undefined
+};
+ak.prototype.getSupportedOids=function(){return new Array()
+};
+return ak
+})();
+window.ChallengeHandlers=(function(){var ak=function(){};
+ak._definedDefault=new ai();
+ak.setDefault=function(al){if(al==null){throw new Error("challengeHandler not defined")
+}ak._definedDefault=al
+};
+ak.getDefault=function(){return ak._definedDefault
+};
+return ak
+})();
+var G={};
+(function(){var an=m.getLogger("com.kaazing.gateway.client.html5.Windows1252");
+var ap={8364:128,129:129,8218:130,402:131,8222:132,8230:133,8224:134,8225:135,710:136,8240:137,352:138,8249:139,338:140,141:141,381:142,143:143,144:144,8216:145,8217:146,8220:147,8221:148,8226:149,8211:150,8212:151,732:152,8482:153,353:154,8250:155,339:156,157:157,382:158,376:159};
+var am={128:8364,129:129,130:8218,131:402,132:8222,133:8230,134:8224,135:8225,136:710,137:8240,138:352,139:8249,140:338,141:141,142:381,143:143,144:144,145:8216,146:8217,147:8220,148:8221,149:8226,150:8211,151:8212,152:732,153:8482,154:353,155:8250,156:339,157:157,158:382,159:376};
+G.toCharCode=function(au){if(au<128||(au>159&&au<256)){return au
+}else{var at=am[au];
+if(typeof(at)=="undefined"){an.severe(this,"Windows1252.toCharCode: Error: Could not find "+au);
+throw new Error("Windows1252.toCharCode could not find: "+au)
+}return at
+}};
+G.fromCharCode=function(au){if(au<256){return au
+}else{var at=ap[au];
+if(typeof(at)=="undefined"){an.severe(this,"Windows1252.fromCharCode: Error: Could not find "+au);
+throw new Error("Windows1252.fromCharCode could not find: "+au)
+}return at
+}};
+var aq=String.fromCharCode(127);
+var ao=String.fromCharCode(0);
+var ar="\n";
+var al=function(av){an.entering(this,"Windows1252.escapedToArray",av);
+var at=[];
+for(var au=0;
+au<av.length;
+au++){var ax=G.fromCharCode(av.charCodeAt(au));
+if(ax==127){au++;
+if(au==av.length){at.hasRemainder=true;
+break
+}var aw=G.fromCharCode(av.charCodeAt(au));
+switch(aw){case 127:at.push(127);
+break;
+case 48:at.push(0);
+break;
+case 110:at.push(10);
+break;
+case 114:at.push(13);
+break;
+default:an.severe(this,"Windows1252.escapedToArray: Error: Escaping format error");
+throw new Error("Escaping format error")
+}}else{at.push(ax)
+}}return at
+};
+var ak=function(au){an.entering(this,"Windows1252.toEscapedByteString",au);
+var at=[];
+while(au.remaining()){var aw=au.getUnsigned();
+var av=String.fromCharCode(G.toCharCode(aw));
+switch(av){case aq:at.push(aq);
+at.push(aq);
+break;
+case ao:at.push(aq);
+at.push("0");
+break;
+case ar:at.push(aq);
+at.push("n");
+break;
+default:at.push(av)
+}}return at.join("")
+};
+G.toArray=function(av,aw){an.entering(this,"Windows1252.toArray",{s:av,escaped:aw});
+if(aw){return al(av)
+}else{var at=[];
+for(var au=0;
+au<av.length;
+au++){at.push(G.fromCharCode(av.charCodeAt(au)))
+}return at
+}};
+G.toByteString=function(au,av){an.entering(this,"Windows1252.toByteString",{buf:au,escaped:av});
+if(av){return ak(au)
+}else{var at=[];
+while(au.remaining()){var aw=au.getUnsigned();
+at.push(String.fromCharCode(G.toCharCode(aw)))
+}return at.join("")
+}}
+})();
+var Z=(function(){var ak=function(al,am){this.label=al;
+this.value=am
+};
+return ak
+})();
+var ag=(function(){var al=function(an){var ao=new URI(an);
+if(am(ao.scheme)){this._uri=ao
+}else{throw new Error("HttpURI - invalid scheme: "+an)
+}};
+function am(an){return"http"==an||"https"==an
+}var ak=al.prototype;
+ak.getURI=function(){return this._uri
+};
+ak.duplicate=function(an){try{return new al(an)
+}catch(ao){throw ao
+}return null
+};
+ak.isSecure=function(){return("https"==this._uri.scheme)
+};
+ak.toString=function(){return this._uri.toString()
+};
+al.replaceScheme=function(an,ao){var ap=URI.replaceProtocol(an,ao);
+return new al(ap)
+};
+return al
+})();
+var af=(function(){var al=function(aq){var ar=new URI(aq);
+if(ap(ar.scheme)){this._uri=ar;
+if(ar.port==undefined){this._uri=new URI(al.addDefaultPort(aq))
+}}else{throw new Error("WSURI - invalid scheme: "+aq)
+}};
+function ap(aq){return"ws"==aq||"wss"==aq
+}function ao(aq){try{return new al(aq)
+}catch(ar){throw ar
+}return null
+}var ak=al.prototype;
+ak.getAuthority=function(){return this._uri.authority
+};
+ak.isSecure=function(){return"wss"==this._uri.scheme
+};
+ak.getHttpEquivalentScheme=function(){return this.isSecure()?"https":"http"
+};
+ak.toString=function(){return this._uri.toString()
+};
+var am=80;
+var an=443;
+al.setDefaultPort=function(aq){if(aq.port==0){if(aq.scheme=="ws"){aq.port=am
+}else{if(aq.scheme=="wss"){aq.port=an
+}else{if(aq.scheme=="http"){aq.port=80
+}else{if(aq.schemel=="https"){aq.port=443
+}else{throw new Error("Unknown protocol: "+aq.scheme)
+}}}}aq.authority=aq.host+":"+aq.port
+}};
+al.addDefaultPort=function(aq){var ar=new URI(aq);
+if(ar.port==undefined){al.setDefaultPort(ar)
+}return ar.toString()
+};
+al.replaceScheme=function(aq,ar){var at=URI.replaceProtocol(aq,ar);
+return new al(at)
+};
+return al
+})();
+var z=(function(){var al={};
+al.ws="ws";
+al.wss="wss";
+al["javascript:wse"]="ws";
+al["javascript:wse+ssl"]="wss";
+al["javascript:ws"]="ws";
+al["javascript:wss"]="wss";
+al["flash:wsr"]="ws";
+al["flash:wsr+ssl"]="wss";
+al["flash:wse"]="ws";
+al["flash:wse+ssl"]="wss";
+var am=function(ar){var aq=an(ar);
+if(ap(aq)){this._uri=new URI(URI.replaceProtocol(ar,al[aq]));
+this._compositeScheme=aq;
+this._location=ar
+}else{throw new Error("WSCompositeURI - invalid composite scheme: "+an(ar))
+}};
+function an(aq){var ar=aq.indexOf("://");
+if(ar>0){return aq.substr(0,ar)
+}else{return""
+}}function ap(aq){return al[aq]!=null
+}function ao(aq){try{return new am(aq)
+}catch(ar){throw ar
+}return null
+}var ak=am.prototype;
+ak.isSecure=function(){var aq=this._uri.scheme;
+return"wss"==al[aq]
+};
+ak.getWSEquivalent=function(){try{var aq=al[this._compositeScheme];
+return af.replaceScheme(this._location,aq)
+}catch(ar){throw ar
+}return null
+};
+ak.getPlatformPrefix=function(){if(this._compositeScheme.indexOf("javascript:")===0){return"javascript"
+}else{if(this._compositeScheme.indexOf("flash:")===0){return"flash"
+}else{return""
+}}};
+ak.toString=function(){return this._location
+};
+return am
+})();
+var W=(function(){var ak=function(){this._parent=null;
+this._challengeResponse=new ChallengeResponse(null,null)
+};
+ak.prototype.toString=function(){return"[Channel]"
+};
+return ak
+})();
+var w=(function(){var al=function(am,ao,an){this._location=am;
+this._protocol=ao;
+this._isBinary=an;
+this._controlFrames={};
+this._handshakePayload;
+this._isEscape=false;
+this._bufferedAmount=0
+};
+var ak=al.prototype=new W();
+ak.getBufferedAmount=function(){return this._bufferedAmount
+};
+ak.toString=function(){return"[WebSocketChannel "+_location+" "+_protocol!=null?_protocol:"- binary:"+isBinary+"]"
+};
+return al
+})();
+var B=(function(){var al=function(){this._nextHandler;
+this._listener
+};
+var ak=al.prototype;
+ak.processConnect=function(an,am,ao){this._nextHandler.processConnect(an,am,ao)
+};
+ak.processAuthorize=function(an,am){this._nextHandler.processAuthorize(an,am)
+};
+ak.processTextMessage=function(am,an){this._nextHandler.processTextMessage(am,an)
+};
+ak.processBinaryMessage=function(an,am){this._nextHandler.processBinaryMessage(an,am)
+};
+ak.processClose=function(am){this._nextHandler.processClose(am)
+};
+ak.setListener=function(am){this._listener=am
+};
+ak.setNextHandler=function(am){this._nextHandler=am
+};
+return al
+})();
+var M=(function(){var ak=function(){var al="";
+var am=""
+};
+ak.KAAZING_EXTENDED_HANDSHAKE="x-kaazing-handshake";
+ak.KAAZING_SEC_EXTENSION_REVALIDATE="x-kaazing-http-revalidate";
+ak.HEADER_SEC_EXTENSIONS="X-WebSocket-Extensions";
+return ak
+})();
+var ae=(function(){var al=function(am,ao,an){this._location=am;
+this._protocol=ao;
+this._isBinary=an;
+this.requestHeaders=[];
+this.responseHeaders={};
+this.readyState=0;
+this.authenticationReceived=false
+};
+var ak=al.prototype=new w();
+return al
+})();
+var H=(function(){var al=function(){};
+var ak=al.prototype;
+ak.createChannel=function(am,ap,ao){var an=new ae(am,ap,ao);
+if(ap){an.requestHeaders.push(new Z("X-WebSocket-Protocol",ap))
+}an.requestHeaders.push(new Z(M.HEADER_SEC_EXTENSIONS,M.KAAZING_SEC_EXTENSION_REVALIDATE));
+return an
+};
+return al
+})();
+var C=(function(){var al=function(){};
+var ak=al.prototype;
+ak.createChannel=function(am,ap,ao){var an=new ae(am,ap,ao);
+return an
+};
+return al
+})();
+var N=(function(){var al=function(am,ao,an){this._location=am.getWSEquivalent();
+this._protocol=ao;
+this._isBinary=an;
+this._webSocket;
+this._compositeScheme=am._compositeScheme;
+this._connectionStrategies=[];
+this._selectedChannel;
+this.readyState=0;
+this._closing=false;
+this._compositeScheme=am._compositeScheme
+};
+var ak=al.prototype=new w();
+ak.getReadyState=function(){return this.readyState
+};
+ak.getWebSocket=function(){return this._webSocket
+};
+ak.getCompositeScheme=function(){return this._compositeScheme
+};
+ak.getNextStrategy=function(){if(this._connectionStrategies.length<=0){return null
+}else{return this._connectionStrategies.shift()
+}};
+return al
+})();
+var ad=(function(){var ao="WebSocketControlFrameHandler";
+var am=m.getLogger(ao);
+var an=function(){am.finest(ao,"<init>")
+};
+var al=function(at,aq){var ap=0;
+for(var ar=aq;
+ar<aq+4;
+ar++){ap=(ap<<8)+at.get()
+}return ap
+};
+var ak=an.prototype=new B();
+ak.handleConnectionOpened=function(av,ax){am.finest(ao,"handleConnectionOpened");
+var aw=av.responseHeaders;
+if(aw["X-WebSocket-Protocol"]!=null){av.protocol=aw["X-WebSocket-Protocol"]
+}if(aw[M.HEADER_SEC_EXTENSIONS]!=null){var at=aw[M.HEADER_SEC_EXTENSIONS];
+if(at!=null&&at.length>0){var ar=at.split(",");
+for(var ap=0;
+ap<ar.length;
+ap++){var aq=ar[ap].split(";");
+if(aq.length>1){var au=aq[1].replace(/^\s+|\s+$/g,"");
+av._controlFrames[parseInt(au,16)]=aq[0].replace(/^\s+|\s+$/g,"")
+}}}}this._listener.connectionOpened(av,ax)
+};
+ak.handleMessageReceived=function(au,at){am.finest(ao,"handleMessageReceived",at);
+if(au._isEscape){au._isEscape=false;
+this._listener.messageReceived(au,at);
+return
+}if(at==null||at.limit<4){this._listener.messageReceived(au,at);
+return
+}var ap=at.position;
+var av=al(at,0);
+if(au._controlFrames[av]!=null){if(at.limit==4){au._isEscape=true;
+return
+}else{if(M.KAAZING_SEC_EXTENSION_REVALIDATE==au._controlFrames[av]){var ar=at.getString(Charset.UTF8).substr(1);
+if(au._redirectUri!=null){if(typeof(au._redirectUri)=="string"){var aq=new URI(au._redirectUri);
+ar=aq.scheme+"://"+aq.authority+ar
+}else{ar=au._redirectUri.getHttpEquivalentScheme()+"://"+au._redirectUri.getAuthority()+ar
+}}else{ar=au._location.getHttpEquivalentScheme()+"://"+au._location.getAuthority()+ar
+}this._listener.authenticationRequested(au,ar,M.KAAZING_SEC_EXTENSION_REVALIDATE)
+}}}else{at.position=ap;
+this._listener.messageReceived(au,at)
+}};
+ak.setNextHandler=function(aq){this._nextHandler=aq;
+var ar={};
+var ap=this;
+ar.connectionOpened=function(at,au){ap.handleConnectionOpened(at,au)
+};
+ar.messageReceived=function(au,at){ap.handleMessageReceived(au,at)
+};
+ar.connectionClosed=function(at){ap._listener.connectionClosed(at)
+};
+ar.connectionFailed=function(at){ap._listener.connectionFailed(at)
+};
+ar.authenticationRequested=function(av,at,au){ap._listener.authenticationRequested(av,at,au)
+};
+ar.redirected=function(au,at){ap._listener.redirected(au,at)
+};
+aq.setListener(ar)
+};
+ak.setListener=function(ap){this._listener=ap
+};
+return an
+})();
+var aj=(function(){var al=m.getLogger("RevalidateHandler");
+var am=function(an){al.finest("ENTRY Revalidate.<init>");
+this.channel=an
+};
+var ak=am.prototype;
+ak.connect=function(an){al.finest("ENTRY Revalidate.connect with {0}",an);
+var ap=this;
+var ao=new XMLHttpRequest0();
+ao.open("GET",an+"&.kr="+Math.random(),true);
+if(ap.channel._challengeResponse!=null&&ap.channel._challengeResponse.credentials!=null){ao.setRequestHeader("Authorization",ap.channel._challengeResponse.credentials);
+this.clearAuthenticationData(ap.channel)
+}ao.onreadystatechange=function(){switch(ao.readyState){case 2:if(ao.status==403){ao.abort()
+}break;
+case 4:if(ao.status==401){ap.handle401(ap.channel,an,ao.getResponseHeader("WWW-Authenticate"));
+return
+}break
+}};
+ao.send(null)
+};
+ak.clearAuthenticationData=function(an){if(an._challengeResponse!=null){an._challengeResponse.clearCredentials()
+}};
+ak.handle401=function(ar,an,aq){var at=this;
+var au=an;
+if(au.indexOf("/;a/")>0){au=au.substring(0,au.indexOf("/;a/"))
+}else{if(au.indexOf("/;ae/")>0){au=au.substring(0,au.indexOf("/;ae/"))
+}else{if(au.indexOf("/;ar/")>0){au=au.substring(0,au.indexOf("/;ar/"))
+}}}var ap=new ChallengeRequest(au,aq);
+var ao;
+if(this.channel._challengeResponse.nextChallengeHandler!=null){ao=this.channel._challengeResponse.nextChallengeHandler
+}else{ao=ChallengeHandlers.getDefault()
+}if(ao!=null&&ao.canHandle(ap)){ao.handle(ap,function(av){try{if(av!=null&&av.credentials!=null){at.channel._challengeResponse=av;
+at.connect(an)
+}}catch(aw){}})
+}};
+return am
+})();
+var T=(function(){var an="WebSocketNativeDelegateHandler";
+var am=m.getLogger(an);
+var al=function(){am.finest(an,"<init>")
+};
+var ak=al.prototype=new B();
+ak.processConnect=function(ar,aq,at){am.finest(an,"connect",ar);
+if(ar.readyState==2){throw new Error("WebSocket is already closed")
+}if(ar._delegate==null){var ap=new a();
+ap.parent=ar;
+ar._delegate=ap;
+ao(ap,this)
+}ar._delegate.connect(aq.toString(),at)
+};
+ak.processTextMessage=function(ap,aq){am.finest(an,"connect",ap);
+if(ap._delegate.readyState()==1){ap._delegate.send(aq)
+}else{throw new Error("WebSocket is already closed")
+}};
+ak.processBinaryMessage=function(aq,ap){am.finest(an,"connect",aq);
+if(aq._delegate.readyState()==1){aq._delegate.send(ap)
+}else{throw new Error("WebSocket is already closed")
+}};
+ak.processClose=function(ap){am.finest(an,"close",ap);
+try{ap._delegate.close()
+}catch(aq){}};
+var ao=function(ap,ar){var aq={};
+aq.connectionOpened=function(at,au){ar._listener.connectionOpened(at,au)
+};
+aq.messageReceived=function(au,at){ar._listener.messageReceived(au,at)
+};
+aq.connectionClosed=function(at){ar._listener.connectionClosed(at)
+};
+aq.connectionFailed=function(at){ar._listener.connectionFailed(at)
+};
+aq.authenticationRequested=function(av,at,au){ar._listener.authenticationRequested(av,at,au)
+};
+aq.redirected=function(au,at){ar._listener.redirected(au,at)
+};
+ap.setListener(aq)
+};
+return al
+})();
+var E=(function(){var ao="WebSocketNativeBalancingHandler";
+var am=m.getLogger(ao);
+var an=function(){am.finest(ao,"<init>")
+};
+var al=function(aq,ap,ar){ap._redirecting=true;
+ap._redirectUri=ar;
+aq._nextHandler.processClose(ap)
+};
+var ak=an.prototype=new B();
+ak.processConnect=function(aq,ap,ar){aq._balanced=false;
+this._nextHandler.processConnect(aq,ap,ar)
+};
+ak.handleConnectionClosed=function(ap){if(ap._redirecting==true){ap._redirecting=false;
+ap._redirected=true;
+ap.handshakePayload.clear();
+var aq=ap._protocol;
+if(aq==null||aq.length==0){aq=M.KAAZING_EXTENDED_HANDSHAKE
+}else{if(aq.indexOf(M.KAAZING_EXTENDED_HANDSHAKE)<0){aq+=","+M.KAAZING_EXTENDED_HANDSHAKE
+}}this.processConnect(ap,ap._redirectUri,aq)
+}else{this._listener.connectionClosed(ap)
+}};
+ak.handleMessageReceived=function(ar,aq){am.finest(ao,"handleMessageReceived",aq);
+if(ar._balanced||aq.remaining()<4){this._listener.messageReceived(ar,aq);
+return
+}var ap=aq.position;
+var at=aq.getBytes(3);
+if(at[0]==-17&&at[1]==-125){var au=aq.getString(Charset.UTF8);
+if(au.match("N$")){ar._balanced=true;
+this._listener.connectionOpened(ar,"")
+}else{if(au.indexOf("R")==0){var av=new af(au.substring(1));
+al(this,ar,av)
+}else{am.warning(ao,"Invalidate balancing message: "+au)
+}}return
+}else{aq.position=ap;
+this._listener.messageReceived(ar,aq)
+}};
+ak.setNextHandler=function(aq){this._nextHandler=aq;
+var ar={};
+var ap=this;
+ar.connectionOpened=function(at,au){ap._listener.connectionOpened(at,au)
+};
+ar.messageReceived=function(au,at){ap.handleMessageReceived(au,at)
+};
+ar.connectionClosed=function(at){ap.handleConnectionClosed(at)
+};
+ar.connectionFailed=function(at){ap._listener.connectionFailed(at)
+};
+ar.authenticationRequested=function(av,at,au){ap._listener.authenticationRequested(av,at,au)
+};
+ar.redirected=function(au,at){ap._listener.redirected(au,at)
+};
+aq.setListener(ar)
+};
+ak.setListener=function(ap){this._listener=ap
+};
+return an
+})();
+var L=(function(){var ak="WebSocketNativeHandshakeHandler";
+var at=m.getLogger(ak);
+var an="Sec-WebSocket-Protocol";
+var ao="Sec-WebSocket-Extensions";
+var ap="Authorization";
+var ar="WWW-Authenticate";
+var ay="Set-Cookie";
+var au="GET";
+var az="HTTP/1.1";
+var aC=":";
+var aD=" ";
+var aw="\r\n";
+var ax=function(){at.finest(ak,"<init>")
+};
+var aA=function(aF,aH){at.finest(ak,"sendCookieRequest with {0}",aH);
+var aE=new XMLHttpRequest0();
+var aG=aF._location.getHttpEquivalentScheme()+"://"+aF._location.getAuthority()+(aF._location._uri.path||"");
+aG=aG.replace(/[\/]?$/,"/;api/set-cookies");
+aE.open("POST",aG,true);
+aE.setRequestHeader("Content-Type","text/plain; charset=utf-8");
+aE.onreadystatechange=function(){};
+aE.send(aH)
+};
+var al=function(aJ,aH,aF){var aG=[];
+var aE=[];
+aG.push("WebSocket-Protocol");
+aE.push("");
+aG.push(an);
+aE.push(aH._protocol);
+aG.push(ao);
+aE.push(M.KAAZING_SEC_EXTENSION_REVALIDATE);
+aG.push(ap);
+aE.push(aF);
+var aI=am(aH._location,aG,aE);
+aJ._nextHandler.processTextMessage(aH,aI)
+};
+var am=function(aF,aJ,aK){at.entering(ak,"encodeGetRequest");
+var aM=[];
+aM.push(au);
+aM.push(aD);
+var aL=[];
+if(aF._uri.path!=undefined){aL.push(aF._uri.path)
+}if(aF._uri.query!=undefined){aL.push("?");
+aL.push(aF._uri.query)
+}aM.push(aL.join(""));
+aM.push(aD);
+aM.push(az);
+aM.push(aw);
+for(var aG=0;
+aG<aJ.length;
+aG++){var aH=aJ[aG];
+var aI=aK[aG];
+if(aH!=null&&aI!=null){aM.push(aH);
+aM.push(aC);
+aM.push(aD);
+aM.push(aI);
+aM.push(aw)
+}}aM.push(aw);
+var aE=aM.join("");
+return aE
+};
+var av=function(aE){var aF=aE.getString(Charset.UTF8);
+return aF.split("\n")
+};
+var aq=function(aK,aI,aE){aI.handshakePayload.putBuffer(aE);
+if(aE.capacity>0){return
+}aI.handshakePayload.flip();
+var aQ=av(aI.handshakePayload);
+aI.handshakePayload.clear();
+var aH="";
+for(var aG=aQ.length-1;
+aG>=0;
+aG--){if(aQ[aG].indexOf("HTTP/1.1")==0){var aO=aQ[aG].split(" ");
+aH=aO[1];
+break
+}}if("101"==aH){var aM="";
+for(var aG in aQ){var aP=aQ[aG];
+if(aP!=null&&aP.indexOf(ao)==0){aM=aP.substring(ao.length+2)
+}else{if(aP!=null&&aP.indexOf(an)==0){aI.protocol=aP.substring(an.length+2)
+}else{if(aP!=null&&aP.indexOf(ay)==0){aA(aI,aP.substring(ay.length+2))
+}}}}if(aM.length>0){var aJ=aM.split(", ");
+for(var aG in aJ){var aF=aJ[aG].split("; ");
+if(aF.length>1){var aN=aF[1];
+aI._controlFrames[parseInt(aN,16)]=aF[0]
+}}}return
+}else{if("401"==aH){var aL="";
+for(var aG in aQ){if(aQ[aG].indexOf(ar)==0){aL=aQ[aG].substring(ar.length+2);
+break
+}}aK._listener.authenticationRequested(aI,aI._location.toString(),aL)
+}else{aK._listener.connectionFailed(aI)
+}}};
+var aB=ax.prototype=new B();
+aB.processConnect=function(aF,aE,aG){aF.handshakePayload=new ByteBuffer();
+if(aG==null||aG.length==0){aG=M.KAAZING_EXTENDED_HANDSHAKE
+}else{if(aG.indexOf(M.KAAZING_EXTENDED_HANDSHAKE)<0){aG+=","+M.KAAZING_EXTENDED_HANDSHAKE
+}}this._nextHandler.processConnect(aF,aE,aG)
+};
+aB.processAuthorize=function(aF,aE){al(this,aF,aE)
+};
+aB.handleConnectionOpened=function(aE,aF){at.finest(ak,"handleConnectionOpened");
+if(M.KAAZING_EXTENDED_HANDSHAKE==aF){al(this,aE,null)
+}else{aE._balanced=true;
+this._listener.connectionOpened(aE,aE.protocol)
+}};
+aB.handleMessageReceived=function(aF,aE){at.finest(ak,"handleMessageReceived",aE);
+if(aF.readyState==1){aF._isEscape=false;
+this._listener.messageReceived(aF,aE)
+}else{aq(this,aF,aE)
+}};
+aB.setNextHandler=function(aE){this._nextHandler=aE;
+var aG=this;
+var aF={};
+aF.connectionOpened=function(aH,aI){aG.handleConnectionOpened(aH,aI)
+};
+aF.messageReceived=function(aI,aH){aG.handleMessageReceived(aI,aH)
+};
+aF.connectionClosed=function(aH){aG._listener.connectionClosed(aH)
+};
+aF.connectionFailed=function(aH){aG._listener.connectionFailed(aH)
+};
+aF.authenticationRequested=function(aJ,aH,aI){aG._listener.authenticationRequested(aJ,aH,aI)
+};
+aF.redirected=function(aI,aH){aG._listener.redirected(aI,aH)
+};
+aE.setListener(aF)
+};
+aB.setListener=function(aE){this._listener=aE
+};
+return ax
+})();
+var v=(function(){var am="WebSocketNativeAuthenticationHandler";
+var al=m.getLogger(am);
+var an=function(){al.finest(am,"<init>")
+};
+var ak=an.prototype=new B();
+ak.handleClearAuthenticationData=function(ao){if(ao._challengeResponse!=null){ao._challengeResponse.clearCredentials()
+}};
+ak.handleRemoveAuthenticationData=function(ao){this.handleClearAuthenticationData(ao);
+ao._challengeResponse=new ChallengeResponse(null,null)
+};
+ak.handle401=function(av,ao,au){var aw=this;
+var at=av._location;
+if(av.redirectUri!=null){at=av._redirectUri
+}if(M.KAAZING_SEC_EXTENSION_REVALIDATE==au){var ar=new aj(new ae(at,av._protocol,av._isBinary));
+ar.connect(ao)
+}else{var aq=new ChallengeRequest(at.toString(),au);
+var ap;
+if(av._challengeResponse.nextChallengeHandler!=null){ap=av._challengeResponse.nextChallengeHandler
+}else{ap=ChallengeHandlers.getDefault()
+}if(ap!=null&&ap.canHandle(aq)){ap.handle(aq,function(ax){try{if(ax==null||ax.credentials==null){aw.handleClearAuthenticationData(av);
+aw._listener.connectionFailed(av)
+}else{av._challengeResponse=ax;
+aw._nextHandler.processAuthorize(av,ax.credentials)
+}}catch(ay){aw.handleClearAuthenticationData(av);
+aw._listener.connectionFailed(av)
+}})
+}else{this.handleClearAuthenticationData(av);
+this._listener.connectionFailed(av)
+}}};
+ak.handleAuthenticate=function(aq,ao,ap){aq.authenticationReceived=true;
+this.handle401(aq,ao,ap)
+};
+ak.setNextHandler=function(ap){this._nextHandler=ap;
+var aq={};
+var ao=this;
+aq.connectionOpened=function(ar,at){ao._listener.connectionOpened(ar,at)
+};
+aq.messageReceived=function(at,ar){ao._listener.messageReceived(at,ar)
+};
+aq.connectionClosed=function(ar){ao._listener.connectionClosed(ar)
+};
+aq.connectionFailed=function(ar){ao._listener.connectionFailed(ar)
+};
+aq.authenticationRequested=function(au,ar,at){ao.handleAuthenticate(au,ar,at)
+};
+aq.redirected=function(at,ar){ao._listener.redirected(at,ar)
+};
+ap.setListener(aq)
+};
+ak.setListener=function(ao){this._listener=ao
+};
+return an
+})();
+var F=(function(){var ak="WebSocketNativeHandler";
+var ay=m.getLogger(ak);
+var al=function(){var aA=new v();
+return aA
+};
+var ao=function(){var aA=new L();
+return aA
+};
+var am=function(){var aA=new ad();
+return aA
+};
+var az=function(){var aA=new E();
+return aA
+};
+var aq=function(){var aA=new T();
+return aA
+};
+var aw=al();
+var ax=ao();
+var at=am();
+var an=az();
+var av=aq();
+var ap=function(){ay.finest(ak,"<init>");
+this.setNextHandler(aw);
+aw.setNextHandler(ax);
+ax.setNextHandler(at);
+at.setNextHandler(an);
+an.setNextHandler(av)
+};
+var ar=function(aA,aB){ay.finest(ak,"<init>")
+};
+var au=ap.prototype=new B();
+au.setNextHandler=function(aA){this._nextHandler=aA;
+var aC=this;
+var aB={};
+aB.connectionOpened=function(aD,aE){aC._listener.connectionOpened(aD,aE)
+};
+aB.messageReceived=function(aE,aD){aC._listener.messageReceived(aE,aD)
+};
+aB.connectionClosed=function(aD){aC._listener.connectionClosed(aD)
+};
+aB.connectionFailed=function(aD){aC._listener.connectionFailed(aD)
+};
+aB.authenticationRequested=function(aF,aD,aE){aC._listener.authenticationRequested(aF,aD,aE)
+};
+aB.redirected=function(aE,aD){aC._listener.redirected(aE,aD)
+};
+aA.setListener(aB)
+};
+au.setListener=function(aA){this._listener=aA
+};
+return ap
+})();
+var Y=(function(){var an=m.getLogger("com.kaazing.gateway.client.html5.WebSocketEmulatedProxyDownstream");
+var az=512*1024;
+var ar=1;
+var aC=function(aG){an.entering(this,"WebSocketEmulatedProxyDownstream.<init>",aG);
 this.retry=3000;
-if(browser=="opera"||browser=="ie"){
-this.requiresEscaping=true;
-}
-if(_30d.indexOf(".kv="==-1)){
-_30d+=((_30d.indexOf("?")==-1)?"?":"&")+".kv=10.05";
-}else{
-_30d=_30d.replace(/\.kv=[^&]*(.*)/,".kv=10.05$1");
-}
-var _30e=new URI(_30d);
-var _30f={"http":80,"https":443};
-if(_30e.port==null){
-_30e.port=_30f[_30e.scheme];
-_30e.authority=_30e.host+":"+_30e.port;
-}
-this.origin=_30e.scheme+"://"+_30e.authority;
-this.location=_30d;
-this.xhr=null;
+if(browser=="opera"||browser=="ie"){this.requiresEscaping=true
+}var aJ=new URI(aG);
+var aH={http:80,https:443};
+if(aJ.port==undefined){aJ.port=aH[aJ.scheme];
+aJ.authority=aJ.host+":"+aJ.port
+}this.origin=aJ.scheme+"://"+aJ.authority;
+this.location=aG;
+this.activeXhr=null;
 this.reconnectTimer=null;
-var _310=this;
-setTimeout(function(){
-connect(_310);
+this.buf=new ByteBuffer();
+var aI=this;
+setTimeout(function(){al(aI,true);
+aI.activeXhr=aI.mostRecentXhr;
+aF(aI,aI.mostRecentXhr)
 },0);
+an.exiting(this,"WebSocketEmulatedProxyDownstream.<init>")
 };
-_25a=_30c.prototype;
-var _311=0;
-var _312=255;
-var _313=1;
-var _314=128;
-var _315=127;
-var _316=3000;
-_25a.readyState=0;
-function connect(_317){
-if(_317.reconnectTimer!==null){
-_317.reconnectTimer=null;
-}
-_317.buf=new ByteBuffer();
-var _318=new URI(_317.location);
-var _319=[];
-if(_317.location.indexOf("&.kb=")===-1&&_317.location.indexOf("?.kb=")===-1){
-_319.push(".kb=512");
-}
-switch(browser){
-case "ie":
-_319.push(".kns=1");
+var ax=aC.prototype;
+var aq=0;
+var ao=255;
+var aB=1;
+var aE=128;
+var au=127;
+var av=3000;
+ax.readyState=0;
+function al(aJ,aG){an.entering(this,"WebSocketEmulatedProxyDownstream.connect");
+if(aJ.reconnectTimer!==null){aJ.reconnectTimer=null
+}var aI=new URI(aJ.location);
+var aH=[];
+switch(browser){case"ie":aH.push(".kns=1");
 break;
-case "safari":
-_319.push(".kp=256");
+case"safari":aH.push(".kp=256");
 break;
-case "firefox":
-_319.push(".kp=1025");
-_319.push(String(Math.random()).substring(2));
+case"firefox":aH.push(".kp=1025");
 break;
-case "android":
-_319.push(".kp=4096");
-_319.push(".kbp=4096");
+case"android":aH.push(".kp=4096");
+aH.push(".kbp=4096");
+break
+}if(browser=="android"||browser.ios){aH.push(".kkt=20")
+}aH.push(".kc=text/plain;charset=windows-1252");
+aH.push(".kb=4096");
+aH.push(".kid="+String(Math.random()).substring(2));
+if(aH.length>0){if(aI.query===undefined){aI.query=aH.join("&")
+}else{aI.query+="&"+aH.join("&")
+}}var aK=new XMLHttpRequest0();
+aK.id=ar++;
+aK.position=0;
+aK.opened=false;
+aK.reconnect=false;
+aK.requestClosing=false;
+aK.onprogress=function(){if(aK==aJ.activeXhr&&aJ.readyState!=2){setTimeout(function(){ak(aJ)
+},0)
+}};
+aK.onload=function(){if(aK==aJ.activeXhr&&aJ.readyState!=2){ak(aJ);
+aK.onerror=function(){};
+aK.ontimeout=function(){};
+aK.onreadystatechange=function(){};
+if(!aK.reconnect){at(aJ)
+}else{if(aK.requestClosing){ap(aJ)
+}else{if(aJ.activeXhr==aJ.mostRecentXhr){al(aJ);
+aJ.activeXhr=aJ.mostRecentXhr;
+aF(aJ,aJ.activeXhr)
+}else{var aL=aJ.mostRecentXhr;
+aJ.activeXhr=aL;
+switch(aL.readyState){case 1:case 2:aF(aJ,aL);
 break;
-}
-_319.push(".kc=text/plain;charset=windows-1252");
-if(_319.length>0){
-if(_318.query===undefined){
-_318.query=_319.join("&");
-}else{
-_318.query+="&"+_319.join("&");
-}
-}
-var xhr=_317.xhr=new XMLHttpRequest0();
-var _31b={"xhr":xhr,"position":0};
-_317.nextMessageAt=0;
-if(_317.location.indexOf(".ki=p")==-1||_317.location.indexOf("https://")==0){
-xhr.onprogress=function(){
-setTimeout(function(){
-_process(_317,_31b);
-},0);
-};
-}
-xhr.onload=function(){
-_process(_317,_31b);
-if(_317.xhr==_31b.xhr&&_317.readyState!=2){
-_317.xhr.onerror=function(){
-};
-_317.xhr.ontimeout=function(){
-};
-_317.xhr.onreadystatechange=function(){
-};
-if(_317.reconnectImmediately){
-_317.reconnectImmediately=false;
-connect(_317);
-}else{
-doError(_317);
-}
-}
-};
-xhr.onreadystatechange=function(){
-if(!_317.reconnectImmediately&&xhr.readyStateChange>3){
-_317.readyState=1;
-doOpen(_317);
-xhr.onreadystatechange=function(){
-};
-}
-};
-xhr.ontimeout=function(){
-doClose(_317);
-};
-xhr.onerror=function(){
-doClose(_317);
-};
-xhr.open("GET",_318.toString(),true);
-xhr.send("");
-if(_317.location.indexOf("&.ki=p")==-1){
-setTimeout(function(){
-if(xhr.readyState<3&&_317.readyState<2){
-_317.location+="&.ki=p";
-connect(_317);
-}
-},_316);
-}
-};
-_25a.disconnect=function(){
-if(this.readyState!==2){
-_disconnect(this);
-}
-};
-function _disconnect(_31c){
-if(_31c.reconnectTimer!==null){
-clearTimeout(_31c.reconnectTimer);
-_31c.reconnectTimer=null;
-}
-if(_31c.xhr!==null){
-_31c.xhr.onprogress=function(){
-};
-_31c.xhr.onload=function(){
-};
-_31c.xhr.onerror=function(){
-};
-_31c.xhr.abort();
-}
-_31c.lineQueue=[];
-_31c.lastEventId=null;
-_31c.location=null;
-_31c.readyState=2;
-};
-function _process(_31d,_31e){
-var _31f=_31e.xhr.responseText;
-var _320=_31f.slice(_31e.position);
-_31e.position=_31f.length;
-var buf=_31d.buf;
-var _322=_2ee.toArray(_320,_31d.requiresEscaping);
-if(_322.hasRemainder){
-_31e.position--;
-}
-buf.position=buf.limit;
-buf.putBytes(_322);
-buf.position=_31d.nextMessageAt;
-buf.mark();
-parse:
-while(true){
-if(!buf.hasRemaining()){
+case 3:ak(aJ);
 break;
-}
-var type=buf.getUnsigned();
-switch(type&128){
-case _311:
-var _324=buf.indexOf(_312);
-if(_324==-1){
-break parse;
-}
-var _325=buf.array.slice(buf.position,_324);
-var data=new ByteBuffer(_325);
-var _327=_324-buf.position;
-buf.skip(_327+1);
-buf.mark();
-if(type==_313){
-handleCommandFrame(_31d,data);
-}else{
-dispatchText(_31d,data);
-}
+case 4:aJ.activeXhr.onload();
 break;
-case _314:
-var _328=0;
-var _329=false;
-while(buf.hasRemaining()){
-var b=buf.getUnsigned();
-_328=_328<<7;
-_328|=(b&127);
-if((b&128)!=128){
-_329=true;
+default:}}}}}};
+aK.ontimeout=function(){an.entering(this,"WebSocketEmulatedProxyDownstream.connect.xhr.ontimeout");
+at(aJ)
+};
+aK.onerror=function(){an.entering(this,"WebSocketEmulatedProxyDownstream.connect.xhr.onerror");
+at(aJ)
+};
+aK.open("GET",aI.toString(),true);
+aK.send("");
+aJ.mostRecentXhr=aK
+}function aF(aG,aH){if(aG.location.indexOf("&.ki=p")==-1){setTimeout(function(){if(aH&&aH.readyState<3&&aG.readyState<2){aG.location+="&.ki=p";
+al(aG,false)
+}},av)
+}}ax.disconnect=function(){an.entering(this,"WebSocketEmulatedProxyDownstream.disconnect");
+if(this.readyState!==2){ay(this)
+}};
+function ay(aG){an.entering(this,"WebSocketEmulatedProxyDownstream._disconnect");
+if(aG.reconnectTimer!==null){clearTimeout(aG.reconnectTimer);
+aG.reconnectTimer=null
+}if(aG.mostRecentXhr!==null){aG.mostRecentXhr.onprogress=function(){};
+aG.mostRecentXhr.onload=function(){};
+aG.mostRecentXhr.onerror=function(){};
+aG.mostRecentXhr.abort()
+}if(aG.activeXhr!=aG.mostRecentXhr&&aG.activeXhr!==null){aG.activeXhr.onprogress=function(){};
+aG.activeXhr.onload=function(){};
+aG.activeXhr.onerror=function(){};
+aG.activeXhr.abort()
+}aG.lineQueue=[];
+aG.lastEventId=null;
+aG.location=null;
+aG.readyState=2
+}function ak(aP){var aU=aP.activeXhr;
+var aO=aU.responseText;
+if(aO.length>=az){if(aP.activeXhr==aP.mostRecentXhr){al(aP,false)
+}}var aK=aO.slice(aU.position);
+aU.position=aO.length;
+var aI=aP.buf;
+var aV=G.toArray(aK,aP.requiresEscaping);
+if(aV.hasRemainder){aU.position--
+}aI.position=aI.limit;
+aI.putBytes(aV);
+aI.position=0;
+aI.mark();
+parse:while(true){if(!aI.hasRemaining()){break
+}var aQ=aI.getUnsigned();
+switch(aQ&128){case aq:var aT=aI.indexOf(ao);
+if(aT==-1){break parse
+}var aJ=aI.array.slice(aI.position,aT);
+var aL=new ByteBuffer(aJ);
+var aG=aT-aI.position;
+aI.skip(aG+1);
+aI.mark();
+if(aQ==aB){am(aP,aL)
+}else{aw(aP,aL)
+}break;
+case aE:var aH=0;
+var aM=false;
+while(aI.hasRemaining()){var aR=aI.getUnsigned();
+aH=aH<<7;
+aH|=(aR&127);
+if((aR&128)!=128){aM=true;
+break
+}}if(!aM){break parse
+}if(aI.remaining()<aH){break parse
+}var aN=aI.array.slice(aI.position,aI.position+aH);
+var aS=new ByteBuffer(aN);
+aI.skip(aH);
+aI.mark();
+aA(aP,aS);
 break;
-}
-}
-if(!_329){
-break parse;
-}
-if(buf.remaining()<_328){
-break parse;
-}
-var _32b=buf.array.slice(buf.position,buf.position+_328);
-var _32c=new ByteBuffer(_32b);
-buf.skip(_328);
-buf.mark();
-dispatchBytes(_31d,_32c);
+default:throw new Error("Emulation protocol error. Unknown frame type: "+aQ)
+}}aI.reset();
+aI.compact()
+}function am(aH,aG){while(aG.remaining()){var aI=String.fromCharCode(aG.getUnsigned());
+switch(aI){case"0":break;
+case"1":aH.activeXhr.reconnect=true;
 break;
-default:
-throw new Error("Emulation protocol error. Unknown frame type: "+type);
-}
-}
-buf.reset();
-buf.compact();
-nextMessageAt=buf.position;
-};
-function handleCommandFrame(_32d,data){
-while(data.remaining()){
-var _32f=String.fromCharCode(data.getUnsigned());
-switch(_32f){
-case "0":
+case"2":aH.activeXhr.requestClosing=true;
 break;
-case "1":
-_32d.reconnectImmediately=true;
-break;
-default:
-throw new Error("Protocol decode error. Unknown command: "+_32f);
-}
-}
-};
-function dispatchBytes(_330,buf){
-var e=document.createEvent("Events");
-e.initEvent("message",true,true);
-e.lastEventId=_330.lastEventId;
-e.data=_24f(buf);
-e.decoder=_240;
-e.origin=_330.origin;
-if(e.source!==null){
-e.source=null;
-}
-if(typeof (_330.onmessage)==="function"){
-_330.onmessage(e);
-}
-};
-function dispatchText(data){
-var e=document.createEvent("Events");
-e.initEvent("message",true,true);
-e.lastEventId=$this.lastEventId;
-e.data=data;
-e.origin=$this.origin;
-if(e.source!==null){
-e.source=null;
-}
-if(typeof ($this.onmessage)==="function"){
-$this.onmessage(e);
-}
-};
-function doOpen(_335){
-if(typeof (_335.onopen)==="function"){
-_335.onopen();
-}
-};
-function doClose(_336){
-if(_336.readyState!=2){
-_336.disconnect();
-doError(_336);
-}
-};
-function doError(_337){
-var e=document.createEvent("Events");
-e.initEvent("error",true,true);
-if(typeof (_337.onerror)==="function"){
-_337.onerror(e);
-}
-};
-return _30c;
+default:throw new Error("Protocol decode error. Unknown command: "+aI)
+}}}function aA(aI,aG){var aH=document.createEvent("Events");
+aH.initEvent("message",true,true);
+aH.lastEventId=aI.lastEventId;
+aH.data=aG;
+aH.decoder=o;
+aH.origin=aI.origin;
+if(aH.source!==null){aH.source=null
+}if(typeof(aI.onmessage)==="function"){aI.onmessage(aH)
+}}function aw(aI,aG){var aH=document.createEvent("Events");
+aH.initEvent("message",true,true);
+aH.lastEventId=aI.lastEventId;
+aH.text=aG;
+aH.origin=aI.origin;
+if(aH.source!==null){aH.source=null
+}if(typeof(aI.onmessage)==="function"){aI.onmessage(aH)
+}}function ap(aG){at(aG)
+}function at(aG){if(aG.readyState!=2){aG.disconnect();
+aD(aG)
+}}function aD(aH){var aG=document.createEvent("Events");
+aG.initEvent("error",true,true);
+if(typeof(aH.onerror)==="function"){aH.onerror(aG)
+}}return aC
 })();
-var _339=(function(){
-var _33a=function(_33b,_33c){
-this.URL=_33b;
-if(_33b.indexOf(".kv=")==-1){
-_33b+=((_33b.indexOf("?")==-1)?"?":"&")+".kv=10.05";
-}else{
-_33b=_33b.replace(/\.kv=[^&]*(.*)/,".kv=10.05$1");
-}
-if(browser=="opera"||browser=="ie"){
-this.requiresEscaping=true;
-}
-this._sendQueue=[];
-_33d(this);
+var S=(function(){var ao=m.getLogger("WebSocketEmulatedProxy");
+var aA=function(){this.parent;
+this._listener
 };
-_25a=_33a.prototype;
-_25a.readyState=0;
-_25a.bufferedAmount=0;
-_25a.URL="";
-_25a.onopen=function(){
+var ay=aA.prototype;
+ay.connect=function(aE,aF){ao.entering(this,"WebSocketEmulatedProxy.connect",{location:aE,subprotocol:aF});
+this.URL=aE.replace("ws","http");
+this.protocol=aF;
+if(browser=="opera"||browser=="ie"){ao.config(this,"WebSocketEmulatedProxy.<init>: browser is "+browser);
+this.requiresEscaping=true
+}this._sendQueue=[];
+ak(this);
+ao.exiting(this,"WebSocketEmulatedProxy.<init>")
 };
-_25a.onerror=function(){
-};
-_25a.onmessage=function(_33e){
-};
-_25a.onclose=function(){
-};
-var _33f=128;
-var _340=0;
-var _341=255;
-var _342=1;
-var _343=[_342,48,49,_341];
-var _344=[_342,48,50,_341];
-_25a.send=function(data){
-switch(this.readyState){
-case 0:
+ay.readyState=0;
+ay.bufferedAmount=0;
+ay.URL="";
+ay.onopen=function(){};
+ay.onerror=function(){};
+ay.onmessage=function(aE){};
+ay.onclose=function(){};
+var aD=128;
+var av=0;
+var ap=255;
+var aC=1;
+var am=[aC,48,49,ap];
+var az=[aC,48,50,ap];
+ay.send=function(aF){ao.entering(this,"WebSocketEmulatedProxy.send",{data:aF});
+switch(this.readyState){case 0:ao.severe(this,"WebSocketEmulatedProxy.send: Error: readyState is 0");
 throw new Error("INVALID_STATE_ERR");
-case 1:
-if(data===null){
-throw new Error("data is null");
-}
-var buf=new ByteBuffer();
-if(typeof data=="string"){
-buf.put(_340);
-buf.putString(data,Charset.UTF8);
-buf.put(_341);
-}else{
-if(data.constructor==ByteBuffer){
-buf.put(_33f);
-_347(buf,data.remaining());
-buf.putBuffer(data);
-}else{
-throw new Error("Invalid type for send");
-}
-}
-buf.flip();
-doSend(this,buf);
+case 1:if(aF===null){ao.severe(this,"WebSocketEmulatedProxy.send: Error: data is null");
+throw new Error("data is null")
+}var aE=new ByteBuffer();
+if(typeof aF=="string"){ao.finest(this,"WebSocketEmulatedProxy.send: Data is string");
+aE.put(av);
+aE.putString(aF,Charset.UTF8);
+aE.put(ap)
+}else{if(aF.constructor==ByteBuffer){ao.finest(this,"WebSocketEmulatedProxy.send: Data is ByteBuffer");
+aE.put(aD);
+aB(aE,aF.remaining());
+aE.putBuffer(aF)
+}else{ao.severe(this,"WebSocketEmulatedProxy.send: Error: Invalid type for send");
+throw new Error("Invalid type for send")
+}}aE.flip();
+an(this,aE);
 return true;
-case 2:
-return false;
-default:
-throw new Error("INVALID_STATE_ERR");
-}
+case 2:return false;
+default:ao.severe(this,"WebSocketEmulatedProxy.send: Error: invalid readyState");
+throw new Error("INVALID_STATE_ERR")
+}ao.exiting(this,"WebSocketEmulatedProxy.send")
 };
-_25a.close=function(){
-switch(this.readyState){
-case 1:
-doSend(this,new ByteBuffer(_344));
-_348(this);
+ay.close=function(){ao.entering(this,"WebSocketEmulatedProxy.close");
+switch(this.readyState){case 0:au(this);
 break;
-}
+case 1:an(this,new ByteBuffer(az));
+au(this);
+break
+}};
+ay.setListener=function(aE){this._listener=aE
 };
-function doSend(_349,buf){
-_349.bufferedAmount+=buf.remaining();
-_349._sendQueue.push(buf);
-if(!_349._writeSuspended){
-doFlush(_349);
-}
-};
-function doFlush(_34b){
-var _34c=_34b._sendQueue;
-var _34d=_34c.length;
-_34b._writeSuspended=(_34d>0);
-if(_34d>0){
-var xhr=new XMLHttpRequest0();
-xhr.open("POST",_34b._upstream,true);
-xhr.onreadystatechange=function(){
-if(xhr.readyState==4){
-switch(xhr.status){
-case 200:
-setTimeout(function(){
-doFlush(_34b);
+function an(aF,aE){ao.entering(this,"WebSocketEmulatedProxy.doSend",aE);
+aF.bufferedAmount+=aE.remaining();
+aF._sendQueue.push(aE);
+if(!aF._writeSuspended){aw(aF)
+}}function aw(aH){ao.entering(this,"WebSocketEmulatedProxy.doFlush");
+var aF=aH._sendQueue;
+var aG=aF.length;
+aH._writeSuspended=(aG>0);
+if(aG>0){var aI=new XMLHttpRequest0();
+aI.open("POST",aH._upstream,true);
+aI.onreadystatechange=function(){if(aI.readyState==4){ao.finest(this,"WebSocketEmulatedProxy.doFlush: xhr.status="+aI.status);
+switch(aI.status){case 200:setTimeout(function(){aw(aH)
 },0);
 break;
-default:
-_348(_34b);
+default:au(aH);
+break
+}}};
+var aE=new ByteBuffer();
+while(aF.length){aE.putBuffer(aF.shift())
+}aE.putBytes(am);
+aE.flip();
+if(browser=="firefox"){if(aI.sendAsBinary){ao.finest(this,"WebSocketEmulatedProxy.doFlush: xhr.sendAsBinary");
+aI.setRequestHeader("Content-Type","application/octet-stream");
+aI.sendAsBinary(s(aE))
+}else{aI.send(s(aE))
+}}else{aI.setRequestHeader("Content-Type","text/plain; charset=utf-8");
+aI.send(s(aE,aH.requiresEscaping))
+}}aH.bufferedAmount=0
+}var aq=function(aE){if(aE.challengeResponse==null){return
+}aE.challengeResponse.clearCredentials()
+};
+var ak=function(aL){ao.entering(this,"WebSocketEmulatedProxy.connect");
+var aG=new URI(aL.URL);
+aG.scheme=aG.scheme.replace("ws","http");
+var aH=aL.requiresEscaping?"/;e/cte":"/;e/ct";
+aG.path=aG.path.replace(/[\/]?$/,aH);
+var aE=aG.toString();
+var aM=aE.indexOf("?");
+if(aM==-1){aE+="?"
+}else{aE+="&"
+}aE+=".kn="+String(Math.random()).substring(2);
+ao.finest(this,"WebSocketEmulatedProxy.connect: Connecting to "+aE);
+var aK=new XMLHttpRequest0();
+var aI=false;
+aK.open("GET",aE,true);
+aK.setRequestHeader("X-WebSocket-Version","wseb-1.0");
+for(var aJ=0;
+aJ<aL.parent.requestHeaders.length;
+aJ++){var aF=aL.parent.requestHeaders[aJ];
+aK.setRequestHeader(aF.label,aF.value)
+}if(aL.challengeResponse!=null&&aL.challengeResponse.credentials!=null){aK.setRequestHeader("Authorization",aL.challengeResponse.credentials);
+aq(aL)
+}aK.onreadystatechange=function(){switch(aK.readyState){case 2:if(aK.status==403){ax(aL)
+}else{timer=setTimeout(function(){if(!aI){ax(aL)
+}},5000)
+}break;
+case 4:aI=true;
+if(aK.status==401){aL._listener.authenticationRequested(aL.parent,aK._location,aK.getResponseHeader("WWW-Authenticate"));
+return
+}if(aL.readyState<2){if(aK.status==201){var aN=aK.responseText.split("\n");
+aL._upstream=aN[0];
+var aO=aN[1];
+aL._downstream=new Y(aO);
+var aP=aO.substring(0,aO.indexOf("/;e/"));
+if(aP!=aL.parent._location.toString().replace("ws","http")){aL.parent._redirectUri=aP
+}ar(aL,aL._downstream);
+aL.parent.responseHeaders=aK.getAllResponseHeaders();
+at(aL)
+}else{ax(aL)
+}}break
+}};
+aK.send(null);
+ao.exiting(this,"WebSocketEmulatedProxy.connect")
+};
+var aB=function(aE,aF){ao.entering(this,"WebSocketEmulatedProxy.encodeLength",{buf:aE,length:aF});
+var aI=0;
+var aG=0;
+do{aG<<=8;
+aG|=(aF&127);
+aF>>=7;
+aI++
+}while(aF>0);
+do{var aH=aG&255;
+aG>>=8;
+if(aI!=1){aH|=128
+}aE.put(aH)
+}while(--aI>0)
+};
+var at=function(aE){ao.entering(this,"WebSocketEmulatedProxy.doOpen");
+aE.readyState=1;
+aE._listener.connectionOpened(aE.parent,"")
+};
+function ax(aE){aq(aE);
+if(aE.readyState<2){ao.entering(this,"WebSocketEmulatedProxy.doError");
+aE.readyState=2;
+if(aE.onerror!=null){aE._listener.connectionFailed(aE.parent)
+}}}var au=function(aE){ao.entering(this,"WebSocketEmulatedProxy.doClose");
+switch(aE.readyState){case 2:break;
+case 0:case 1:aE.readyState=2;
+aE._listener.connectionClosed(aE.parent);
 break;
-}
-}
+default:}};
+var al=function(aH,aG){ao.finest("WebSocket.handleMessage: A WebSocket binary frame received on a WebSocket");
+var aF;
+if(aG.text){var aE=aG.text;
+aF=ByteBuffer.allocate(aE.length);
+aF.putString(aE,Charset.UTF8);
+aF.position=0
+}else{if(aG.data){aF=aG.data
+}}aH._listener.messageReceived(aH.parent,aF)
 };
-var out=new ByteBuffer();
-while(_34c.length){
-out.putBuffer(_34c.shift());
-}
-out.putBytes(_343);
-out.flip();
-if(xhr.sendAsBinary){
-xhr.setRequestHeader("Content-Type","application/octet-stream");
-xhr.sendAsBinary(_24f(out));
-}else{
-xhr.setRequestHeader("Content-Type","text/plain; charset=utf-8");
-xhr.send(_24f(out,_34b.requiresEscaping));
-}
-}
-_34b.bufferedAmount=0;
+var ar=function(aF,aE){ao.entering(this,"WebSocketEmulatedProxy.bindHandlers");
+aE.onmessage=function(aG){switch(aG.type){case"message":if(aF.readyState==1){al(aF,aG)
+}break
+}};
+aE.onerror=function(){try{aE.disconnect()
+}finally{au(aF)
+}}
 };
-var _33d=function(_350){
-var url=new URI(_350.URL);
-url.scheme=url.scheme.replace("ws","http");
-var _352=_350.requiresEscaping?"/;e/cte":"/;e/ct";
-url.path=url.path.replace(/[\/]?$/,_352);
-var _353=url.toString();
-var _354=_353.indexOf("?");
-if(_354==-1){
-_353+="?";
-}else{
-_353+="&";
-}
-_353+=".kn="+String(Math.random()).substring(2);
-if(browser=="android"||browser.ios){
-_353+="&.kkt=30";
-}
-var _355=new XMLHttpRequest0();
-var _356=false;
-_355.open("GET",_353,true);
-_355.onreadystatechange=function(){
-switch(_355.readyState){
-case 2:
-timer=setTimeout(function(){
-if(!_356){
-_357(_350);
-}
-},5000);
-break;
-case 4:
-_356=true;
-if(_350.readyState<2){
-if(_355.status==201){
-var _358=_355.responseText.split("\n");
-_350._upstream=_358[0];
-var _359=_358[1];
-_350._downstream=new _30b(_359);
-_35a(_350,_350._downstream);
-_35b(_350);
-}else{
-_357(_350);
-}
-}
-break;
-}
-};
-_355.send(null);
-};
-var _35a=function(_35c,_35d){
-_35d.onmessage=function(_35e){
-switch(_35e.type){
-case "message":
-if(_35c.readyState==1){
-_35c.onmessage(_35e);
-}
-break;
-}
-};
-_35d.onerror=function(){
-_35d.disconnect();
-_348(_35c);
-};
-};
-var _347=function(buf,_360){
-var _361=0;
-var _362=0;
-do{
-_362<<=8;
-_362|=(_360&127);
-_360>>=7;
-_361++;
-}while(_360>0);
-do{
-var _363=_362&255;
-_362>>=8;
-if(_361!=1){
-_363|=128;
-}
-buf.put(_363);
-}while(--_361>0);
-};
-var _35b=function(_364){
-_364.readyState=1;
-_364.onopen();
-};
-var _357=function(_365){
-if(_365.readyState<2){
-_365.readyState=2;
-_365.onerror();
-}
-};
-var _348=function(_366){
-switch(_366.readyState){
-case 0:
-case 2:
-break;
-case 1:
-_366.readyState=2;
-_366.onclose();
-break;
-default:
-}
-};
-return _33a;
+return aA
 })();
-(function(){
-var _367="javascript:ws";
-var _368="javascript:wss";
-var _369="javascript:wse";
-var _36a="javascript:wse+ssl";
-var _36b="flash:wse";
-var _36c="flash:wse+ssl";
-var _36d="flash:wsr";
-var _36e="flash:wsr+ssl";
-var _36f={};
-_36f[_367]=_256;
-_36f[_368]=_256;
-_36f[_369]=_339;
-_36f[_36a]=_339;
-_36f[_36b]=_279;
-_36f[_36c]=_279;
-_36f[_36d]=_28e;
-_36f[_36e]=_28e;
-window.WebSocket=function(url,_371){
-var _372=new URI(url);
-if(_372.port===undefined){
-var _373=_372.scheme;
-_372.port=((_373.indexOf("wss")==-1)&&(_373.indexOf("ssl")==-1))?80:443;
-}
-url=_372.toString();
-this.URL=_372.toString();
+var aa=(function(){var an="WebSocketEmulatedDelegateHandler";
+var al=m.getLogger(an);
+var am=function(){al.finest(an,"<init>")
+};
+var ak=am.prototype=new B();
+ak.processConnect=function(ar,aq,at){al.finest(an,"connect",ar);
+if(ar.readyState==2){throw new Error("WebSocket is already closed")
+}var ap=new S();
+ap.parent=ar;
+ar._delegate=ap;
+ao(ap,this);
+ap.connect(aq.toString(),at)
+};
+ak.processTextMessage=function(ap,aq){al.finest(an,"connect",ap);
+if(ap.readyState==1){ap._delegate.send(aq)
+}else{throw new Error("WebSocket is already closed")
+}};
+ak.processBinaryMessage=function(aq,ap){al.finest(an,"connect",aq);
+if(aq.readyState==1){aq._delegate.send(ap)
+}else{throw new Error("WebSocket is already closed")
+}};
+ak.processClose=function(ap){try{ap._delegate.close()
+}catch(aq){listener.connectionClosed(ap)
+}};
+var ao=function(ap,ar){var aq={};
+aq.connectionOpened=function(at,au){ar._listener.connectionOpened(at,au)
+};
+aq.messageReceived=function(au,at){ar._listener.messageReceived(au,at)
+};
+aq.connectionClosed=function(at){ar._listener.connectionClosed(at)
+};
+aq.connectionFailed=function(at){ar._listener.connectionFailed(at)
+};
+aq.authenticationRequested=function(av,at,au){ar._listener.authenticationRequested(av,at,au)
+};
+aq.redirected=function(au,at){ar._listener.redirected(au,at)
+};
+ap.setListener(aq)
+};
+return am
+})();
+var X=(function(){var an="WebSocketEmulatedAuthenticationHandler";
+var al=m.getLogger(an);
+var am=function(){al.finest(an,"<init>")
+};
+var ak=am.prototype=new B();
+ak.handleClearAuthenticationData=function(ao){if(ao._challengeResponse!=null){ao._challengeResponse.clearCredentials()
+}};
+ak.handleRemoveAuthenticationData=function(ao){this.handleClearAuthenticationData(ao);
+ao._challengeResponse=new ChallengeResponse(null,null)
+};
+ak.handle401=function(ar,ax,aw){var au=this;
+if(M.KAAZING_SEC_EXTENSION_REVALIDATE==aw){var at=new aj(ar);
+at.connect(ax)
+}else{var av=ax;
+if(av.indexOf("/;e/")>0){av=av.substring(0,av.indexOf("/;e/"))
+}var ap=new af(av.replace("http","ws"));
+var aq=new ChallengeRequest(av,aw);
+var ao;
+if(ar._challengeResponse.nextChallengeHandler!=null){ao=ar._challengeResponse.nextChallengeHandler
+}else{ao=ChallengeHandlers.getDefault()
+}if(ao!=null&&ao.canHandle(aq)){ao.handle(aq,function(ay){try{if(ay==null||ay.credentials==null){au.handleClearAuthenticationData(ar);
+au._listener.connectionFailed(ar)
+}else{ar._challengeResponse=ay;
+au.processConnect(ar,ap,ar._protocol)
+}}catch(az){au.handleClearAuthenticationData(ar);
+au._listener.connectionFailed(ar)
+}})
+}else{this.handleClearAuthenticationData(ar);
+this._listener.connectionFailed(ar)
+}}};
+ak.processConnect=function(ar,ao,at){if(ar._challengeResponse!=null&&ar._challengeResponse.credentials!=null){var ap=ar._challengeResponse.credentials.toString();
+var aq=new Z("Authorization",ap);
+ar.requestHeaders.push(aq);
+this.handleClearAuthenticationData(ar)
+}this._nextHandler.processConnect(ar,ao,at)
+};
+ak.handleAuthenticate=function(aq,ao,ap){aq.authenticationReceived=true;
+this.handle401(aq,ao,ap)
+};
+ak.setNextHandler=function(ap){this._nextHandler=ap;
+var aq={};
+var ao=this;
+aq.connectionOpened=function(ar,at){ao._listener.connectionOpened(ar,at)
+};
+aq.messageReceived=function(at,ar){ao._listener.messageReceived(at,ar)
+};
+aq.connectionClosed=function(ar){ao._listener.connectionClosed(ar)
+};
+aq.connectionFailed=function(ar){ao._listener.connectionFailed(ar)
+};
+aq.authenticationRequested=function(au,ar,at){ao.handleAuthenticate(au,ar,at)
+};
+aq.redirected=function(at,ar){ao._listener.redirected(at,ar)
+};
+ap.setListener(aq)
+};
+ak.setListener=function(ao){this._listener=ao
+};
+return am
+})();
+var K=(function(){var ak="WebSocketEmulatedHandler";
+var av=m.getLogger(ak);
+var al=function(){var aw=new X();
+return aw
+};
+var am=function(){var aw=new ad();
+return aw
+};
+var ao=function(){var aw=new aa();
+return aw
+};
+var au=al();
+var aq=am();
+var at=ao();
+var an=function(){av.finest(ak,"<init>");
+this.setNextHandler(au);
+au.setNextHandler(aq);
+aq.setNextHandler(at)
+};
+var ap=function(aw,ax){av.finest(ak,"<init>")
+};
+var ar=an.prototype=new B();
+ar.setNextHandler=function(aw){this._nextHandler=aw;
+var ay=this;
+var ax={};
+ax.connectionOpened=function(az,aA){ay._listener.connectionOpened(az,aA)
+};
+ax.messageReceived=function(aA,az){ay._listener.messageReceived(aA,az)
+};
+ax.connectionClosed=function(az){ay._listener.connectionClosed(az)
+};
+ax.connectionFailed=function(az){ay._listener.connectionFailed(az)
+};
+ax.authenticationRequested=function(aB,az,aA){ay._listener.authenticationRequested(aB,az,aA)
+};
+ax.redirected=function(aA,az){ay._listener.redirected(aA,az)
+};
+aw.setListener(ax)
+};
+ar.setListener=function(aw){this._listener=aw
+};
+return an
+})();
+var I=(function(){var am="WebSocketFlashEmulatedDelegateHandler";
+var al=m.getLogger(am);
+var ao=function(){al.finest(am,"<init>")
+};
+var ak=ao.prototype=new B();
+ak.processConnect=function(ar,aq,at){al.finest(am,"connect",ar);
+if(ar.readyState==2){throw new Error("WebSocket is already closed")
+}var ap=new f();
+ap.parent=ar;
+ar._delegate=ap;
+an(ap,this);
+ap.connect(aq.toString(),at)
+};
+ak.processTextMessage=function(ap,aq){al.finest(am,"connect",ap);
+if(ap.readyState==1){ap._delegate.send(aq)
+}else{throw new Error("WebSocket is already closed")
+}};
+ak.processBinaryMessage=function(aq,ap){al.finest(am,"connect",aq);
+if(aq.readyState==1){aq._delegate.send(ap)
+}else{throw new Error("WebSocket is already closed")
+}};
+ak.processClose=function(ap){al.finest(am,"close",ap);
+if(ap.readyState==1){ap._delegate.close()
+}else{throw new Error("WebSocket is already closed")
+}};
+var an=function(ap,ar){var aq={};
+aq.connectionOpened=function(at,au){ar._listener.connectionOpened(at,au)
+};
+aq.messageReceived=function(au,at){ar._listener.messageReceived(au,at)
+};
+aq.connectionClosed=function(at){ar._listener.connectionClosed(at)
+};
+aq.connectionFailed=function(at){ar._listener.connectionFailed(at)
+};
+aq.authenticationRequested=function(av,at,au){ar._listener.authenticationRequested(av,at,au)
+};
+aq.redirected=function(au,at){au._redirectUri=at
+};
+ap.setListener(aq)
+};
+return ao
+})();
+var U=(function(){var ak="WebSocketFlashEmulatedHandler";
+var av=m.getLogger(ak);
+var al=function(){var aw=new X();
+return aw
+};
+var am=function(){var aw=new ad();
+return aw
+};
+var ao=function(){var aw=new I();
+return aw
+};
+var au=al();
+var aq=am();
+var at=ao();
+var an=function(){av.finest(ak,"<init>");
+this.setNextHandler(au);
+au.setNextHandler(aq);
+aq.setNextHandler(at)
+};
+var ap=function(aw,ax){av.finest(ak,"<init>")
+};
+var ar=an.prototype=new B();
+ar.setNextHandler=function(aw){this._nextHandler=aw;
+var ay=this;
+var ax={};
+ax.connectionOpened=function(az,aA){ay._listener.connectionOpened(az,aA)
+};
+ax.messageReceived=function(aA,az){ay._listener.messageReceived(aA,az)
+};
+ax.connectionClosed=function(az){ay._listener.connectionClosed(az)
+};
+ax.connectionFailed=function(az){ay._listener.connectionFailed(az)
+};
+ax.authenticationRequested=function(aB,az,aA){ay._listener.authenticationRequested(aB,az,aA)
+};
+ax.redirected=function(aA,az){ay._listener.redirected(aA,az)
+};
+aw.setListener(ax)
+};
+ar.setListener=function(aw){this._listener=aw
+};
+return an
+})();
+var R=(function(){var an="WebSocketFlashRtmpDelegateHandler";
+var al=m.getLogger(an);
+var ap;
+var am=function(){al.finest(an,"<init>");
+ap=this
+};
+var ak=am.prototype=new B();
+ak.processConnect=function(at,ar,au){al.finest(an,"connect",at);
+if(at.readyState==2){throw new Error("WebSocket is already closed")
+}var aq=new e();
+aq.parent=at;
+at._delegate=aq;
+ao(aq,this);
+aq.connect(ar.toString(),au)
+};
+ak.processTextMessage=function(aq,ar){al.finest(an,"connect",aq);
+if(aq.readyState==1){aq._delegate.send(ar)
+}else{throw new Error("WebSocket is already closed")
+}};
+ak.processBinaryMessage=function(ar,aq){al.finest(an,"connect",ar);
+if(ar.readyState==1){ar._delegate.send(aq)
+}else{throw new Error("WebSocket is already closed")
+}};
+ak.processClose=function(aq){al.finest(an,"close",aq);
+if(aq.readyState==1){aq._delegate.close()
+}else{throw new Error("WebSocket is already closed")
+}};
+var ao=function(aq,at){var ar={};
+ar.connectionOpened=function(au,av){at._listener.connectionOpened(au,av)
+};
+ar.messageReceived=function(av,au){at._listener.messageReceived(av,au)
+};
+ar.connectionClosed=function(au){at._listener.connectionClosed(au)
+};
+ar.connectionFailed=function(au){at._listener.connectionFailed(au)
+};
+ar.authenticationRequested=function(aw,au,av){at._listener.authenticationRequested(aw,au,av)
+};
+ar.redirected=function(av,au){av._redirectUri=au
+};
+aq.setListener(ar)
+};
+return am
+})();
+var V=(function(){var ak="WebSocketFlashRtmpHandler";
+var av=m.getLogger(ak);
+var al=function(){var aw=new X();
+return aw
+};
+var am=function(){var aw=new ad();
+return aw
+};
+var an=function(){var aw=new R();
+return aw
+};
+var au=al();
+var ap=am();
+var at=an();
+var aq=function(){av.finest(ak,"<init>");
+this.setNextHandler(au);
+au.setNextHandler(ap);
+ap.setNextHandler(at)
+};
+var ao=function(aw,ax){av.finest(ak,"<init>")
+};
+var ar=aq.prototype=new B();
+ar.setNextHandler=function(aw){this._nextHandler=aw;
+var ay=this;
+var ax={};
+ax.connectionOpened=function(az,aA){ay._listener.connectionOpened(az,aA)
+};
+ax.messageReceived=function(aA,az){ay._listener.messageReceived(aA,az)
+};
+ax.connectionClosed=function(az){ay._listener.connectionClosed(az)
+};
+ax.connectionFailed=function(az){ay._listener.connectionFailed(az)
+};
+ax.authenticationRequested=function(aB,az,aA){ay._listener.authenticationRequested(aB,az,aA)
+};
+ax.redirected=function(aA,az){ay._listener.redirected(aA,az)
+};
+aw.setListener(ax)
+};
+ar.setListener=function(aw){this._listener=aw
+};
+return aq
+})();
+var ab=(function(){var an="WebSocketSelectedHandler";
+var al=m.getLogger(an);
+var am=function(){al.fine(an,"<init>")
+};
+var ak=am.prototype=new B();
+ak.processConnect=function(ap,ao,aq){al.fine(an,"connect",ap);
+if(ap.readyState==2){throw new Error("WebSocket is already closed")
+}this._nextHandler.processConnect(ap,ao,aq)
+};
+ak.handleConnectionOpened=function(ap,aq){al.fine(an,"handleConnectionOpened");
+var ao=ap;
+if(ao.readyState==0){ao.readyState=1;
+this._listener.connectionOpened(ap,aq)
+}};
+ak.handleMessageReceived=function(ap,ao){al.fine(an,"handleMessageReceived",ao);
+if(ap.readyState!=1){return
+}this._listener.messageReceived(ap,ao)
+};
+ak.handleConnectionClosed=function(ap){al.fine(an,"handleConnectionClosed");
+var ao=ap;
+if(ao.readyState!=2){ao.readyState=2;
+this._listener.connectionClosed(ap)
+}};
+ak.handleConnectionFailed=function(ao){al.fine(an,"connectionFailed");
+if(ao.readyState!=2){ao.readyState=2;
+this._listener.connectionFailed(ao)
+}};
+ak.setNextHandler=function(ao){this._nextHandler=ao;
+var ap={};
+var aq=this;
+ap.connectionOpened=function(ar,at){aq.handleConnectionOpened(ar,at)
+};
+ap.redirected=function(at,ar){throw new Error("invalid event received")
+};
+ap.authenticationRequested=function(au,ar,at){throw new Error("invalid event received")
+};
+ap.messageReceived=function(at,ar){aq.handleMessageReceived(at,ar)
+};
+ap.connectionClosed=function(ar){aq.handleConnectionClosed(ar)
+};
+ap.connectionFailed=function(ar){aq.handleConnectionFailed(ar)
+};
+ao.setListener(ap)
+};
+ak.setListener=function(ao){this._listener=ao
+};
+return am
+})();
+var P=(function(){var ak=function(am,an,al){this._nativeEquivalent=am;
+this._handler=an;
+this._channelFactory=al
+};
+return ak
+})();
+var J=(function(){var al="WebSocketCompositeHandler";
+var aB=m.getLogger(al);
+var ay="javascript:ws";
+var ao="javascript:wss";
+var ax="javascript:wse";
+var aE="javascript:wse+ssl";
+var az="flash:wse";
+var at="flash:wse+ssl";
+var aq="flash:wsr";
+var au="flash:wsr+ssl";
+var aH={};
+var an={};
+var am=new C();
+var ak=new H();
+var av=function(){this._handlerListener=ar(this);
+this._nativeHandler=aA(this);
+this._emulatedHandler=aC(this);
+this._emulatedFlashHandler=ap(this);
+this._rtmpFlashHandler=aF(this);
+aB.finest(al,"<init>");
+aw();
+aH[ay]=new P("ws",this._nativeHandler,am);
+aH[ao]=new P("wss",this._nativeHandler,am);
+aH[ax]=new P("ws",this._emulatedHandler,ak);
+aH[aE]=new P("wss",this._emulatedHandler,ak);
+aH[az]=new P("ws",this._emulatedFlashHandler,ak);
+aH[at]=new P("wss",this._emulatedFlashHandler,ak);
+aH[aq]=new P("ws",this._rtmpFlashHandler,ak);
+aH[au]=new P("wss",this._rtmpFlashHandler,ak)
+};
+function aw(){switch(browser){case"android":case"opera":an.ws=new Array(ay,ax);
+an.wss=new Array(ao,aE);
+case"ie":var aI=navigator.appVersion;
+if(aI.indexOf("MSIE 6.0")>=0||aI.indexOf("MSIE 7.0")>=0){an.ws=new Array(ay,az,ax);
+an.wss=new Array(ao,at,aE)
+}else{an.ws=new Array(ay,ax,az);
+an.wss=new Array(ao,aE,at)
+}case"firefox":case"chrome":case"safari":default:an.ws=new Array(ay,ax,az);
+an.wss=new Array(ao,aE,at)
+}}function ar(aJ){var aI={};
+aI.connectionOpened=function(aK,aL){aJ.handleConnectionOpened(aK,aL)
+};
+aI.messageReceived=function(aL,aK){aJ.handleMessageReceived(aL,aK)
+};
+aI.connectionClosed=function(aK){aJ.handleConnectionClosed(aK)
+};
+aI.connectionFailed=function(aK){aJ.handleConnectionFailed(aK)
+};
+aI.authenticationRequested=function(aM,aK,aL){};
+aI.redirected=function(aL,aK){};
+return aI
+}function aA(aJ){var aI=new ab();
+var aK=new F();
+aI.setListener(aJ._handlerListener);
+aI.setNextHandler(aK);
+return aI
+}function aC(aJ){var aI=new ab();
+var aK=new K();
+aI.setListener(aJ._handlerListener);
+aI.setNextHandler(aK);
+return aI
+}function ap(aK){var aI=new ab();
+var aJ=new U();
+aI.setListener(aK._handlerListener);
+aI.setNextHandler(aJ);
+return aI
+}function aF(aK){var aI=new ab();
+var aJ=new V();
+aI.setListener(aK._handlerListener);
+aI.setNextHandler(aJ);
+return aI
+}var aD=function(aM,aL){var aP=aH[aL];
+var aK=aP._channelFactory;
+var aI=aM._location;
+var aO=aM._protocol;
+var aN=aM._isBinary;
+var aJ=aK.createChannel(aI,aO,aN);
+aM._selectedChannel=aJ;
+aJ.parent=aM;
+aJ._handler=aP._handler;
+aJ._handler.processConnect(aM._selectedChannel,aI,aO)
+};
+var aG=av.prototype;
+aG.fallbackNext=function(aJ){aB.finest(al,"fallbackNext");
+var aI=aJ.getNextStrategy();
+if(aI==null){this.doClose(aJ)
+}else{aD(aJ,aI)
+}};
+aG.doOpen=function(aI){if(aI.readyState==0){aI.readyState=1;
+aI._webSocket.handleOpen()
+}};
+aG.doClose=function(aI){if(aI.readyState==0||aI.readyState==1){aI.readyState=2;
+aI._webSocket.handleClose()
+}};
+aG.processConnect=function(aN,aJ,aP){aB.finest(al,"connect",aN);
+var aI=aN;
+aB.finest("Current ready state = "+aI.readyState);
+if(aI.readyState==1){aB.fine("Attempt to reconnect an existing open WebSocket to a different location");
+throw new Error("Attempt to reconnect an existing open WebSocket to a different location")
+}var aK=aI._compositeScheme;
+if(aK!="ws"&&aK!="wss"){var aO=aH[aK];
+if(aO==null){throw new Error("Invalid connection scheme: "+aK)
+}aB.finest("Turning off fallback since the URL is prefixed with java:");
+aI._connectionStrategies.push(aK)
+}else{var aM=an[aK];
+if(aM!=null){for(var aL=0;
+aL<aM.length;
+aL++){aI._connectionStrategies.push(aM[aL])
+}}else{throw new Error("Invalid connection scheme: "+aK)
+}}this.fallbackNext(aI)
+};
+aG.processTextMessage=function(aL,aK){aB.finest(al,"send",aK);
+var aJ=aL;
+if(aJ.readyState!=1){aB.fine("Attempt to post message on unopened or closed web socket");
+throw new Error("Attempt to post message on unopened or closed web socket")
+}var aI=aJ._selectedChannel;
+aI._handler.processTextMessage(aI,aK)
+};
+aG.processBinaryMessage=function(aL,aK){aB.finest(al,"send",aK);
+var aJ=aL;
+if(aJ.readyState!=1){aB.fine("Attempt to post message on unopened or closed web socket");
+throw new Error("Attempt to post message on unopened or closed web socket")
+}var aI=aJ._selectedChannel;
+aI._handler.processBinaryMessage(aI,aK)
+};
+aG.processClose=function(aK){aB.finest(al,"close");
+var aJ=aK;
+if(aJ&&aJ.readyState==2){aB.fine("WebSocket already closed");
+throw new Error("WebSocket already closed")
+}if(aJ&&!aJ._closing){aJ._closing=true;
+var aI=aJ._selectedChannel;
+aI._handler.processClose(aI)
+}};
+aG.setListener=function(aI){this._listener=aI
+};
+aG.handleConnectionOpened=function(aJ,aK){var aI=aJ.parent;
+this.doOpen(aI)
+};
+aG.handleMessageReceived=function(aK,aI){var aJ=aK.parent;
+aJ._webSocket.handleMessage(aI)
+};
+aG.handleConnectionClosed=function(aJ){var aI=aJ.parent;
+if(aI._closing){this.doClose(aI)
+}else{if(aI.readyState==0&&!aJ.authenticationReceived){this.fallbackNext(aI)
+}else{this.doClose(aI)
+}}};
+aG.handleConnectionFailed=function(aJ){var aI=aJ.parent;
+if(aI._closing){this.doClose(aI)
+}else{if(aI.readyState==0&&!aJ.authenticationReceived){this.fallbackNext(aI)
+}else{this.doClose(aI)
+}}};
+return av
+})();
+(function(){var ak=new J();
+window.WebSocket=(function(){var al="WebSocket";
+var at=m.getLogger(al);
+var ao=function(av,aw){at.entering(this,"WebSocket.<init>",{url:av,protocol:aw});
 this.readyState=0;
-this._subprotocol=_371;
-var _374=splitScheme(url);
-var _375=_374.shift();
-this._urlRemainder=_374.shift();
-if(_375=="ws"||_375=="wse"||_375=="wss"||_375=="wse+ssl"){
-var _376=_22d("kaazing:WebSocketConnectionStrategies");
-var _377=null;
-if(_376){
-_377=_376.split(" ");
-}
-if(!_377){
-if(_375=="ws"){
-this._connectionStrategies=_236(WebSocket.connectionStrategies,function(_378){
-return !(_378.match("wss")||_378.match("ssl"));
-});
-}else{
-if(_375=="wss"){
-this._connectionStrategies=_236(WebSocket.connectionStrategies,function(_379){
-return (_379.match("wss")||_379.match("ssl"));
-});
-}else{
-if(_375.match("wse")){
-var _37a=function(s){
-return s.match("wse");
+this.location=av;
+this.protocol=aw;
+this._queue=[];
+au(this,av,aw)
 };
-this._connectionStrategies=_236(WebSocket.connectionStrategies,_37a);
-}
-}
-}
-}
-}else{
-if(_36f[_375]){
-this._connectionStrategies=[_375];
-}else{
-throw new Error("Unsupported composite scheme: "+_375);
-}
-}
-this.URL=url.replace("flash:","").replace("javascript:","").replace("wse+ssl:","wss:").replace("wse:","ws:").replace("wsr+ssl:","wss:").replace("wsr:","ws:");
-fallbackNext(this);
+var au=function(ax,av,ay){var aw=new z(av);
+ax._channel=new N(aw,ay,false);
+ax._channel._webSocket=ax;
+ak.processConnect(ax._channel,aw.getWSEquivalent(),ay)
 };
-function pickStrategies(){
-switch(browser){
-case "android":
-case "opera":
-return [_367,_369,_368,_36a];
-case "ie":
-var _37c=navigator.appVersion;
-if(_37c.indexOf("MSIE 6.0")>=0||_37c.indexOf("MSIE 7.0")>=0){
-return [_367,_36b,_369,_368,_36c,_36a];
-}else{
-return [_367,_369,_36b,_368,_36a,_36c];
-}
-case "firefox":
-case "chrome":
-case "safari":
-default:
-return [_367,_369,_36b,_368,_36a,_36c];
-}
+function ap(ax,av){at.entering(this,"WebSocket.doOpen");
+if(ax.readyState<1){ax.readyState=1;
+if(typeof(ax.onopen)!=="undefined"){if(!av){try{av=document.createEvent("Events");
+av.initEvent("open",true,true)
+}catch(ay){av={type:"open",bubbles:true,cancelable:true}
+}}try{ax.onopen(av)
+}catch(aw){at.severe(this,"WebSocket.onopen: Error thrown from application")
+}}}}var an=ao.prototype;
+an.getURL=function(){return this.location
 };
-window.WebSocket.connectionStrategies=pickStrategies();
-window.WebSocket.__impls__=_36f;
-var _37d=WebSocket.prototype;
-function splitScheme(url){
-var _37f=url.split("://");
-var _380=_37f.shift();
-var _381=_37f.shift();
-return [_380,_381];
+an.getProtocol=function(){return this._channel.protocol||""
 };
-_37d.send=function(data){
-switch(this.readyState){
-case 0:
-throw new Error("INVALID_STATE_ERR");
-case 1:
-if(data===null){
-throw new Error("data is null");
-}
-this._delegate.send(data);
-_383(this);
+an.getReadyState=function(){return this.readyState
+};
+an.send=function(av){switch(this.readyState){case 0:at.error("WebSocket.send: Error: Attempt to send message on unopened or closed WebSocket");
+throw new Error("Attempt to send message on unopened or closed WebSocket");
+case 1:ak.processTextMessage(this._channel,av);
 return true;
-case 2:
-return false;
-default:
-throw new Error("INVALID_STATE_ERR");
-}
+case 2:return false;
+default:at.error("WebSocket.send: Illegal state error");
+throw new Error("Illegal state error")
+}};
+an.close=function(){ak.processClose(this._channel)
 };
-var _383=function(_384){
-_384.bufferedAmount=_384._delegate.bufferedAmount;
-if(_384.bufferedAmount!=0){
-setTimeout(function(){
-_383(_384);
-},1000);
-}
-};
-_37d.postMessage=_37d.send;
-_37d.disconnect=_37d.close;
-_37d.close=function(){
-switch(this.readyState){
-case 1:
-case 2:
-this._delegate.close();
+an.handleOpen=function(aw){switch(this.readyState){case 0:ap(this,aw);
 break;
-}
-};
-function initDelegate(_385,_386){
-if(typeof (_385._subprotocol)!=="undefined"){
-_385._delegate=new _386(_385.URL,_385._subprotocol);
-}else{
-_385._delegate=new _386(_385.URL);
-}
-bindHandlers(_385);
-};
-function fallbackNext(_387){
-var _388=_387._connectionStrategies.shift();
-var _389=_36f[_388];
-if(_389){
-initDelegate(_387,_389);
-}else{
-doClose(_387);
-}
-};
-function doOpen(_38a,ev){
-if(_38a.readyState<1){
-_38a.readyState=1;
-if(typeof (_38a.onopen)!=="undefined"){
-if(!ev){
-try{
-ev=document.createEvent("Events");
-ev.initEvent("open",true,true);
-}
-catch(ie){
-ev={type:"open",bubbles:true,cancelable:true};
-}
-}
-try{
-_38a.onopen(ev);
-}
-catch(e){
-}
-}
-}
-};
-function doClose(_38c,ev){
-if(_38c.readyState<2){
-_38c.readyState=2;
-if(typeof (_38c.onclose)!=="undefined"){
-setTimeout(function(){
-if(!ev){
-try{
-ev=document.createEvent("Events");
-ev.initEvent("close",true,true);
-}
-catch(ie){
-ev={type:"close",bubbles:true,cancelable:true};
-}
-}
-try{
-_38c.onclose(ev);
-}
-catch(e){
-}
+case 1:case 2:var av=(aw?" from "+aw.target:"");
+at.severe(this,"WebSocket.openHandler: Error: Invalid readyState for open event"+av);
+throw new Error("Invalid readyState for open event"+av);
+default:at.severe(this,"WebSocket.openHandler: Error: Invalid readyState "+_readyState);
+throw new Error("Socket has invalid readyState: "+_readyState)
+}};
+var am=function(ax,av){if(typeof(ax.onmessage)==="function"){var aw;
+try{aw=document.createEvent("Events");
+aw.initEvent("message",true,true)
+}catch(ay){aw={type:"message",bubbles:true,cancelable:true}
+}aw.data=j(av,Charset.UTF8);
+aw.source=ax;
+ax.onmessage(aw)
+}};
+var ar=function(ay){var az=new Date().getTime();
+var aw=az+50;
+while(ay._queue.length>0){if(new Date().getTime()>aw){setTimeout(function(){ar(ay)
 },0);
-}
-}
+return
+}var av=ay._queue.shift();
+var ax=false;
+try{am(ay,av);
+ax=true
+}finally{if(!ax){if(ay._queue.length==0){ay._delivering=false
+}else{setTimeout(function(){ar(ay)
+},0)
+}}}}ay._delivering=false
 };
-function errorHandler(_38e,ev){
-unbindHandlers(_38e);
-fallbackNext(_38e);
+an.handleMessage=function(av){switch(this.readyState){case 1:this._queue.push(av);
+if(!this._delivering){this._delivering=true;
+ar(this)
+}break;
+case 0:case 2:break;
+default:throw new Error("Socket has invalid readyState: "+$this.readyState)
+}};
+var aq=function(aw,av){at.entering(aw,"WebSocket.doClose");
+if(aw.readyState<2){aw.readyState=2;
+delete aw._channel;
+if(typeof(aw.onclose)!=="undefined"){setTimeout(function(){if(!av){try{av=document.createEvent("Events");
+av.initEvent("close",true,true)
+}catch(ay){av={type:"close",bubbles:true,cancelable:true}
+}}try{aw.onclose(av)
+}catch(ax){at.severe(this,"WebSocket.onclose: Error thrown from application")
+}},0)
+}}};
+an.handleClose=function(av){aq(this,av)
 };
-function openHandler(_390,ev){
-switch(_390.readyState){
-case 0:
-doOpen(_390,ev);
-break;
-case 1:
-case 2:
-var _392=(ev?" from "+ev.target:"");
-throw new Error("Invalid readyState for open event"+_392);
-default:
-throw new Error("Socket has invalid readyState: "+_390.readyState);
-}
+an.handleError=function(av){aq(this,av)
 };
-function closeHandler(_393,ev){
-switch(_393.readyState){
-case 0:
-unbindHandlers(_393);
-fallbackNext(_393);
-break;
-case 1:
-doClose(_393,ev);
-break;
-case 2:
-var _395=(ev?" from "+ev.target:"");
-throw new Error("Invalid readyState for close event"+_395);
-break;
-default:
-throw new Error("Socket has invalid readyState: "+_393.readyState);
-}
-};
-function bindHandlers(_396){
-var _397=_396._delegate;
-_397.onmessage=function(e){
-if(e.decoder){
-var e2;
-try{
-e2=document.createEvent("Events");
-e2.initEvent("message",true,true);
-}
-catch(ie){
-e2={type:"message",bubbles:true,cancelable:true};
-}
-e2.data=e.decoder(e.data);
-e2.origin=e.origin;
-e2.source=_396;
-_396.onmessage(e2);
-}else{
-_396.onmessage(e);
-}
-};
-_397.onclose=function(e){
-closeHandler(_396,e);
-};
-_397.onopen=function(e){
-openHandler(_396,e);
-};
-_397.onerror=function(e){
-errorHandler(_396,e);
-};
-};
-function unbindHandlers(_39d){
-var _39e=_39d._delegate;
-if(_39e){
-_39e.onerror=undefined;
-_39e.onmessage=undefined;
-_39e.onclose=undefined;
-_39e.onopen=undefined;
-}
-};
+return ao
+})();
+window.WebSocket.__impls__={};
+window.WebSocket.__impls__["flash:wse"]=f
 }());
-(function(){
-var _39f="javascript:ws";
-var _3a0="javascript:wss";
-var _3a1="javascript:wse";
-var _3a2="javascript:wse+ssl";
-var _3a3="flash:wse";
-var _3a4="flash:wse+ssl";
-var _3a5="flash:wsr";
-var _3a6="flash:wsr+ssl";
-var _3a7={};
-_3a7[_39f]=_275;
-_3a7[_3a0]=_275;
-_3a7[_3a1]=_339;
-_3a7[_3a2]=_339;
-_3a7[_3a3]=_279;
-_3a7[_3a4]=_279;
-_3a7[_3a5]=_28e;
-_3a7[_3a6]=_28e;
-window.ByteSocket=function(url,_3a9){
-var _3aa=new URI(url);
-if(_3aa.port===undefined){
-var _3ab=_3aa.scheme;
-_3aa.port=((_3ab.indexOf("wss")==-1)&&(_3ab.indexOf("ssl")==-1))?80:443;
-}
-url=_3aa.toString();
-this.URL=_3aa.toString();
+(function(){window.ByteSocket=(function(){var al="ByteSocket";
+var ap=m.getLogger(al);
+var av=new J();
+var aq=function(az,aA){ap.entering(this,"ByteSocket.<init>",{url:az,subprotocol:aA});
+$this=this;
 this.readyState=0;
-this._subprotocol=_3a9;
-var _3ac=splitScheme(url);
-var _3ad=_3ac.shift();
-this._urlRemainder=_3ac.shift();
-if(_3ad=="ws"||_3ad=="wse"||_3ad=="wss"||_3ad=="wse+ssl"){
-var _3ae=_22d("kaazing:ByteSocketConnectionStrategies");
-var _3af=null;
-if(_3ae){
-_3af=_3ae.split(" ");
-}
-if(!_3af){
-if(_3ad=="ws"){
-this._connectionStrategies=_236(ByteSocket.connectionStrategies,function(_3b0){
-return !(_3b0.match("wss")||_3b0.match("ssl"));
-});
-}else{
-if(_3ad=="wss"){
-this._connectionStrategies=_236(ByteSocket.connectionStrategies,function(_3b1){
-return (_3b1.match("wss")||_3b1.match("ssl"));
-});
-}else{
-if(_3ad.match("wse")){
-var _3b2=function(s){
-return s.match("wse");
+this.location=az;
+this.protocol=aA;
+this._queue=[];
+ay(this,az,aA)
 };
-this._connectionStrategies=_236(ByteSocket.connectionStrategies,_3b2);
-}
-}
-}
-}
-}else{
-if(_3a7[_3ad]){
-this._connectionStrategies=[_3ad];
-}else{
-throw new Error("Unsupported composite scheme: "+_3ad);
-}
-}
-this.URL=url.replace("flash:","").replace("javascript:","").replace("wse+ssl:","wss:").replace("wse:","ws:").replace("wsr+ssl:","wss:").replace("wsr:","ws:");
-fallbackNext(this);
+var ay=function(aB,az,aC){var aA=new z(az);
+aB._channel=new N(aA,aC,true);
+aB._channel._webSocket=aB;
+av.processConnect(aB._channel,aA.getWSEquivalent(),aC)
 };
-function pickStrategies(){
-switch(browser){
-case "android":
-case "opera":
-return [_39f,_3a1,_3a0,_3a2];
-case "ie":
-var _3b4=navigator.appVersion;
-if(_3b4.indexOf("MSIE 6.0")>=0||_3b4.indexOf("MSIE 7.0")>=0){
-return [_39f,_3a3,_3a1,_3a0,_3a4,_3a2];
-}else{
-return [_39f,_3a1,_3a3,_3a0,_3a2,_3a4];
-}
-case "firefox":
-case "chrome":
-case "safari":
-default:
-return [_39f,_3a1,_3a3,_3a0,_3a2,_3a4];
-}
-};
-window.ByteSocket.connectionStrategies=pickStrategies();
-window.ByteSocket.__impls__=_3a7;
-var _3b5=ByteSocket.prototype;
-function splitScheme(url){
-var _3b7=url.split("://");
-var _3b8=_3b7.shift();
-var _3b9=_3b7.shift();
-return [_3b8,_3b9];
-};
-_3b5.send=function(data){
-if(data.constructor!=window.ByteBuffer){
-throw new Error("ByteSocket.send must be called with a ByteBuffer argument");
-}
-switch(this.readyState){
-case 0:
+var ar=aq.prototype;
+ar.send=function(az){ap.entering(this,"ByteSocket.send",az);
+if(az.constructor!=window.ByteBuffer){throw new Error("ByteSocket.send must be called with a ByteBuffer argument")
+}switch(this.readyState){case 0:ap.severe(this,"ByteSocket.send: Error: readyState is 0");
 throw new Error("INVALID_STATE_ERR");
-case 1:
-if(data===null){
-throw new Error("data is null");
-}
-this._delegate.send(data);
-_3bb(this);
+case 1:if(az===null){ap.severe(this,"ByteSocket.send: Error: data is null");
+throw new Error("data is null")
+}av.processBinaryMessage(this._channel,az);
+an(this);
 return true;
-case 2:
-return false;
-default:
-throw new Error("INVALID_STATE_ERR");
-}
-};
-var _3bb=function(_3bc){
-_3bc.bufferedAmount=_3bc._delegate.bufferedAmount;
-if(_3bc.bufferedAmount!=0){
-setTimeout(function(){
-_3bb(_3bc);
-},1000);
-}
-};
-_3b5.postMessage=_3b5.send;
-_3b5.disconnect=_3b5.close;
-_3b5.close=function(){
-switch(this.readyState){
-case 1:
-case 2:
-this._delegate.close();
+case 2:return false;
+default:ap.severe(this,"ByteSocket.send: Error: Invalid readyState "+readyState);
+throw new Error("INVALID_STATE_ERR")
+}};
+ar.handleOpen=function(aA){switch(this.readyState){case 0:au(this,aA);
 break;
-}
+case 1:case 2:var az=(aA?" from "+aA.target:"");
+WSLOG.severe(this,"WebSocket.openHandler: Error: Invalid readyState for open event"+az);
+throw new Error("Invalid readyState for open event"+az);
+default:WSLOG.severe(this,"WebSocket.openHandler: Error: Invalid readyState "+_readyState);
+throw new Error("Socket has invalid readyState: "+_readyState)
+}};
+var an=function(az){};
+ar.postMessage=ar.send;
+ar.disconnect=ar.close;
+ar.close=function(){ap.entering(this,"ByteSocket.close");
+av.processClose(this._channel)
 };
-function initDelegate(_3bd,_3be){
-if(typeof (_3bd._subprotocol)!=="undefined"){
-_3bd._delegate=new _3be(_3bd.URL,_3bd._subprotocol);
-}else{
-_3bd._delegate=new _3be(_3bd.URL);
-}
-bindHandlers(_3bd);
-};
-function fallbackNext(_3bf){
-var _3c0=_3bf._connectionStrategies.shift();
-var _3c1=_3a7[_3c0];
-if(_3c1){
-initDelegate(_3bf,_3c1);
-}else{
-doClose(_3bf);
-}
-};
-function doClose(_3c2){
-if(typeof (_3c2.onclose)!=="undefined"){
-_3c2.onclose();
-}
-};
-function errorHandler(_3c3,e){
-unbindHandlers(_3c3);
-fallbackNext(_3c3);
-};
-function openHandler(_3c5,e){
-switch(_3c5.readyState){
-case 0:
-_3c5.readyState=1;
-_3c5.onopen(e);
+function au(aB,az){ap.entering(aB,"ByteSocket.doOpen");
+if(aB.readyState<1){aB.readyState=1;
+if(typeof(aB.onopen)!=="undefined"){if(!az){try{az=document.createEvent("Events");
+az.initEvent("open",true,true)
+}catch(aC){az={type:"open",bubbles:true,cancelable:true}
+}}try{aB.onopen(az)
+}catch(aA){ap.severe(aB,"ByteSocket.doOpen: Error thrown from application")
+}}}}function ao(aB,aA){ap.entering(aB,"ByteSocket.openHandler",aA);
+switch(aB.readyState){case 0:au(aB,aA);
 break;
-case 1:
-case 2:
-var _3c7=(e?" from "+e.target:"");
-throw new Error("Invalid readyState for open event"+_3c7);
-break;
-default:
-throw new Error("Socket has invalid readyState: "+_3c5.readyState);
-}
-};
-function closeHandler(_3c8,e){
-switch(_3c8.readyState){
-case 0:
-unbindHandlers(_3c8);
-fallbackNext(_3c8);
-break;
-case 1:
-_3c8.readyState=2;
-setTimeout(function(){
-doClose(_3c8);
+case 1:case 2:var az=(aA?" from "+aA.target:"");
+ap.severe(aB,"ByteSocket.openHandler: Error: Invalid readyState for open event"+az);
+throw new Error("Invalid readyState for open event"+az);
+default:ap.severe(aB,"ByteSocket.openHandler: Error: Invalid readyState "+aB.readyState);
+throw new Error("Socket has invalid readyState: "+aB.readyState)
+}}function ak(aC,az){if(typeof(aC.onmessage)==="function"){ap.entering(this,"ByteSocket.messageHandler");
+var aB;
+try{aB=document.createEvent("Events");
+aB.initEvent("message",true,true)
+}catch(aD){aB={type:"message",bubbles:true,cancelable:true}
+}aB.data=az;
+aB.source=aC;
+try{aC.onmessage(aB)
+}catch(aA){ap.severe(aC,"ByteSocket.doOpen: Error thrown from application message handler")
+}}}function ax(aC){var aD=new Date().getTime();
+var aA=aD+50;
+while(aC._queue.length>0){if(new Date().getTime()>aA){setTimeout(function(){ax(aC)
 },0);
+return
+}var az=aC._queue.shift();
+var aB=false;
+try{ak(aC,az);
+aB=true
+}finally{if(!aB){if(aC._queue.length==0){aC._delivering=false
+}else{setTimeout(function(){ax(aC)
+},0)
+}}}}aC._delivering=false
+}function at(aA,az){switch(aA.readyState){case 1:aA._queue.push(az);
+if(!aA._delivering){aA._delivering=true;
+setTimeout(function(){ax(aA)
+},0)
+}break;
+case 0:case 2:break;
+default:throw new Error("Socket has invalid readyState: "+aA.readyState)
+}}function aw(aA,az){ap.entering(aA,"ByteSocket.doClose");
+if(aA.readyState<2){aA.readyState=2;
+if(typeof(aA.onclose)!=="undefined"){setTimeout(function(){if(!az){try{az=document.createEvent("Events");
+az.initEvent("close",true,true)
+}catch(aC){az={type:"close",bubbles:true,cancelable:true}
+}}try{aA.onclose(az)
+}catch(aB){ap.severe(aA,"ByteSocket.doClose: Error thrown from application")
+}},0)
+}}}function am(aB,aA){ap.entering(aB,"ByteSocket.closeHandler",aA);
+switch(aB.readyState){case 0:unbindHandlers(aB);
+fallbackNext(aB);
 break;
-case 2:
-var _3ca=(e?" from "+e.target:"");
-throw new Error("Invalid readyState for close event"+_3ca);
+case 1:aw(aB,aA);
 break;
-default:
-throw new Error("Socket has invalid readyState: "+_3c8.readyState);
-}
+case 2:var az=(aA?" from "+aA.target:"");
+ap.severe(aB,"ByteSocket.closeHandler: Error: Invalid readyState for close event"+az);
+throw new Error("Invalid readyState for close event"+az);
+break;
+default:ap.severe(aB,"ByteSocket.closeHandler: Error: Invalid readyState "+aB.readyState);
+throw new Error("Socket has invalid readyState: "+aB.readyState)
+}}ar.handleMessage=function(az){switch(this.readyState){case 1:var aA=this;
+this._queue.push(az);
+if(!this._delivering){this._delivering=true;
+setTimeout(function(){ax(aA)
+},0)
+}break;
+case 0:case 2:break;
+default:throw new Error("Socket has invalid readyState: "+aA.readyState)
+}};
+ar.handleClose=function(az){aw(this,az)
 };
-function bindHandlers(_3cb){
-var _3cc=_3cb._delegate;
-_3cc.onmessage=function(e){
-var a=[];
-for(var i=0;i<e.data.length;i++){
-a.push(e.data.charCodeAt(i)&255);
-}
-var e2;
-try{
-e2=document.createEvent("Events");
-e2.initEvent("message",true,true);
-}
-catch(ie){
-e2={type:"message",bubbles:true,cancelable:true};
-}
-e2.data=new ByteBuffer(a);
-e2.origin=e.origin;
-e2.source=_3cb;
-_3cb.onmessage(e2);
+ar.handleError=function(az){aw(this,az)
 };
-_3cc.onclose=function(e){
-closeHandler(_3cb,e);
-};
-_3cc.onopen=function(e){
-openHandler(_3cb,e);
-};
-_3cc.onerror=function(e){
-errorHandler(_3cb,e);
-};
-};
-function unbindHandlers(_3d4){
-var _3d5=_3d4._delegate;
-if(_3d5){
-_3d5.onerror=undefined;
-_3d5.onmessage=undefined;
-_3d5.onclose=undefined;
-_3d5.onopen=undefined;
-}
-};
+return aq
+})()
 }());
-window.___Loader=new _2ca(_201);
+window.___Loader=new y(r)
+})()
 })();
+var EventDispatcher=function(){};
+(function(){var a=EventDispatcher.prototype;
+a._initEventDispatcher=function(){this._eventListeners={}
+};
+a.addEventListener=function(c,d){var b=this._eventListeners[c];
+if(b){b.push(d)
+}else{this._eventListeners[c]=[d]
+}};
+a.removeEventListener=function(e,f){var d=this._eventListeners[e];
+if(d){var b=[];
+for(var c=0;
+c<d.length;
+c++){if(d[c]!==f){b.push(d[c])
+}}this._eventListeners[e]=new Listeners
+}};
+a.hasEventListener=function(c){var b=this._eventListeners[c];
+return Boolean(b)
+};
+a.dispatchEvent=function(d){var c=this._eventListeners[d.type];
+if(c){for(var b=0;
+b<c.length;
+b++){c[b](d)
+}}if(this["on"+d.type]){this["on"+d.type](d)
+}}
 })();
-var EventDispatcher=function(){
-};
-(function(){
-var _3d6=EventDispatcher.prototype;
-_3d6._initEventDispatcher=function(){
-this._eventListeners={};
-};
-_3d6.addEventListener=function(type,_3d8){
-var _3d9=this._eventListeners[type];
-if(_3d9){
-_3d9.push(_3d8);
-}else{
-this._eventListeners[type]=[_3d8];
-}
-};
-_3d6.removeEventListener=function(type,_3db){
-var _3dc=this._eventListeners[type];
-if(_3dc){
-var _3dd=[];
-for(var i=0;i<_3dc.length;i++){
-if(_3dc[i]!==_3db){
-_3dd.push(_3dc[i]);
-}
-}
-this._eventListeners[type]=new Listeners;
-}
-};
-_3d6.hasEventListener=function(type){
-var _3e0=this._eventListeners[type];
-return Boolean(_3e0);
-};
-_3d6.dispatchEvent=function(e){
-var _3e2=this._eventListeners[e.type];
-if(_3e2){
-for(var i=0;i<_3e2.length;i++){
-_3e2[i](e);
-}
-}
-if(this["on"+e.type]){
-this["on"+e.type](e);
-}
-};
-})();
-var AmqpClient=function(){
-this._options={};
+var AmqpClient=function(){this._options={};
 this._readyState=0;
-this._init();
+this._init()
 };
-(function(){
-var _3e4=function(_3e5){
-this.context=_3e5;
-this.states={};
+(function(){var v=function(az){this.context=az;
+this.states={}
 };
-(function(){
-var _3e6=_3e4.prototype;
-var _3e7=function _3e7(){
+(function(){var az=v.prototype;
+var aA=function aA(){};
+az.enterState=function(aF,aC,aD){if(this.currentState){this.currentState.exitBehavior(this.context,aC,aD,aF)
+}var aE=this.states[aF];
+this.currentState=aE;
+try{aE.entryBehavior(this.context,aC,aD,aF)
+}catch(aG){var aB=new Error("Could not call behavior for state "+aE.stateName+"\n\n"+aG.message);
+aB.innerException=aG;
+throw (aB)
+}};
+az.addState=function(aK,aD,aI,aC){var aB={};
+aB.stateName=aK;
+aB.entryBehavior=aI||aA;
+aB.exitBehavior=aC||aA;
+this.states[aK]=(aB);
+aB.rules={};
+var aJ=aD||[];
+for(var aF=0;
+aF<aJ.length;
+aF++){var aG=aJ[aF];
+for(var aE=0;
+aE<aG.inputs.length;
+aE++){var aH=aG.inputs[aE];
+aB.rules[aH]=aG.targetState
+}}};
+az.feedInput=function(aB,aC){var aE=this.currentState;
+if(aE.rules[aB]){var aF=this;
+var aD=function(){aF.enterState(aE.rules[aB],aB,aC)
 };
-_3e6.enterState=function(_3e8,_3e9,args){
-if(this.currentState){
-this.currentState.exitBehavior(this.context,_3e9,args,_3e8);
-}
-var _3eb=this.states[_3e8];
-this.currentState=_3eb;
-try{
-_3eb.entryBehavior(this.context,_3e9,args,_3e8);
-}
-catch(e){
-var _3ec=new Error("Could not call behavior for state "+_3eb.stateName+"\n\n"+e.message);
-_3ec.innerException=e;
-throw (_3ec);
-}
-};
-_3e6.addState=function(_3ed,_3ee,_3ef,_3f0){
-var _3f1={};
-_3f1.stateName=_3ed;
-_3f1.entryBehavior=_3ef||_3e7;
-_3f1.exitBehavior=_3f0||_3e7;
-this.states[_3ed]=(_3f1);
-_3f1.rules={};
-var _3f2=_3ee||[];
-for(var i=0;i<_3f2.length;i++){
-var rule=_3f2[i];
-for(var j=0;j<rule.inputs.length;j++){
-var _3f6=rule.inputs[j];
-_3f1.rules[_3f6]=rule.targetState;
-}
-}
-};
-_3e6.feedInput=function(_3f7,args){
-var _3f9=this.currentState;
-if(_3f9.rules[_3f7]){
-var sm=this;
-var func=function(){
-sm.enterState(_3f9.rules[_3f7],_3f7,args);
-};
-func();
-return true;
-}else{
-return false;
-}
-};
+aD();
+return true
+}else{return false
+}}
 })();
-var _3fc=function(){
+var e=function(){};
+(function(){e.prototype=new EventDispatcher();
+var aC=e.prototype;
+var az=function az(){};
+var aB=function aB(aE){throw aE
 };
-(function(){
-_3fc.prototype=new EventDispatcher();
-var _3fd=_3fc.prototype;
-var _3fe=function _3fe(){
+aC._stateMachine=null;
+aC.onerror=function(aE){};
+aC._actions=[];
+aC._processActions=function aA(){if(!this._actions.length){return
+}var aG=this._actions[0];
+var aF=this._stateMachine.feedInput(aG.actionName+"Action",aG);
+if(aF){var aE=this;
+setTimeout(function(){try{aG.func.apply(aE,aG.args)
+}catch(aH){aG.error(aH)
+}},0);
+this._actions.shift()
+}};
+aC._enqueueAction=function aD(aF,aJ,aH,aE,aG){var aK={};
+aK.actionName=aF||"";
+aK.func=aJ||az;
+aK.args=aH||null;
+aK.continuation=aE||az;
+aK.error=aG||aB;
+this._actions.push(aK);
+var aI=this;
+var aJ=function(){aI._processActions()
 };
-var _3ff=function _3ff(ex){
-throw ex;
+setTimeout(aJ,0)
 };
-_3fd._stateMachine=null;
-_3fd.onerror=function(e){
-};
-_3fd._actions=[];
-_3fd._processActions=function _processActions(){
-if(!this._actions.length){
-return;
-}
-var _402=this._actions[0];
-var _403=this._stateMachine.feedInput(_402.actionName+"Action",_402);
-if(_403){
-var _404=this;
-setTimeout(function(){
-try{
-_402.func.apply(_404,_402.args);
-}
-catch(ex1){
-_402.error(ex1);
-}
-},0);
-this._actions.shift();
-}
-};
-_3fd._enqueueAction=function _enqueueAction(_405,func,args,_408,_409){
-var _40a={};
-_40a.actionName=_405||"";
-_40a.func=func||_3fe;
-_40a.args=args||null;
-_40a.continuation=_408||_3fe;
-_40a.error=_409||_3ff;
-this._actions.push(_40a);
-var _40b=this;
-var func=function(){
-_40b._processActions();
-};
-setTimeout(func,0);
-};
-_3fd._initAsyncClient=function(){
-this._initEventDispatcher();
-this._stateMachine=new _3e4(this);
+aC._initAsyncClient=function(){this._initEventDispatcher();
+this._stateMachine=new v(this);
 this._actions=[];
 this._buffer=null;
-this._socket=null;
+this._socket=null
 };
-_3fd._send=null;
-_3fd._readHandler=null;
+aC._send=null;
+aC._readHandler=null
 })();
-var _40c={};
-_40c.FRAME_METHOD={"value":1,"message":""};
-_40c.FRAME_HEADER={"value":2,"message":""};
-_40c.FRAME_BODY={"value":3,"message":""};
-_40c.FRAME_HEARTBEAT={"value":8,"message":""};
-_40c.FRAME_MIN_SIZE={"value":4096,"message":""};
-_40c.FRAME_END={"value":206,"message":""};
-_40c.REPLY_SUCCESS={"value":200,"message":"Indicates that the method completed successfully. This reply code is reserved for future use - the current protocol design does not use positive confirmation and reply codes are sent only in case of an error."};
-_40c.CONTENT_TOO_LARGE={"value":311,"message":"The client attempted to transfer content larger than the server could accept at the present time. The client may retry at a later time."};
-_40c.NO_CONSUMERS={"value":313,"message":"When the exchange cannot deliver to a consumer when the immediate flag is set. As a result of pending data on the queue or the absence of any consumers of the queue."};
-_40c.CONNECTION_FORCED={"value":320,"message":"An operator intervened to close the connection for some reason. The client may retry at some later date."};
-_40c.INVALID_PATH={"value":402,"message":"The client tried to work with an unknown virtual host."};
-_40c.ACCESS_REFUSED={"value":403,"message":"The client attempted to work with a server entity to which it has no access due to security settings."};
-_40c.NOT_FOUND={"value":404,"message":"The client attempted to work with a server entity that does not exist."};
-_40c.RESOURCE_LOCKED={"value":405,"message":"The client attempted to work with a server entity to which it has no access because another client is working with it."};
-_40c.PRECONDITION_FAILED={"value":406,"message":"The client requested a method that was not allowed because some precondition failed."};
-_40c.FRAME_ERROR={"value":501,"message":"The sender sent a malformed frame that the recipient could not decode. This strongly implies a programming error in the sending peer."};
-_40c.SYNTAX_ERROR={"value":502,"message":"The sender sent a frame that contained illegal values for one or more fields. This strongly implies a programming error in the sending peer."};
-_40c.COMMAND_INVALID={"value":503,"message":"The client sent an invalid sequence of frames, attempting to perform an operation that was considered invalid by the server. This usually implies a programming error in the client."};
-_40c.CHANNEL_ERROR={"value":504,"message":"The client attempted to work with a channel that had not been correctly opened. This most likely indicates a fault in the client layer."};
-_40c.UNEXPECTED_FRAME={"value":505,"message":"The peer sent a frame that was not expected, usually in the context of a content header and body.  This strongly indicates a fault in the peer's content processing."};
-_40c.RESOURCE_ERROR={"value":506,"message":"The server could not complete the method because it lacked sufficient resources. This may be due to the client creating too many of some type of entity."};
-_40c.NOT_ALLOWED={"value":530,"message":"The client tried to work with some entity in a manner that is prohibited by the server, due to security settings or by some other criteria."};
-_40c.NOT_IMPLEMENTED={"value":540,"message":"The client tried to use functionality that is not implemented in the server."};
-_40c.INTERNAL_ERROR={"value":541,"message":"The server could not complete the method because of an internal error. The server may require intervention by an operator in order to resume normal operations."};
-var _40d={"ClassId":{"type":"short","asserts":[]},"ConsumerTag":{"type":"shortstr","asserts":[]},"DeliveryTag":{"type":"longlong","asserts":[]},"ExchangeName":{"type":"shortstr","asserts":[]},"MethodId":{"type":"short","asserts":[]},"NoAck":{"type":"bit","asserts":[]},"NoLocal":{"type":"bit","asserts":[]},"NoWait":{"type":"bit","asserts":[]},"Path":{"type":"shortstr","asserts":[]},"PeerProperties":{"type":"table","asserts":[]},"QueueName":{"type":"shortstr","asserts":[]},"Redelivered":{"type":"bit","asserts":[]},"MessageCount":{"type":"long","asserts":[]},"ReplyCode":{"type":"short","asserts":[]},"ReplyText":{"type":"shortstr","asserts":[]},"Bit":{"type":"bit","asserts":[]},"Octet":{"type":"octet","asserts":[]},"Short":{"type":"short","asserts":[]},"Long":{"type":"long","asserts":[]},"Longlong":{"type":"longlong","asserts":[]},"Shortstr":{"type":"shortstr","asserts":[]},"Longstr":{"type":"longstr","asserts":[]},"Timestamp":{"type":"timestamp","asserts":[]},"Table":{"type":"table","asserts":[]}};
-var _40e={};
-_40e.Connection={};
-_40e.Connection.startConnection={};
-_40e.Connection.startConnection.allParameters=[{"name":"versionMajor","type":"Octet"},{"name":"versionMinor","type":"Octet"},{"name":"serverProperties","type":"PeerProperties"},{"name":"mechanisms","type":"Longstr"},{"name":"locales","type":"Longstr"}];
-_40e.Connection.startConnection.returnType="StartOkConnection";
-_40e.Connection.startConnection.index=10;
-_40e.Connection.startConnection.classIndex=10;
-_40e.Connection.startConnection.synchronous=true;
-_40e.Connection.startConnection.hasContent=false;
-_40e.Connection.startOkConnection={};
-_40e.Connection.startOkConnection.allParameters=[{"name":"clientProperties","type":"PeerProperties"},{"name":"mechanism","type":"Shortstr"},{"name":"response","type":"Longstr"},{"name":"locale","type":"Shortstr"}];
-_40e.Connection.startOkConnection.returnType="voidConnection";
-_40e.Connection.startOkConnection.index=11;
-_40e.Connection.startOkConnection.classIndex=10;
-_40e.Connection.startOkConnection.synchronous=true;
-_40e.Connection.startOkConnection.hasContent=false;
-_40e.Connection.secureConnection={};
-_40e.Connection.secureConnection.allParameters=[{"name":"challenge","type":"Longstr"}];
-_40e.Connection.secureConnection.returnType="SecureOkConnection";
-_40e.Connection.secureConnection.index=20;
-_40e.Connection.secureConnection.classIndex=10;
-_40e.Connection.secureConnection.synchronous=true;
-_40e.Connection.secureConnection.hasContent=false;
-_40e.Connection.secureOkConnection={};
-_40e.Connection.secureOkConnection.allParameters=[{"name":"response","type":"Longstr"}];
-_40e.Connection.secureOkConnection.returnType="voidConnection";
-_40e.Connection.secureOkConnection.index=21;
-_40e.Connection.secureOkConnection.classIndex=10;
-_40e.Connection.secureOkConnection.synchronous=true;
-_40e.Connection.secureOkConnection.hasContent=false;
-_40e.Connection.tuneConnection={};
-_40e.Connection.tuneConnection.allParameters=[{"name":"channelMax","type":"Short"},{"name":"frameMax","type":"Long"},{"name":"heartbeat","type":"Short"}];
-_40e.Connection.tuneConnection.returnType="TuneOkConnection";
-_40e.Connection.tuneConnection.index=30;
-_40e.Connection.tuneConnection.classIndex=10;
-_40e.Connection.tuneConnection.synchronous=true;
-_40e.Connection.tuneConnection.hasContent=false;
-_40e.Connection.tuneOkConnection={};
-_40e.Connection.tuneOkConnection.allParameters=[{"name":"channelMax","type":"Short"},{"name":"frameMax","type":"Long"},{"name":"heartbeat","type":"Short"}];
-_40e.Connection.tuneOkConnection.returnType="voidConnection";
-_40e.Connection.tuneOkConnection.index=31;
-_40e.Connection.tuneOkConnection.classIndex=10;
-_40e.Connection.tuneOkConnection.synchronous=true;
-_40e.Connection.tuneOkConnection.hasContent=false;
-_40e.Connection.openConnection={};
-_40e.Connection.openConnection.allParameters=[{"name":"virtualHost","type":"Path"},{"name":"reserved1","type":"Shortstr"},{"name":"reserved2","type":"Bit"}];
-_40e.Connection.openConnection.returnType="OpenOkConnection";
-_40e.Connection.openConnection.index=40;
-_40e.Connection.openConnection.classIndex=10;
-_40e.Connection.openConnection.synchronous=true;
-_40e.Connection.openConnection.hasContent=false;
-_40e.Connection.openOkConnection={};
-_40e.Connection.openOkConnection.allParameters=[{"name":"reserved1","type":"Shortstr"}];
-_40e.Connection.openOkConnection.returnType="voidConnection";
-_40e.Connection.openOkConnection.index=41;
-_40e.Connection.openOkConnection.classIndex=10;
-_40e.Connection.openOkConnection.synchronous=true;
-_40e.Connection.openOkConnection.hasContent=false;
-_40e.Connection.closeConnection={};
-_40e.Connection.closeConnection.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"classId","type":"ClassId"},{"name":"methodId","type":"MethodId"}];
-_40e.Connection.closeConnection.returnType="CloseOkConnection";
-_40e.Connection.closeConnection.index=50;
-_40e.Connection.closeConnection.classIndex=10;
-_40e.Connection.closeConnection.synchronous=true;
-_40e.Connection.closeConnection.hasContent=false;
-_40e.Connection.closeOkConnection={};
-_40e.Connection.closeOkConnection.allParameters=[];
-_40e.Connection.closeOkConnection.returnType="voidConnection";
-_40e.Connection.closeOkConnection.index=51;
-_40e.Connection.closeOkConnection.classIndex=10;
-_40e.Connection.closeOkConnection.synchronous=true;
-_40e.Connection.closeOkConnection.hasContent=false;
-_40e.Connection.methodLookup={10:"startConnection",11:"startOkConnection",20:"secureConnection",21:"secureOkConnection",30:"tuneConnection",31:"tuneOkConnection",40:"openConnection",41:"openOkConnection",50:"closeConnection",51:"closeOkConnection"};
-_40e.Connection.className="Connection";
-_40e.Channel={};
-_40e.Channel.openChannel={};
-_40e.Channel.openChannel.allParameters=[{"name":"reserved1","type":"Shortstr"}];
-_40e.Channel.openChannel.returnType="OpenOkChannel";
-_40e.Channel.openChannel.index=10;
-_40e.Channel.openChannel.classIndex=20;
-_40e.Channel.openChannel.synchronous=true;
-_40e.Channel.openChannel.hasContent=false;
-_40e.Channel.openOkChannel={};
-_40e.Channel.openOkChannel.allParameters=[{"name":"reserved1","type":"Longstr"}];
-_40e.Channel.openOkChannel.returnType="voidChannel";
-_40e.Channel.openOkChannel.index=11;
-_40e.Channel.openOkChannel.classIndex=20;
-_40e.Channel.openOkChannel.synchronous=true;
-_40e.Channel.openOkChannel.hasContent=false;
-_40e.Channel.flowChannel={};
-_40e.Channel.flowChannel.allParameters=[{"name":"active","type":"Bit"}];
-_40e.Channel.flowChannel.returnType="FlowOkChannel";
-_40e.Channel.flowChannel.index=20;
-_40e.Channel.flowChannel.classIndex=20;
-_40e.Channel.flowChannel.synchronous=true;
-_40e.Channel.flowChannel.hasContent=false;
-_40e.Channel.flowOkChannel={};
-_40e.Channel.flowOkChannel.allParameters=[{"name":"active","type":"Bit"}];
-_40e.Channel.flowOkChannel.returnType="voidChannel";
-_40e.Channel.flowOkChannel.index=21;
-_40e.Channel.flowOkChannel.classIndex=20;
-_40e.Channel.flowOkChannel.synchronous=false;
-_40e.Channel.flowOkChannel.hasContent=false;
-_40e.Channel.closeChannel={};
-_40e.Channel.closeChannel.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"classId","type":"ClassId"},{"name":"methodId","type":"MethodId"}];
-_40e.Channel.closeChannel.returnType="CloseOkChannel";
-_40e.Channel.closeChannel.index=40;
-_40e.Channel.closeChannel.classIndex=20;
-_40e.Channel.closeChannel.synchronous=true;
-_40e.Channel.closeChannel.hasContent=false;
-_40e.Channel.closeOkChannel={};
-_40e.Channel.closeOkChannel.allParameters=[];
-_40e.Channel.closeOkChannel.returnType="voidChannel";
-_40e.Channel.closeOkChannel.index=41;
-_40e.Channel.closeOkChannel.classIndex=20;
-_40e.Channel.closeOkChannel.synchronous=true;
-_40e.Channel.closeOkChannel.hasContent=false;
-_40e.Channel.methodLookup={10:"openChannel",11:"openOkChannel",20:"flowChannel",21:"flowOkChannel",40:"closeChannel",41:"closeOkChannel"};
-_40e.Channel.className="Channel";
-_40e.Exchange={};
-_40e.Exchange.declareExchange={};
-_40e.Exchange.declareExchange.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"type","type":"Shortstr"},{"name":"passive","type":"Bit"},{"name":"durable","type":"Bit"},{"name":"reserved2","type":"Bit"},{"name":"reserved3","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
-_40e.Exchange.declareExchange.returnType="DeclareOkExchange";
-_40e.Exchange.declareExchange.index=10;
-_40e.Exchange.declareExchange.classIndex=40;
-_40e.Exchange.declareExchange.synchronous=true;
-_40e.Exchange.declareExchange.hasContent=false;
-_40e.Exchange.declareOkExchange={};
-_40e.Exchange.declareOkExchange.allParameters=[];
-_40e.Exchange.declareOkExchange.returnType="voidExchange";
-_40e.Exchange.declareOkExchange.index=11;
-_40e.Exchange.declareOkExchange.classIndex=40;
-_40e.Exchange.declareOkExchange.synchronous=true;
-_40e.Exchange.declareOkExchange.hasContent=false;
-_40e.Exchange.deleteExchange={};
-_40e.Exchange.deleteExchange.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"ifUnused","type":"Bit"},{"name":"noWait","type":"NoWait"}];
-_40e.Exchange.deleteExchange.returnType="DeleteOkExchange";
-_40e.Exchange.deleteExchange.index=20;
-_40e.Exchange.deleteExchange.classIndex=40;
-_40e.Exchange.deleteExchange.synchronous=true;
-_40e.Exchange.deleteExchange.hasContent=false;
-_40e.Exchange.deleteOkExchange={};
-_40e.Exchange.deleteOkExchange.allParameters=[];
-_40e.Exchange.deleteOkExchange.returnType="voidExchange";
-_40e.Exchange.deleteOkExchange.index=21;
-_40e.Exchange.deleteOkExchange.classIndex=40;
-_40e.Exchange.deleteOkExchange.synchronous=true;
-_40e.Exchange.deleteOkExchange.hasContent=false;
-_40e.Exchange.methodLookup={10:"declareExchange",11:"declareOkExchange",20:"deleteExchange",21:"deleteOkExchange"};
-_40e.Exchange.className="Exchange";
-_40e.Queue={};
-_40e.Queue.declareQueue={};
-_40e.Queue.declareQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"passive","type":"Bit"},{"name":"durable","type":"Bit"},{"name":"exclusive","type":"Bit"},{"name":"autoDelete","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
-_40e.Queue.declareQueue.returnType="DeclareOkQueue";
-_40e.Queue.declareQueue.index=10;
-_40e.Queue.declareQueue.classIndex=50;
-_40e.Queue.declareQueue.synchronous=true;
-_40e.Queue.declareQueue.hasContent=false;
-_40e.Queue.declareOkQueue={};
-_40e.Queue.declareOkQueue.allParameters=[{"name":"queue","type":"QueueName"},{"name":"messageCount","type":"MessageCount"},{"name":"consumerCount","type":"Long"}];
-_40e.Queue.declareOkQueue.returnType="voidQueue";
-_40e.Queue.declareOkQueue.index=11;
-_40e.Queue.declareOkQueue.classIndex=50;
-_40e.Queue.declareOkQueue.synchronous=true;
-_40e.Queue.declareOkQueue.hasContent=false;
-_40e.Queue.bindQueue={};
-_40e.Queue.bindQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
-_40e.Queue.bindQueue.returnType="BindOkQueue";
-_40e.Queue.bindQueue.index=20;
-_40e.Queue.bindQueue.classIndex=50;
-_40e.Queue.bindQueue.synchronous=true;
-_40e.Queue.bindQueue.hasContent=false;
-_40e.Queue.bindOkQueue={};
-_40e.Queue.bindOkQueue.allParameters=[];
-_40e.Queue.bindOkQueue.returnType="voidQueue";
-_40e.Queue.bindOkQueue.index=21;
-_40e.Queue.bindOkQueue.classIndex=50;
-_40e.Queue.bindOkQueue.synchronous=true;
-_40e.Queue.bindOkQueue.hasContent=false;
-_40e.Queue.unbindQueue={};
-_40e.Queue.unbindQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"arguments","type":"Table"}];
-_40e.Queue.unbindQueue.returnType="UnbindOkQueue";
-_40e.Queue.unbindQueue.index=50;
-_40e.Queue.unbindQueue.classIndex=50;
-_40e.Queue.unbindQueue.synchronous=true;
-_40e.Queue.unbindQueue.hasContent=false;
-_40e.Queue.unbindOkQueue={};
-_40e.Queue.unbindOkQueue.allParameters=[];
-_40e.Queue.unbindOkQueue.returnType="voidQueue";
-_40e.Queue.unbindOkQueue.index=51;
-_40e.Queue.unbindOkQueue.classIndex=50;
-_40e.Queue.unbindOkQueue.synchronous=true;
-_40e.Queue.unbindOkQueue.hasContent=false;
-_40e.Queue.purgeQueue={};
-_40e.Queue.purgeQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"noWait","type":"NoWait"}];
-_40e.Queue.purgeQueue.returnType="PurgeOkQueue";
-_40e.Queue.purgeQueue.index=30;
-_40e.Queue.purgeQueue.classIndex=50;
-_40e.Queue.purgeQueue.synchronous=true;
-_40e.Queue.purgeQueue.hasContent=false;
-_40e.Queue.purgeOkQueue={};
-_40e.Queue.purgeOkQueue.allParameters=[{"name":"messageCount","type":"MessageCount"}];
-_40e.Queue.purgeOkQueue.returnType="voidQueue";
-_40e.Queue.purgeOkQueue.index=31;
-_40e.Queue.purgeOkQueue.classIndex=50;
-_40e.Queue.purgeOkQueue.synchronous=true;
-_40e.Queue.purgeOkQueue.hasContent=false;
-_40e.Queue.deleteQueue={};
-_40e.Queue.deleteQueue.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"ifUnused","type":"Bit"},{"name":"ifEmpty","type":"Bit"},{"name":"noWait","type":"NoWait"}];
-_40e.Queue.deleteQueue.returnType="DeleteOkQueue";
-_40e.Queue.deleteQueue.index=40;
-_40e.Queue.deleteQueue.classIndex=50;
-_40e.Queue.deleteQueue.synchronous=true;
-_40e.Queue.deleteQueue.hasContent=false;
-_40e.Queue.deleteOkQueue={};
-_40e.Queue.deleteOkQueue.allParameters=[{"name":"messageCount","type":"MessageCount"}];
-_40e.Queue.deleteOkQueue.returnType="voidQueue";
-_40e.Queue.deleteOkQueue.index=41;
-_40e.Queue.deleteOkQueue.classIndex=50;
-_40e.Queue.deleteOkQueue.synchronous=true;
-_40e.Queue.deleteOkQueue.hasContent=false;
-_40e.Queue.methodLookup={10:"declareQueue",11:"declareOkQueue",20:"bindQueue",21:"bindOkQueue",50:"unbindQueue",51:"unbindOkQueue",30:"purgeQueue",31:"purgeOkQueue",40:"deleteQueue",41:"deleteOkQueue"};
-_40e.Queue.className="Queue";
-_40e.Basic={};
-_40e.Basic.qosBasic={};
-_40e.Basic.qosBasic.allParameters=[{"name":"prefetchSize","type":"Long"},{"name":"prefetchCount","type":"Short"},{"name":"global","type":"Bit"}];
-_40e.Basic.qosBasic.returnType="QosOkBasic";
-_40e.Basic.qosBasic.index=10;
-_40e.Basic.qosBasic.classIndex=60;
-_40e.Basic.qosBasic.synchronous=true;
-_40e.Basic.qosBasic.hasContent=false;
-_40e.Basic.qosOkBasic={};
-_40e.Basic.qosOkBasic.allParameters=[];
-_40e.Basic.qosOkBasic.returnType="voidBasic";
-_40e.Basic.qosOkBasic.index=11;
-_40e.Basic.qosOkBasic.classIndex=60;
-_40e.Basic.qosOkBasic.synchronous=true;
-_40e.Basic.qosOkBasic.hasContent=false;
-_40e.Basic.consumeBasic={};
-_40e.Basic.consumeBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"consumerTag","type":"ConsumerTag"},{"name":"noLocal","type":"NoLocal"},{"name":"noAck","type":"NoAck"},{"name":"exclusive","type":"Bit"},{"name":"noWait","type":"NoWait"},{"name":"arguments","type":"Table"}];
-_40e.Basic.consumeBasic.returnType="ConsumeOkBasic";
-_40e.Basic.consumeBasic.index=20;
-_40e.Basic.consumeBasic.classIndex=60;
-_40e.Basic.consumeBasic.synchronous=true;
-_40e.Basic.consumeBasic.hasContent=false;
-_40e.Basic.consumeOkBasic={};
-_40e.Basic.consumeOkBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"}];
-_40e.Basic.consumeOkBasic.returnType="voidBasic";
-_40e.Basic.consumeOkBasic.index=21;
-_40e.Basic.consumeOkBasic.classIndex=60;
-_40e.Basic.consumeOkBasic.synchronous=true;
-_40e.Basic.consumeOkBasic.hasContent=false;
-_40e.Basic.cancelBasic={};
-_40e.Basic.cancelBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"},{"name":"noWait","type":"NoWait"}];
-_40e.Basic.cancelBasic.returnType="CancelOkBasic";
-_40e.Basic.cancelBasic.index=30;
-_40e.Basic.cancelBasic.classIndex=60;
-_40e.Basic.cancelBasic.synchronous=true;
-_40e.Basic.cancelBasic.hasContent=false;
-_40e.Basic.cancelOkBasic={};
-_40e.Basic.cancelOkBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"}];
-_40e.Basic.cancelOkBasic.returnType="voidBasic";
-_40e.Basic.cancelOkBasic.index=31;
-_40e.Basic.cancelOkBasic.classIndex=60;
-_40e.Basic.cancelOkBasic.synchronous=true;
-_40e.Basic.cancelOkBasic.hasContent=false;
-_40e.Basic.publishBasic={};
-_40e.Basic.publishBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"mandatory","type":"Bit"},{"name":"immediate","type":"Bit"}];
-_40e.Basic.publishBasic.returnType="voidBasic";
-_40e.Basic.publishBasic.index=40;
-_40e.Basic.publishBasic.classIndex=60;
-_40e.Basic.publishBasic.synchronous=false;
-_40e.Basic.publishBasic.hasContent=true;
-_40e.Basic.returnBasic={};
-_40e.Basic.returnBasic.allParameters=[{"name":"replyCode","type":"ReplyCode"},{"name":"replyText","type":"ReplyText"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"}];
-_40e.Basic.returnBasic.returnType="voidBasic";
-_40e.Basic.returnBasic.index=50;
-_40e.Basic.returnBasic.classIndex=60;
-_40e.Basic.returnBasic.synchronous=false;
-_40e.Basic.returnBasic.hasContent=true;
-_40e.Basic.deliverBasic={};
-_40e.Basic.deliverBasic.allParameters=[{"name":"consumerTag","type":"ConsumerTag"},{"name":"deliveryTag","type":"DeliveryTag"},{"name":"redelivered","type":"Redelivered"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"}];
-_40e.Basic.deliverBasic.returnType="voidBasic";
-_40e.Basic.deliverBasic.index=60;
-_40e.Basic.deliverBasic.classIndex=60;
-_40e.Basic.deliverBasic.synchronous=false;
-_40e.Basic.deliverBasic.hasContent=true;
-_40e.Basic.getBasic={};
-_40e.Basic.getBasic.allParameters=[{"name":"reserved1","type":"Short"},{"name":"queue","type":"QueueName"},{"name":"noAck","type":"NoAck"}];
-_40e.Basic.getBasic.returnType="GetOkBasic";
-_40e.Basic.getBasic.index=70;
-_40e.Basic.getBasic.classIndex=60;
-_40e.Basic.getBasic.synchronous=true;
-_40e.Basic.getBasic.hasContent=false;
-_40e.Basic.getOkBasic={};
-_40e.Basic.getOkBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"redelivered","type":"Redelivered"},{"name":"exchange","type":"ExchangeName"},{"name":"routingKey","type":"Shortstr"},{"name":"messageCount","type":"MessageCount"}];
-_40e.Basic.getOkBasic.returnType="voidBasic";
-_40e.Basic.getOkBasic.index=71;
-_40e.Basic.getOkBasic.classIndex=60;
-_40e.Basic.getOkBasic.synchronous=true;
-_40e.Basic.getOkBasic.hasContent=true;
-_40e.Basic.getEmptyBasic={};
-_40e.Basic.getEmptyBasic.allParameters=[{"name":"reserved1","type":"Shortstr"}];
-_40e.Basic.getEmptyBasic.returnType="voidBasic";
-_40e.Basic.getEmptyBasic.index=72;
-_40e.Basic.getEmptyBasic.classIndex=60;
-_40e.Basic.getEmptyBasic.synchronous=true;
-_40e.Basic.getEmptyBasic.hasContent=false;
-_40e.Basic.ackBasic={};
-_40e.Basic.ackBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"multiple","type":"Bit"}];
-_40e.Basic.ackBasic.returnType="voidBasic";
-_40e.Basic.ackBasic.index=80;
-_40e.Basic.ackBasic.classIndex=60;
-_40e.Basic.ackBasic.synchronous=false;
-_40e.Basic.ackBasic.hasContent=false;
-_40e.Basic.rejectBasic={};
-_40e.Basic.rejectBasic.allParameters=[{"name":"deliveryTag","type":"DeliveryTag"},{"name":"requeue","type":"Bit"}];
-_40e.Basic.rejectBasic.returnType="voidBasic";
-_40e.Basic.rejectBasic.index=90;
-_40e.Basic.rejectBasic.classIndex=60;
-_40e.Basic.rejectBasic.synchronous=false;
-_40e.Basic.rejectBasic.hasContent=false;
-_40e.Basic.recoverAsyncBasic={};
-_40e.Basic.recoverAsyncBasic.allParameters=[{"name":"requeue","type":"Bit"}];
-_40e.Basic.recoverAsyncBasic.returnType="voidBasic";
-_40e.Basic.recoverAsyncBasic.index=100;
-_40e.Basic.recoverAsyncBasic.classIndex=60;
-_40e.Basic.recoverAsyncBasic.synchronous=false;
-_40e.Basic.recoverAsyncBasic.hasContent=false;
-_40e.Basic.recoverBasic={};
-_40e.Basic.recoverBasic.allParameters=[{"name":"requeue","type":"Bit"}];
-_40e.Basic.recoverBasic.returnType="voidBasic";
-_40e.Basic.recoverBasic.index=110;
-_40e.Basic.recoverBasic.classIndex=60;
-_40e.Basic.recoverBasic.synchronous=false;
-_40e.Basic.recoverBasic.hasContent=false;
-_40e.Basic.recoverOkBasic={};
-_40e.Basic.recoverOkBasic.allParameters=[];
-_40e.Basic.recoverOkBasic.returnType="voidBasic";
-_40e.Basic.recoverOkBasic.index=111;
-_40e.Basic.recoverOkBasic.classIndex=60;
-_40e.Basic.recoverOkBasic.synchronous=true;
-_40e.Basic.recoverOkBasic.hasContent=false;
-_40e.Basic.methodLookup={10:"qosBasic",11:"qosOkBasic",20:"consumeBasic",21:"consumeOkBasic",30:"cancelBasic",31:"cancelOkBasic",40:"publishBasic",50:"returnBasic",60:"deliverBasic",70:"getBasic",71:"getOkBasic",72:"getEmptyBasic",80:"ackBasic",90:"rejectBasic",100:"recoverAsyncBasic",110:"recoverBasic",111:"recoverOkBasic"};
-_40e.Basic.className="Basic";
-_40e.Tx={};
-_40e.Tx.selectTx={};
-_40e.Tx.selectTx.allParameters=[];
-_40e.Tx.selectTx.returnType="SelectOkTx";
-_40e.Tx.selectTx.index=10;
-_40e.Tx.selectTx.classIndex=90;
-_40e.Tx.selectTx.synchronous=true;
-_40e.Tx.selectTx.hasContent=false;
-_40e.Tx.selectOkTx={};
-_40e.Tx.selectOkTx.allParameters=[];
-_40e.Tx.selectOkTx.returnType="voidTx";
-_40e.Tx.selectOkTx.index=11;
-_40e.Tx.selectOkTx.classIndex=90;
-_40e.Tx.selectOkTx.synchronous=true;
-_40e.Tx.selectOkTx.hasContent=false;
-_40e.Tx.commitTx={};
-_40e.Tx.commitTx.allParameters=[];
-_40e.Tx.commitTx.returnType="CommitOkTx";
-_40e.Tx.commitTx.index=20;
-_40e.Tx.commitTx.classIndex=90;
-_40e.Tx.commitTx.synchronous=true;
-_40e.Tx.commitTx.hasContent=false;
-_40e.Tx.commitOkTx={};
-_40e.Tx.commitOkTx.allParameters=[];
-_40e.Tx.commitOkTx.returnType="voidTx";
-_40e.Tx.commitOkTx.index=21;
-_40e.Tx.commitOkTx.classIndex=90;
-_40e.Tx.commitOkTx.synchronous=true;
-_40e.Tx.commitOkTx.hasContent=false;
-_40e.Tx.rollbackTx={};
-_40e.Tx.rollbackTx.allParameters=[];
-_40e.Tx.rollbackTx.returnType="RollbackOkTx";
-_40e.Tx.rollbackTx.index=30;
-_40e.Tx.rollbackTx.classIndex=90;
-_40e.Tx.rollbackTx.synchronous=true;
-_40e.Tx.rollbackTx.hasContent=false;
-_40e.Tx.rollbackOkTx={};
-_40e.Tx.rollbackOkTx.allParameters=[];
-_40e.Tx.rollbackOkTx.returnType="voidTx";
-_40e.Tx.rollbackOkTx.index=31;
-_40e.Tx.rollbackOkTx.classIndex=90;
-_40e.Tx.rollbackOkTx.synchronous=true;
-_40e.Tx.rollbackOkTx.hasContent=false;
-_40e.Tx.methodLookup={10:"selectTx",11:"selectOkTx",20:"commitTx",21:"commitOkTx",30:"rollbackTx",31:"rollbackOkTx"};
-_40e.Tx.className="Tx";
-var _40f={10:_40e.Connection,20:_40e.Channel,40:_40e.Exchange,50:_40e.Queue,60:_40e.Basic,90:_40e.Tx};
-var _410={"startConnection":_40e.Connection.startConnection,"startOkConnection":_40e.Connection.startOkConnection,"secureConnection":_40e.Connection.secureConnection,"secureOkConnection":_40e.Connection.secureOkConnection,"tuneConnection":_40e.Connection.tuneConnection,"tuneOkConnection":_40e.Connection.tuneOkConnection,"openConnection":_40e.Connection.openConnection,"openOkConnection":_40e.Connection.openOkConnection,"closeConnection":_40e.Connection.closeConnection,"closeOkConnection":_40e.Connection.closeOkConnection,"openChannel":_40e.Channel.openChannel,"openOkChannel":_40e.Channel.openOkChannel,"flowChannel":_40e.Channel.flowChannel,"flowOkChannel":_40e.Channel.flowOkChannel,"closeChannel":_40e.Channel.closeChannel,"closeOkChannel":_40e.Channel.closeOkChannel,"declareExchange":_40e.Exchange.declareExchange,"declareOkExchange":_40e.Exchange.declareOkExchange,"deleteExchange":_40e.Exchange.deleteExchange,"deleteOkExchange":_40e.Exchange.deleteOkExchange,"declareQueue":_40e.Queue.declareQueue,"declareOkQueue":_40e.Queue.declareOkQueue,"bindQueue":_40e.Queue.bindQueue,"bindOkQueue":_40e.Queue.bindOkQueue,"unbindQueue":_40e.Queue.unbindQueue,"unbindOkQueue":_40e.Queue.unbindOkQueue,"purgeQueue":_40e.Queue.purgeQueue,"purgeOkQueue":_40e.Queue.purgeOkQueue,"deleteQueue":_40e.Queue.deleteQueue,"deleteOkQueue":_40e.Queue.deleteOkQueue,"qosBasic":_40e.Basic.qosBasic,"qosOkBasic":_40e.Basic.qosOkBasic,"consumeBasic":_40e.Basic.consumeBasic,"consumeOkBasic":_40e.Basic.consumeOkBasic,"cancelBasic":_40e.Basic.cancelBasic,"cancelOkBasic":_40e.Basic.cancelOkBasic,"publishBasic":_40e.Basic.publishBasic,"returnBasic":_40e.Basic.returnBasic,"deliverBasic":_40e.Basic.deliverBasic,"getBasic":_40e.Basic.getBasic,"getOkBasic":_40e.Basic.getOkBasic,"getEmptyBasic":_40e.Basic.getEmptyBasic,"ackBasic":_40e.Basic.ackBasic,"rejectBasic":_40e.Basic.rejectBasic,"recoverAsyncBasic":_40e.Basic.recoverAsyncBasic,"recoverBasic":_40e.Basic.recoverBasic,"recoverOkBasic":_40e.Basic.recoverOkBasic,"selectTx":_40e.Tx.selectTx,"selectOkTx":_40e.Tx.selectOkTx,"commitTx":_40e.Tx.commitTx,"commitOkTx":_40e.Tx.commitOkTx,"rollbackTx":_40e.Tx.rollbackTx,"rollbackOkTx":_40e.Tx.rollbackOkTx};
-var _411=function(_412){
-this.array=_412||[];
+var M={};
+M.FRAME_METHOD={value:1,message:""};
+M.FRAME_HEADER={value:2,message:""};
+M.FRAME_BODY={value:3,message:""};
+M.FRAME_HEARTBEAT={value:8,message:""};
+M.FRAME_MIN_SIZE={value:4096,message:""};
+M.FRAME_END={value:206,message:""};
+M.REPLY_SUCCESS={value:200,message:"Indicates that the method completed successfully. This reply code is reserved for future use - the current protocol design does not use positive confirmation and reply codes are sent only in case of an error."};
+M.CONTENT_TOO_LARGE={value:311,message:"The client attempted to transfer content larger than the server could accept at the present time. The client may retry at a later time."};
+M.NO_CONSUMERS={value:313,message:"When the exchange cannot deliver to a consumer when the immediate flag is set. As a result of pending data on the queue or the absence of any consumers of the queue."};
+M.CONNECTION_FORCED={value:320,message:"An operator intervened to close the connection for some reason. The client may retry at some later date."};
+M.INVALID_PATH={value:402,message:"The client tried to work with an unknown virtual host."};
+M.ACCESS_REFUSED={value:403,message:"The client attempted to work with a server entity to which it has no access due to security settings."};
+M.NOT_FOUND={value:404,message:"The client attempted to work with a server entity that does not exist."};
+M.RESOURCE_LOCKED={value:405,message:"The client attempted to work with a server entity to which it has no access because another client is working with it."};
+M.PRECONDITION_FAILED={value:406,message:"The client requested a method that was not allowed because some precondition failed."};
+M.FRAME_ERROR={value:501,message:"The sender sent a malformed frame that the recipient could not decode. This strongly implies a programming error in the sending peer."};
+M.SYNTAX_ERROR={value:502,message:"The sender sent a frame that contained illegal values for one or more fields. This strongly implies a programming error in the sending peer."};
+M.COMMAND_INVALID={value:503,message:"The client sent an invalid sequence of frames, attempting to perform an operation that was considered invalid by the server. This usually implies a programming error in the client."};
+M.CHANNEL_ERROR={value:504,message:"The client attempted to work with a channel that had not been correctly opened. This most likely indicates a fault in the client layer."};
+M.UNEXPECTED_FRAME={value:505,message:"The peer sent a frame that was not expected, usually in the context of a content header and body.  This strongly indicates a fault in the peer's content processing."};
+M.RESOURCE_ERROR={value:506,message:"The server could not complete the method because it lacked sufficient resources. This may be due to the client creating too many of some type of entity."};
+M.NOT_ALLOWED={value:530,message:"The client tried to work with some entity in a manner that is prohibited by the server, due to security settings or by some other criteria."};
+M.NOT_IMPLEMENTED={value:540,message:"The client tried to use functionality that is not implemented in the server."};
+M.INTERNAL_ERROR={value:541,message:"The server could not complete the method because of an internal error. The server may require intervention by an operator in order to resume normal operations."};
+var g={ClassId:{type:"short",asserts:[]},ConsumerTag:{type:"shortstr",asserts:[]},DeliveryTag:{type:"longlong",asserts:[]},ExchangeName:{type:"shortstr",asserts:[]},MethodId:{type:"short",asserts:[]},NoAck:{type:"bit",asserts:[]},NoLocal:{type:"bit",asserts:[]},NoWait:{type:"bit",asserts:[]},Path:{type:"shortstr",asserts:[]},PeerProperties:{type:"table",asserts:[]},QueueName:{type:"shortstr",asserts:[]},Redelivered:{type:"bit",asserts:[]},MessageCount:{type:"long",asserts:[]},ReplyCode:{type:"short",asserts:[]},ReplyText:{type:"shortstr",asserts:[]},Bit:{type:"bit",asserts:[]},Octet:{type:"octet",asserts:[]},Short:{type:"short",asserts:[]},Long:{type:"long",asserts:[]},Longlong:{type:"longlong",asserts:[]},Shortstr:{type:"shortstr",asserts:[]},Longstr:{type:"longstr",asserts:[]},Timestamp:{type:"timestamp",asserts:[]},Table:{type:"table",asserts:[]}};
+var U={};
+U.Connection={};
+U.Connection.startConnection={};
+U.Connection.startConnection.allParameters=[{name:"versionMajor",type:"Octet"},{name:"versionMinor",type:"Octet"},{name:"serverProperties",type:"PeerProperties"},{name:"mechanisms",type:"Longstr"},{name:"locales",type:"Longstr"}];
+U.Connection.startConnection.returnType="StartOkConnection";
+U.Connection.startConnection.index=10;
+U.Connection.startConnection.classIndex=10;
+U.Connection.startConnection.synchronous=true;
+U.Connection.startConnection.hasContent=false;
+U.Connection.startOkConnection={};
+U.Connection.startOkConnection.allParameters=[{name:"clientProperties",type:"PeerProperties"},{name:"mechanism",type:"Shortstr"},{name:"response",type:"Longstr"},{name:"locale",type:"Shortstr"}];
+U.Connection.startOkConnection.returnType="voidConnection";
+U.Connection.startOkConnection.index=11;
+U.Connection.startOkConnection.classIndex=10;
+U.Connection.startOkConnection.synchronous=true;
+U.Connection.startOkConnection.hasContent=false;
+U.Connection.secureConnection={};
+U.Connection.secureConnection.allParameters=[{name:"challenge",type:"Longstr"}];
+U.Connection.secureConnection.returnType="SecureOkConnection";
+U.Connection.secureConnection.index=20;
+U.Connection.secureConnection.classIndex=10;
+U.Connection.secureConnection.synchronous=true;
+U.Connection.secureConnection.hasContent=false;
+U.Connection.secureOkConnection={};
+U.Connection.secureOkConnection.allParameters=[{name:"response",type:"Longstr"}];
+U.Connection.secureOkConnection.returnType="voidConnection";
+U.Connection.secureOkConnection.index=21;
+U.Connection.secureOkConnection.classIndex=10;
+U.Connection.secureOkConnection.synchronous=true;
+U.Connection.secureOkConnection.hasContent=false;
+U.Connection.tuneConnection={};
+U.Connection.tuneConnection.allParameters=[{name:"channelMax",type:"Short"},{name:"frameMax",type:"Long"},{name:"heartbeat",type:"Short"}];
+U.Connection.tuneConnection.returnType="TuneOkConnection";
+U.Connection.tuneConnection.index=30;
+U.Connection.tuneConnection.classIndex=10;
+U.Connection.tuneConnection.synchronous=true;
+U.Connection.tuneConnection.hasContent=false;
+U.Connection.tuneOkConnection={};
+U.Connection.tuneOkConnection.allParameters=[{name:"channelMax",type:"Short"},{name:"frameMax",type:"Long"},{name:"heartbeat",type:"Short"}];
+U.Connection.tuneOkConnection.returnType="voidConnection";
+U.Connection.tuneOkConnection.index=31;
+U.Connection.tuneOkConnection.classIndex=10;
+U.Connection.tuneOkConnection.synchronous=true;
+U.Connection.tuneOkConnection.hasContent=false;
+U.Connection.openConnection={};
+U.Connection.openConnection.allParameters=[{name:"virtualHost",type:"Path"},{name:"reserved1",type:"Shortstr"},{name:"reserved2",type:"Bit"}];
+U.Connection.openConnection.returnType="OpenOkConnection";
+U.Connection.openConnection.index=40;
+U.Connection.openConnection.classIndex=10;
+U.Connection.openConnection.synchronous=true;
+U.Connection.openConnection.hasContent=false;
+U.Connection.openOkConnection={};
+U.Connection.openOkConnection.allParameters=[{name:"reserved1",type:"Shortstr"}];
+U.Connection.openOkConnection.returnType="voidConnection";
+U.Connection.openOkConnection.index=41;
+U.Connection.openOkConnection.classIndex=10;
+U.Connection.openOkConnection.synchronous=true;
+U.Connection.openOkConnection.hasContent=false;
+U.Connection.closeConnection={};
+U.Connection.closeConnection.allParameters=[{name:"replyCode",type:"ReplyCode"},{name:"replyText",type:"ReplyText"},{name:"classId",type:"ClassId"},{name:"methodId",type:"MethodId"}];
+U.Connection.closeConnection.returnType="CloseOkConnection";
+U.Connection.closeConnection.index=50;
+U.Connection.closeConnection.classIndex=10;
+U.Connection.closeConnection.synchronous=true;
+U.Connection.closeConnection.hasContent=false;
+U.Connection.closeOkConnection={};
+U.Connection.closeOkConnection.allParameters=[];
+U.Connection.closeOkConnection.returnType="voidConnection";
+U.Connection.closeOkConnection.index=51;
+U.Connection.closeOkConnection.classIndex=10;
+U.Connection.closeOkConnection.synchronous=true;
+U.Connection.closeOkConnection.hasContent=false;
+U.Connection.methodLookup={10:"startConnection",11:"startOkConnection",20:"secureConnection",21:"secureOkConnection",30:"tuneConnection",31:"tuneOkConnection",40:"openConnection",41:"openOkConnection",50:"closeConnection",51:"closeOkConnection"};
+U.Connection.className="Connection";
+U.Channel={};
+U.Channel.openChannel={};
+U.Channel.openChannel.allParameters=[{name:"reserved1",type:"Shortstr"}];
+U.Channel.openChannel.returnType="OpenOkChannel";
+U.Channel.openChannel.index=10;
+U.Channel.openChannel.classIndex=20;
+U.Channel.openChannel.synchronous=true;
+U.Channel.openChannel.hasContent=false;
+U.Channel.openOkChannel={};
+U.Channel.openOkChannel.allParameters=[{name:"reserved1",type:"Longstr"}];
+U.Channel.openOkChannel.returnType="voidChannel";
+U.Channel.openOkChannel.index=11;
+U.Channel.openOkChannel.classIndex=20;
+U.Channel.openOkChannel.synchronous=true;
+U.Channel.openOkChannel.hasContent=false;
+U.Channel.flowChannel={};
+U.Channel.flowChannel.allParameters=[{name:"active",type:"Bit"}];
+U.Channel.flowChannel.returnType="FlowOkChannel";
+U.Channel.flowChannel.index=20;
+U.Channel.flowChannel.classIndex=20;
+U.Channel.flowChannel.synchronous=true;
+U.Channel.flowChannel.hasContent=false;
+U.Channel.flowOkChannel={};
+U.Channel.flowOkChannel.allParameters=[{name:"active",type:"Bit"}];
+U.Channel.flowOkChannel.returnType="voidChannel";
+U.Channel.flowOkChannel.index=21;
+U.Channel.flowOkChannel.classIndex=20;
+U.Channel.flowOkChannel.synchronous=false;
+U.Channel.flowOkChannel.hasContent=false;
+U.Channel.closeChannel={};
+U.Channel.closeChannel.allParameters=[{name:"replyCode",type:"ReplyCode"},{name:"replyText",type:"ReplyText"},{name:"classId",type:"ClassId"},{name:"methodId",type:"MethodId"}];
+U.Channel.closeChannel.returnType="CloseOkChannel";
+U.Channel.closeChannel.index=40;
+U.Channel.closeChannel.classIndex=20;
+U.Channel.closeChannel.synchronous=true;
+U.Channel.closeChannel.hasContent=false;
+U.Channel.closeOkChannel={};
+U.Channel.closeOkChannel.allParameters=[];
+U.Channel.closeOkChannel.returnType="voidChannel";
+U.Channel.closeOkChannel.index=41;
+U.Channel.closeOkChannel.classIndex=20;
+U.Channel.closeOkChannel.synchronous=true;
+U.Channel.closeOkChannel.hasContent=false;
+U.Channel.methodLookup={10:"openChannel",11:"openOkChannel",20:"flowChannel",21:"flowOkChannel",40:"closeChannel",41:"closeOkChannel"};
+U.Channel.className="Channel";
+U.Exchange={};
+U.Exchange.declareExchange={};
+U.Exchange.declareExchange.allParameters=[{name:"reserved1",type:"Short"},{name:"exchange",type:"ExchangeName"},{name:"type",type:"Shortstr"},{name:"passive",type:"Bit"},{name:"durable",type:"Bit"},{name:"reserved2",type:"Bit"},{name:"reserved3",type:"Bit"},{name:"noWait",type:"NoWait"},{name:"arguments",type:"Table"}];
+U.Exchange.declareExchange.returnType="DeclareOkExchange";
+U.Exchange.declareExchange.index=10;
+U.Exchange.declareExchange.classIndex=40;
+U.Exchange.declareExchange.synchronous=true;
+U.Exchange.declareExchange.hasContent=false;
+U.Exchange.declareOkExchange={};
+U.Exchange.declareOkExchange.allParameters=[];
+U.Exchange.declareOkExchange.returnType="voidExchange";
+U.Exchange.declareOkExchange.index=11;
+U.Exchange.declareOkExchange.classIndex=40;
+U.Exchange.declareOkExchange.synchronous=true;
+U.Exchange.declareOkExchange.hasContent=false;
+U.Exchange.deleteExchange={};
+U.Exchange.deleteExchange.allParameters=[{name:"reserved1",type:"Short"},{name:"exchange",type:"ExchangeName"},{name:"ifUnused",type:"Bit"},{name:"noWait",type:"NoWait"}];
+U.Exchange.deleteExchange.returnType="DeleteOkExchange";
+U.Exchange.deleteExchange.index=20;
+U.Exchange.deleteExchange.classIndex=40;
+U.Exchange.deleteExchange.synchronous=true;
+U.Exchange.deleteExchange.hasContent=false;
+U.Exchange.deleteOkExchange={};
+U.Exchange.deleteOkExchange.allParameters=[];
+U.Exchange.deleteOkExchange.returnType="voidExchange";
+U.Exchange.deleteOkExchange.index=21;
+U.Exchange.deleteOkExchange.classIndex=40;
+U.Exchange.deleteOkExchange.synchronous=true;
+U.Exchange.deleteOkExchange.hasContent=false;
+U.Exchange.methodLookup={10:"declareExchange",11:"declareOkExchange",20:"deleteExchange",21:"deleteOkExchange"};
+U.Exchange.className="Exchange";
+U.Queue={};
+U.Queue.declareQueue={};
+U.Queue.declareQueue.allParameters=[{name:"reserved1",type:"Short"},{name:"queue",type:"QueueName"},{name:"passive",type:"Bit"},{name:"durable",type:"Bit"},{name:"exclusive",type:"Bit"},{name:"autoDelete",type:"Bit"},{name:"noWait",type:"NoWait"},{name:"arguments",type:"Table"}];
+U.Queue.declareQueue.returnType="DeclareOkQueue";
+U.Queue.declareQueue.index=10;
+U.Queue.declareQueue.classIndex=50;
+U.Queue.declareQueue.synchronous=true;
+U.Queue.declareQueue.hasContent=false;
+U.Queue.declareOkQueue={};
+U.Queue.declareOkQueue.allParameters=[{name:"queue",type:"QueueName"},{name:"messageCount",type:"MessageCount"},{name:"consumerCount",type:"Long"}];
+U.Queue.declareOkQueue.returnType="voidQueue";
+U.Queue.declareOkQueue.index=11;
+U.Queue.declareOkQueue.classIndex=50;
+U.Queue.declareOkQueue.synchronous=true;
+U.Queue.declareOkQueue.hasContent=false;
+U.Queue.bindQueue={};
+U.Queue.bindQueue.allParameters=[{name:"reserved1",type:"Short"},{name:"queue",type:"QueueName"},{name:"exchange",type:"ExchangeName"},{name:"routingKey",type:"Shortstr"},{name:"noWait",type:"NoWait"},{name:"arguments",type:"Table"}];
+U.Queue.bindQueue.returnType="BindOkQueue";
+U.Queue.bindQueue.index=20;
+U.Queue.bindQueue.classIndex=50;
+U.Queue.bindQueue.synchronous=true;
+U.Queue.bindQueue.hasContent=false;
+U.Queue.bindOkQueue={};
+U.Queue.bindOkQueue.allParameters=[];
+U.Queue.bindOkQueue.returnType="voidQueue";
+U.Queue.bindOkQueue.index=21;
+U.Queue.bindOkQueue.classIndex=50;
+U.Queue.bindOkQueue.synchronous=true;
+U.Queue.bindOkQueue.hasContent=false;
+U.Queue.unbindQueue={};
+U.Queue.unbindQueue.allParameters=[{name:"reserved1",type:"Short"},{name:"queue",type:"QueueName"},{name:"exchange",type:"ExchangeName"},{name:"routingKey",type:"Shortstr"},{name:"arguments",type:"Table"}];
+U.Queue.unbindQueue.returnType="UnbindOkQueue";
+U.Queue.unbindQueue.index=50;
+U.Queue.unbindQueue.classIndex=50;
+U.Queue.unbindQueue.synchronous=true;
+U.Queue.unbindQueue.hasContent=false;
+U.Queue.unbindOkQueue={};
+U.Queue.unbindOkQueue.allParameters=[];
+U.Queue.unbindOkQueue.returnType="voidQueue";
+U.Queue.unbindOkQueue.index=51;
+U.Queue.unbindOkQueue.classIndex=50;
+U.Queue.unbindOkQueue.synchronous=true;
+U.Queue.unbindOkQueue.hasContent=false;
+U.Queue.purgeQueue={};
+U.Queue.purgeQueue.allParameters=[{name:"reserved1",type:"Short"},{name:"queue",type:"QueueName"},{name:"noWait",type:"NoWait"}];
+U.Queue.purgeQueue.returnType="PurgeOkQueue";
+U.Queue.purgeQueue.index=30;
+U.Queue.purgeQueue.classIndex=50;
+U.Queue.purgeQueue.synchronous=true;
+U.Queue.purgeQueue.hasContent=false;
+U.Queue.purgeOkQueue={};
+U.Queue.purgeOkQueue.allParameters=[{name:"messageCount",type:"MessageCount"}];
+U.Queue.purgeOkQueue.returnType="voidQueue";
+U.Queue.purgeOkQueue.index=31;
+U.Queue.purgeOkQueue.classIndex=50;
+U.Queue.purgeOkQueue.synchronous=true;
+U.Queue.purgeOkQueue.hasContent=false;
+U.Queue.deleteQueue={};
+U.Queue.deleteQueue.allParameters=[{name:"reserved1",type:"Short"},{name:"queue",type:"QueueName"},{name:"ifUnused",type:"Bit"},{name:"ifEmpty",type:"Bit"},{name:"noWait",type:"NoWait"}];
+U.Queue.deleteQueue.returnType="DeleteOkQueue";
+U.Queue.deleteQueue.index=40;
+U.Queue.deleteQueue.classIndex=50;
+U.Queue.deleteQueue.synchronous=true;
+U.Queue.deleteQueue.hasContent=false;
+U.Queue.deleteOkQueue={};
+U.Queue.deleteOkQueue.allParameters=[{name:"messageCount",type:"MessageCount"}];
+U.Queue.deleteOkQueue.returnType="voidQueue";
+U.Queue.deleteOkQueue.index=41;
+U.Queue.deleteOkQueue.classIndex=50;
+U.Queue.deleteOkQueue.synchronous=true;
+U.Queue.deleteOkQueue.hasContent=false;
+U.Queue.methodLookup={10:"declareQueue",11:"declareOkQueue",20:"bindQueue",21:"bindOkQueue",50:"unbindQueue",51:"unbindOkQueue",30:"purgeQueue",31:"purgeOkQueue",40:"deleteQueue",41:"deleteOkQueue"};
+U.Queue.className="Queue";
+U.Basic={};
+U.Basic.qosBasic={};
+U.Basic.qosBasic.allParameters=[{name:"prefetchSize",type:"Long"},{name:"prefetchCount",type:"Short"},{name:"global",type:"Bit"}];
+U.Basic.qosBasic.returnType="QosOkBasic";
+U.Basic.qosBasic.index=10;
+U.Basic.qosBasic.classIndex=60;
+U.Basic.qosBasic.synchronous=true;
+U.Basic.qosBasic.hasContent=false;
+U.Basic.qosOkBasic={};
+U.Basic.qosOkBasic.allParameters=[];
+U.Basic.qosOkBasic.returnType="voidBasic";
+U.Basic.qosOkBasic.index=11;
+U.Basic.qosOkBasic.classIndex=60;
+U.Basic.qosOkBasic.synchronous=true;
+U.Basic.qosOkBasic.hasContent=false;
+U.Basic.consumeBasic={};
+U.Basic.consumeBasic.allParameters=[{name:"reserved1",type:"Short"},{name:"queue",type:"QueueName"},{name:"consumerTag",type:"ConsumerTag"},{name:"noLocal",type:"NoLocal"},{name:"noAck",type:"NoAck"},{name:"exclusive",type:"Bit"},{name:"noWait",type:"NoWait"},{name:"arguments",type:"Table"}];
+U.Basic.consumeBasic.returnType="ConsumeOkBasic";
+U.Basic.consumeBasic.index=20;
+U.Basic.consumeBasic.classIndex=60;
+U.Basic.consumeBasic.synchronous=true;
+U.Basic.consumeBasic.hasContent=false;
+U.Basic.consumeOkBasic={};
+U.Basic.consumeOkBasic.allParameters=[{name:"consumerTag",type:"ConsumerTag"}];
+U.Basic.consumeOkBasic.returnType="voidBasic";
+U.Basic.consumeOkBasic.index=21;
+U.Basic.consumeOkBasic.classIndex=60;
+U.Basic.consumeOkBasic.synchronous=true;
+U.Basic.consumeOkBasic.hasContent=false;
+U.Basic.cancelBasic={};
+U.Basic.cancelBasic.allParameters=[{name:"consumerTag",type:"ConsumerTag"},{name:"noWait",type:"NoWait"}];
+U.Basic.cancelBasic.returnType="CancelOkBasic";
+U.Basic.cancelBasic.index=30;
+U.Basic.cancelBasic.classIndex=60;
+U.Basic.cancelBasic.synchronous=true;
+U.Basic.cancelBasic.hasContent=false;
+U.Basic.cancelOkBasic={};
+U.Basic.cancelOkBasic.allParameters=[{name:"consumerTag",type:"ConsumerTag"}];
+U.Basic.cancelOkBasic.returnType="voidBasic";
+U.Basic.cancelOkBasic.index=31;
+U.Basic.cancelOkBasic.classIndex=60;
+U.Basic.cancelOkBasic.synchronous=true;
+U.Basic.cancelOkBasic.hasContent=false;
+U.Basic.publishBasic={};
+U.Basic.publishBasic.allParameters=[{name:"reserved1",type:"Short"},{name:"exchange",type:"ExchangeName"},{name:"routingKey",type:"Shortstr"},{name:"mandatory",type:"Bit"},{name:"immediate",type:"Bit"}];
+U.Basic.publishBasic.returnType="voidBasic";
+U.Basic.publishBasic.index=40;
+U.Basic.publishBasic.classIndex=60;
+U.Basic.publishBasic.synchronous=false;
+U.Basic.publishBasic.hasContent=true;
+U.Basic.returnBasic={};
+U.Basic.returnBasic.allParameters=[{name:"replyCode",type:"ReplyCode"},{name:"replyText",type:"ReplyText"},{name:"exchange",type:"ExchangeName"},{name:"routingKey",type:"Shortstr"}];
+U.Basic.returnBasic.returnType="voidBasic";
+U.Basic.returnBasic.index=50;
+U.Basic.returnBasic.classIndex=60;
+U.Basic.returnBasic.synchronous=false;
+U.Basic.returnBasic.hasContent=true;
+U.Basic.deliverBasic={};
+U.Basic.deliverBasic.allParameters=[{name:"consumerTag",type:"ConsumerTag"},{name:"deliveryTag",type:"DeliveryTag"},{name:"redelivered",type:"Redelivered"},{name:"exchange",type:"ExchangeName"},{name:"routingKey",type:"Shortstr"}];
+U.Basic.deliverBasic.returnType="voidBasic";
+U.Basic.deliverBasic.index=60;
+U.Basic.deliverBasic.classIndex=60;
+U.Basic.deliverBasic.synchronous=false;
+U.Basic.deliverBasic.hasContent=true;
+U.Basic.getBasic={};
+U.Basic.getBasic.allParameters=[{name:"reserved1",type:"Short"},{name:"queue",type:"QueueName"},{name:"noAck",type:"NoAck"}];
+U.Basic.getBasic.returnType="GetOkBasic";
+U.Basic.getBasic.index=70;
+U.Basic.getBasic.classIndex=60;
+U.Basic.getBasic.synchronous=true;
+U.Basic.getBasic.hasContent=false;
+U.Basic.getOkBasic={};
+U.Basic.getOkBasic.allParameters=[{name:"deliveryTag",type:"DeliveryTag"},{name:"redelivered",type:"Redelivered"},{name:"exchange",type:"ExchangeName"},{name:"routingKey",type:"Shortstr"},{name:"messageCount",type:"MessageCount"}];
+U.Basic.getOkBasic.returnType="voidBasic";
+U.Basic.getOkBasic.index=71;
+U.Basic.getOkBasic.classIndex=60;
+U.Basic.getOkBasic.synchronous=true;
+U.Basic.getOkBasic.hasContent=true;
+U.Basic.getEmptyBasic={};
+U.Basic.getEmptyBasic.allParameters=[{name:"reserved1",type:"Shortstr"}];
+U.Basic.getEmptyBasic.returnType="voidBasic";
+U.Basic.getEmptyBasic.index=72;
+U.Basic.getEmptyBasic.classIndex=60;
+U.Basic.getEmptyBasic.synchronous=true;
+U.Basic.getEmptyBasic.hasContent=false;
+U.Basic.ackBasic={};
+U.Basic.ackBasic.allParameters=[{name:"deliveryTag",type:"DeliveryTag"},{name:"multiple",type:"Bit"}];
+U.Basic.ackBasic.returnType="voidBasic";
+U.Basic.ackBasic.index=80;
+U.Basic.ackBasic.classIndex=60;
+U.Basic.ackBasic.synchronous=false;
+U.Basic.ackBasic.hasContent=false;
+U.Basic.rejectBasic={};
+U.Basic.rejectBasic.allParameters=[{name:"deliveryTag",type:"DeliveryTag"},{name:"requeue",type:"Bit"}];
+U.Basic.rejectBasic.returnType="voidBasic";
+U.Basic.rejectBasic.index=90;
+U.Basic.rejectBasic.classIndex=60;
+U.Basic.rejectBasic.synchronous=false;
+U.Basic.rejectBasic.hasContent=false;
+U.Basic.recoverAsyncBasic={};
+U.Basic.recoverAsyncBasic.allParameters=[{name:"requeue",type:"Bit"}];
+U.Basic.recoverAsyncBasic.returnType="voidBasic";
+U.Basic.recoverAsyncBasic.index=100;
+U.Basic.recoverAsyncBasic.classIndex=60;
+U.Basic.recoverAsyncBasic.synchronous=false;
+U.Basic.recoverAsyncBasic.hasContent=false;
+U.Basic.recoverBasic={};
+U.Basic.recoverBasic.allParameters=[{name:"requeue",type:"Bit"}];
+U.Basic.recoverBasic.returnType="voidBasic";
+U.Basic.recoverBasic.index=110;
+U.Basic.recoverBasic.classIndex=60;
+U.Basic.recoverBasic.synchronous=false;
+U.Basic.recoverBasic.hasContent=false;
+U.Basic.recoverOkBasic={};
+U.Basic.recoverOkBasic.allParameters=[];
+U.Basic.recoverOkBasic.returnType="voidBasic";
+U.Basic.recoverOkBasic.index=111;
+U.Basic.recoverOkBasic.classIndex=60;
+U.Basic.recoverOkBasic.synchronous=true;
+U.Basic.recoverOkBasic.hasContent=false;
+U.Basic.methodLookup={10:"qosBasic",11:"qosOkBasic",20:"consumeBasic",21:"consumeOkBasic",30:"cancelBasic",31:"cancelOkBasic",40:"publishBasic",50:"returnBasic",60:"deliverBasic",70:"getBasic",71:"getOkBasic",72:"getEmptyBasic",80:"ackBasic",90:"rejectBasic",100:"recoverAsyncBasic",110:"recoverBasic",111:"recoverOkBasic"};
+U.Basic.className="Basic";
+U.Tx={};
+U.Tx.selectTx={};
+U.Tx.selectTx.allParameters=[];
+U.Tx.selectTx.returnType="SelectOkTx";
+U.Tx.selectTx.index=10;
+U.Tx.selectTx.classIndex=90;
+U.Tx.selectTx.synchronous=true;
+U.Tx.selectTx.hasContent=false;
+U.Tx.selectOkTx={};
+U.Tx.selectOkTx.allParameters=[];
+U.Tx.selectOkTx.returnType="voidTx";
+U.Tx.selectOkTx.index=11;
+U.Tx.selectOkTx.classIndex=90;
+U.Tx.selectOkTx.synchronous=true;
+U.Tx.selectOkTx.hasContent=false;
+U.Tx.commitTx={};
+U.Tx.commitTx.allParameters=[];
+U.Tx.commitTx.returnType="CommitOkTx";
+U.Tx.commitTx.index=20;
+U.Tx.commitTx.classIndex=90;
+U.Tx.commitTx.synchronous=true;
+U.Tx.commitTx.hasContent=false;
+U.Tx.commitOkTx={};
+U.Tx.commitOkTx.allParameters=[];
+U.Tx.commitOkTx.returnType="voidTx";
+U.Tx.commitOkTx.index=21;
+U.Tx.commitOkTx.classIndex=90;
+U.Tx.commitOkTx.synchronous=true;
+U.Tx.commitOkTx.hasContent=false;
+U.Tx.rollbackTx={};
+U.Tx.rollbackTx.allParameters=[];
+U.Tx.rollbackTx.returnType="RollbackOkTx";
+U.Tx.rollbackTx.index=30;
+U.Tx.rollbackTx.classIndex=90;
+U.Tx.rollbackTx.synchronous=true;
+U.Tx.rollbackTx.hasContent=false;
+U.Tx.rollbackOkTx={};
+U.Tx.rollbackOkTx.allParameters=[];
+U.Tx.rollbackOkTx.returnType="voidTx";
+U.Tx.rollbackOkTx.index=31;
+U.Tx.rollbackOkTx.classIndex=90;
+U.Tx.rollbackOkTx.synchronous=true;
+U.Tx.rollbackOkTx.hasContent=false;
+U.Tx.methodLookup={10:"selectTx",11:"selectOkTx",20:"commitTx",21:"commitOkTx",30:"rollbackTx",31:"rollbackOkTx"};
+U.Tx.className="Tx";
+var I={10:U.Connection,20:U.Channel,40:U.Exchange,50:U.Queue,60:U.Basic,90:U.Tx};
+var X={startConnection:U.Connection.startConnection,startOkConnection:U.Connection.startOkConnection,secureConnection:U.Connection.secureConnection,secureOkConnection:U.Connection.secureOkConnection,tuneConnection:U.Connection.tuneConnection,tuneOkConnection:U.Connection.tuneOkConnection,openConnection:U.Connection.openConnection,openOkConnection:U.Connection.openOkConnection,closeConnection:U.Connection.closeConnection,closeOkConnection:U.Connection.closeOkConnection,openChannel:U.Channel.openChannel,openOkChannel:U.Channel.openOkChannel,flowChannel:U.Channel.flowChannel,flowOkChannel:U.Channel.flowOkChannel,closeChannel:U.Channel.closeChannel,closeOkChannel:U.Channel.closeOkChannel,declareExchange:U.Exchange.declareExchange,declareOkExchange:U.Exchange.declareOkExchange,deleteExchange:U.Exchange.deleteExchange,deleteOkExchange:U.Exchange.deleteOkExchange,declareQueue:U.Queue.declareQueue,declareOkQueue:U.Queue.declareOkQueue,bindQueue:U.Queue.bindQueue,bindOkQueue:U.Queue.bindOkQueue,unbindQueue:U.Queue.unbindQueue,unbindOkQueue:U.Queue.unbindOkQueue,purgeQueue:U.Queue.purgeQueue,purgeOkQueue:U.Queue.purgeOkQueue,deleteQueue:U.Queue.deleteQueue,deleteOkQueue:U.Queue.deleteOkQueue,qosBasic:U.Basic.qosBasic,qosOkBasic:U.Basic.qosOkBasic,consumeBasic:U.Basic.consumeBasic,consumeOkBasic:U.Basic.consumeOkBasic,cancelBasic:U.Basic.cancelBasic,cancelOkBasic:U.Basic.cancelOkBasic,publishBasic:U.Basic.publishBasic,returnBasic:U.Basic.returnBasic,deliverBasic:U.Basic.deliverBasic,getBasic:U.Basic.getBasic,getOkBasic:U.Basic.getOkBasic,getEmptyBasic:U.Basic.getEmptyBasic,ackBasic:U.Basic.ackBasic,rejectBasic:U.Basic.rejectBasic,recoverAsyncBasic:U.Basic.recoverAsyncBasic,recoverBasic:U.Basic.recoverBasic,recoverOkBasic:U.Basic.recoverOkBasic,selectTx:U.Tx.selectTx,selectOkTx:U.Tx.selectOkTx,commitTx:U.Tx.commitTx,commitOkTx:U.Tx.commitOkTx,rollbackTx:U.Tx.rollbackTx,rollbackOkTx:U.Tx.rollbackOkTx};
+var ap=function(az){this.array=az||[];
 this._mark=-1;
 this.limit=this.capacity=this.array.length;
 this.order=ByteOrder.BIG_ENDIAN;
-this.bitCount=0;
+this.bitCount=0
 };
-_411.prototype=new ByteBuffer();
-var _413=function(_414,_415){
-if(!_414){
-throw (new Error(_415));
-}
+ap.prototype=new ByteBuffer();
+var w=function(aA,az){if(!aA){throw (new Error(az))
+}};
+var q={octet:"Unsigned","short":"UnsignedShort","long":"UnsignedInt",longlong:"UnsignedLong","int":"Int",table:"Table",longstr:"LongString",shortstr:"ShortString",bit:"Bit",fieldtable:"FieldTable"};
+var O={F:"fieldtable",S:"longstr",I:"int"};
+var ac={longstr:"S","int":"I"};
+var F=function(aE,aB){var aA=new ap();
+aA.putShortString("LOGIN");
+aA.putTypeIdentifier("longstr");
+aA.putLongString(aE);
+aA.putShortString("PASSWORD");
+aA.putTypeIdentifier("longstr");
+aA.putLongString(aB);
+aA.rewind();
+var az=aA.remaining();
+var aD=[];
+for(var aC=0;
+aC<az;
+aC++){aD.push(String.fromCharCode(aA.getUnsigned()))
+}return aD.join("")
 };
-var _416={"octet":"Unsigned","short":"UnsignedShort","long":"UnsignedInt","longlong":"UnsignedLong","int":"Int","table":"Table","longstr":"LongString","shortstr":"ShortString","bit":"Bit","fieldtable":"FieldTable"};
-var _417={"F":"fieldtable","S":"longstr","I":"int"};
-var _418={"longstr":"S","int":"I"};
-var _419=function(_41a,_41b){
-var _41c=new _411();
-_41c.putShortString("LOGIN");
-_41c.putTypeIdentifier("longstr");
-_41c.putLongString(_41a);
-_41c.putShortString("PASSWORD");
-_41c.putTypeIdentifier("longstr");
-_41c.putLongString(_41b);
-_41c.rewind();
-var len=_41c.remaining();
-var _41e=[];
-for(var i=0;i<len;i++){
-_41e.push(String.fromCharCode(_41c.getUnsigned()));
-}
-return _41e.join("");
+var D=function(aA,az){throw (new Error("not implemented"))
 };
-var _420=function(_421,_422){
-throw (new Error("not implemented"));
+ap.prototype.getLongString=function(){var az=this.getUnsignedInt();
+var aB=[];
+for(var aA=0;
+aA<az;
+aA++){aB.push(String.fromCharCode(this.getUnsigned()))
+}return aB.join("")
 };
-_411.prototype.getLongString=function(){
-var len=this.getUnsignedInt();
-var _424=[];
-for(var i=0;i<len;i++){
-_424.push(String.fromCharCode(this.getUnsigned()));
-}
-return _424.join("");
+ap.prototype.getShortString=function(){var az=this.getUnsigned();
+var aB=[];
+for(var aA=0;
+aA<az;
+aA++){aB.push(String.fromCharCode(this.getUnsigned()))
+}return aB.join("")
 };
-_411.prototype.getShortString=function(){
-var len=this.getUnsigned();
-var _427=[];
-for(var i=0;i<len;i++){
-_427.push(String.fromCharCode(this.getUnsigned()));
-}
-return _427.join("");
+ap.prototype.getTypeIdentifier=function(){var az=this.getUnsigned();
+return O[String.fromCharCode(az)]
 };
-_411.prototype.getTypeIdentifier=function(){
-var i=this.getUnsigned();
-return _417[String.fromCharCode(i)];
+ap.prototype.putTypeIdentifier=function(aA){var az=ac[aA];
+this.putUnsigned(az.charCodeAt(0))
 };
-_411.prototype.putTypeIdentifier=function(type){
-var ti=_418[type];
-this.putUnsigned(ti.charCodeAt(0));
+ap.prototype.getFieldValue=function(){var az=this.getUnsigned();
+switch(String.fromCharCode(az)){case"t":return !!this.getUnsigned();
+default:throw new Error("Decoding Error in AmqpBuffer: cannot decode field value")
+}};
+ap.prototype.getFieldTable=function(){var az=this.getUnsignedInt();
+var aD={};
+var aA=this.position;
+while(az>(this.position-aA)){var aB=this.getShortString();
+var aC=this.getFieldValue();
+aD[aB]=aC
+}return aD
 };
-_411.prototype.getFieldValue=function(){
-var _42c=this.getUnsigned();
-switch(String.fromCharCode(_42c)){
-case "t":
-return !!this.getUnsigned();
-default:
-throw new Error("Decoding Error in AmqpBuffer: cannot decode field value");
-}
+ap.prototype.getTable=function(){var aC=[];
+var az=this.getUnsignedInt();
+var aA=new ap(this.array.slice(this.position,this.position+az));
+this.position+=az;
+while(aA.remaining()){var aD={};
+aD.key=aA.getShortString();
+var aB=aA.getTypeIdentifier();
+aD.value=aA["get"+q[aB]]();
+aC.push(aD)
+}return aC
 };
-_411.prototype.getFieldTable=function(){
-var l=this.getUnsignedInt();
-var ft={};
-var _42f=this.position;
-while(l>(this.position-_42f)){
-var key=this.getShortString();
-var _431=this.getFieldValue();
-ft[key]=_431;
-}
-return ft;
+ap.prototype.getBit=function(az){return this.getUnsigned()
 };
-_411.prototype.getTable=function(){
-var _432=[];
-var len=this.getUnsignedInt();
-var _434=new _411(this.array.slice(this.position,this.position+len));
-this.position+=len;
-while(_434.remaining()){
-var kv={};
-kv.key=_434.getShortString();
-var ti=_434.getTypeIdentifier();
-kv.value=_434["get"+_416[ti]]();
-_432.push(kv);
-}
-return _432;
+ap.prototype.putBit=function(aA){if(this.bitCount>0){var az=this.array[this.position-1];
+az=aA<<this.bitCount|az;
+this.array[this.position-1]=az
+}else{this.putUnsigned(aA)
+}};
+ap.prototype.putUnsignedLong=function(az){this.putInt(0);
+return this.putUnsignedInt(az)
 };
-_411.prototype.getBit=function(_437){
-return this.getUnsigned();
+ap.prototype.getUnsignedLong=function(az){this.getInt();
+return this.getUnsignedInt()
 };
-_411.prototype.putBit=function(v){
-if(this.bitCount>0){
-var _439=this.array[this.position-1];
-_439=v<<this.bitCount|_439;
-this.array[this.position-1]=_439;
-}else{
-this.putUnsigned(v);
-}
+ap.prototype.putLongString=function(aA){this.putUnsignedInt(aA.length);
+for(var az=0;
+az<aA.length;
+az++){this.putUnsigned(aA.charCodeAt(az))
+}};
+ap.prototype.putShortString=function(aA){this.putUnsigned(aA.length);
+for(var az=0;
+az<aA.length;
+az++){this.putUnsigned(aA.charCodeAt(az))
+}};
+ap.prototype.putTable=function(aC){if(!aC){this.putUnsignedInt(0);
+return this
+}var az=new ap();
+for(var aA=0;
+aA<aC.length;
+aA++){var aB=aC[aA];
+az.putShortString(aB.key);
+az.putTypeIdentifier(aB.type);
+az["put"+q[aB.type]](aB.value)
+}az.rewind();
+this.putUnsignedInt(az.remaining());
+this.putBuffer(az);
+return this
 };
-_411.prototype.putUnsignedLong=function(v){
-this.putInt(0);
-return this.putUnsignedInt(v);
+ap.prototype.getFrameHeader=function(){var az=this.getUnsigned();
+var aB=this.getUnsignedShort();
+var aA=this.getUnsignedInt();
+var aC={};
+aC.type=az;
+aC.size=aA;
+aC.channel=aB;
+return aC
 };
-_411.prototype.getUnsignedLong=function(v){
-this.getInt();
-return this.getUnsignedInt();
-};
-_411.prototype.putLongString=function(s){
-this.putUnsignedInt(s.length);
-for(var i=0;i<s.length;i++){
-this.putUnsigned(s.charCodeAt(i));
-}
-};
-_411.prototype.putShortString=function(s){
-this.putUnsigned(s.length);
-for(var i=0;i<s.length;i++){
-this.putUnsigned(s.charCodeAt(i));
-}
-};
-_411.prototype.putTable=function(_440){
-if(!_440){
-this.putUnsignedInt(0);
-return this;
-}
-var _441=new _411();
-for(var i=0;i<_440.length;i++){
-var _443=_440[i];
-_441.putShortString(_443.key);
-_441.putTypeIdentifier(_443.type);
-_441["put"+_416[_443.type]](_443.value);
-}
-_441.rewind();
-this.putUnsignedInt(_441.remaining());
-this.putBuffer(_441);
-return this;
-};
-_411.prototype.getFrameHeader=function(){
-var _444=this.getUnsigned();
-var _445=this.getUnsignedShort();
-var size=this.getUnsignedInt();
-var _447={};
-_447.type=_444;
-_447.size=size;
-_447.channel=_445;
-return _447;
-};
-_411.prototype.getFrame=function(){
-var pos=this.position;
-var _449={};
-if(this.remaining()>7){
-_449.header=this.getFrameHeader();
-_449.channel=_449.header.channel;
-_449.type=_449.header.type;
-if(this.remaining()>=_449.header.size+1){
-switch(_449.type){
-case _40c.FRAME_BODY.value:
-var body=new _411(this.array.slice(this.position,this.position+_449.header.size));
-this.position+=_449.header.size;
-_449.body=body;
-_449.methodName="body";
+ap.prototype.getFrame=function(){var aH=this.position;
+var aB={};
+if(this.remaining()>7){aB.header=this.getFrameHeader();
+aB.channel=aB.header.channel;
+aB.type=aB.header.type;
+if(this.remaining()>=aB.header.size+1){switch(aB.type){case M.FRAME_BODY.value:var aF=new ap(this.array.slice(this.position,this.position+aB.header.size));
+this.position+=aB.header.size;
+aB.body=aF;
+aB.methodName="body";
 break;
-case _40c.FRAME_HEADER.value:
-var _44b=this.getUnsignedShort();
-var _44c=this.getUnsignedShort();
-var _44d=this.getUnsignedLong();
-_449.contentProperties=this.getContentProperties();
-_449.methodName="header";
+case M.FRAME_HEADER.value:var aJ=this.getUnsignedShort();
+var aE=this.getUnsignedShort();
+var aA=this.getUnsignedLong();
+aB.contentProperties=this.getContentProperties();
+aB.methodName="header";
 break;
-case _40c.FRAME_METHOD.value:
-var _44b=this.getUnsignedShort();
-var _44e=this.getUnsignedShort();
-var _44f=_40f[_44b].className;
-var _450=_40f[_44b].methodLookup[_44e];
-var _451=_40f[_44b][_450];
-var _452=_40f[_44b][_450].allParameters;
-_449.methodName=_450;
-_449.args=this.getMethodArguments(_452);
+case M.FRAME_METHOD.value:var aJ=this.getUnsignedShort();
+var aG=this.getUnsignedShort();
+var aD=I[aJ].className;
+var aI=I[aJ].methodLookup[aG];
+var az=I[aJ][aI];
+var aC=I[aJ][aI].allParameters;
+aB.methodName=aI;
+aB.args=this.getMethodArguments(aC);
 break;
-default:
-throw (new Error("getFrame: This AMQP frame type is unknown or has not been implemented"));
-}
-_413((this.getUnsigned()===_40c.FRAME_END.value),"AMQP: Frame terminator missing");
-}else{
-this.position=pos;
-return null;
-}
-return _449;
-}
-return null;
+default:throw (new Error("getFrame: This AMQP frame type is unknown or has not been implemented"))
+}w((this.getUnsigned()===M.FRAME_END.value),"AMQP: Frame terminator missing")
+}else{this.position=aH;
+return null
+}return aB
+}return null
 };
-_411.prototype.putFrame=function(type,_454,_455){
-this.putUnsigned(type);
-this.putUnsignedShort(_454);
-var size=_455.remaining();
-this.putUnsignedInt(size);
-this.putBuffer(_455);
-this.putUnsigned(_40c.FRAME_END.value);
-return this;
+ap.prototype.putFrame=function(aA,aB,aC){this.putUnsigned(aA);
+this.putUnsignedShort(aB);
+var az=aC.remaining();
+this.putUnsignedInt(az);
+this.putBuffer(aC);
+this.putUnsigned(M.FRAME_END.value);
+return this
 };
-_411.prototype.putMethodFrame=function(_457,_458,args){
-var _45a=new _411();
-_45a.putUnsignedShort(_457.classIndex);
-_45a.putUnsignedShort(_457.index);
-_45a.putMethodArguments(args,_457.allParameters);
-_45a.flip();
-return this.putFrame(_40c.FRAME_METHOD.value,_458,_45a);
+ap.prototype.putMethodFrame=function(aC,aA,az){var aB=new ap();
+aB.putUnsignedShort(aC.classIndex);
+aB.putUnsignedShort(aC.index);
+aB.putMethodArguments(az,aC.allParameters);
+aB.flip();
+return this.putFrame(M.FRAME_METHOD.value,aA,aB)
 };
-_411.prototype.putHeaderFrame=function(_45b,_45c,_45d,_45e,_45f){
-var _460=new _411();
-_460.putUnsignedShort(_45c);
-_460.putUnsignedShort(_45d);
-_460.putUnsignedLong(_45e);
-_460.putContentProperties(_45f);
-_460.flip();
-return this.putFrame(_40c.FRAME_HEADER.value,_45b,_460);
+ap.prototype.putHeaderFrame=function(aC,aB,aD,az,aA){var aE=new ap();
+aE.putUnsignedShort(aB);
+aE.putUnsignedShort(aD);
+aE.putUnsignedLong(az);
+aE.putContentProperties(aA);
+aE.flip();
+return this.putFrame(M.FRAME_HEADER.value,aC,aE)
 };
-_411.prototype.putBodyFrame=function(_461,_462){
-return this.putFrame(_40c.FRAME_BODY.value,_461,_462);
+ap.prototype.putBodyFrame=function(az,aA){return this.putFrame(M.FRAME_BODY.value,az,aA)
 };
-_411.prototype.putHeartbeat=function(){
-throw (new Error("not implemented"));
+ap.prototype.putHeartbeat=function(){throw (new Error("not implemented"))
 };
-_411.prototype.putMethodArguments=function(args,_464){
-for(var i=0;i<_464.length;i++){
-var p=_464[i];
-var _467=p.type;
-var _468=_40d[_467];
-if(_468){
-var type=_468.type;
-}else{
-throw (new Error("Unknown AMQP domain "+_467));
-}
-this["put"+_416[type]](args[i]);
-this.bitCount=(type==="bit")?this.bitCount+1:0;
-}
-return this;
+ap.prototype.putMethodArguments=function(aA,aD){for(var aB=0;
+aB<aD.length;
+aB++){var aF=aD[aB];
+var az=aF.type;
+var aE=g[az];
+if(aE){var aC=aE.type
+}else{throw (new Error("Unknown AMQP domain "+az))
+}this["put"+q[aC]](aA[aB]);
+this.bitCount=(aC==="bit")?this.bitCount+1:0
+}return this
 };
-_411.prototype.getMethodArguments=function(_46a){
-var _46b=[];
-for(var i=0;i<_46a.length;i++){
-var p=_46a[i];
-var _46e=p.type;
-var type=_40d[_46e].type;
-var arg={};
-arg.type=type;
-arg.name=p.name;
-try{
-var v=this["get"+_416[type]]();
-}
-catch(e){
-throw (new Error("type codec failed for type "+type+" for domain "+_46e));
-}
-this.bitCount=(type==="bit")?this.bitCount+1:0;
-arg.value=v;
-_46b.push(arg);
-}
-return _46b;
+ap.prototype.getMethodArguments=function(aA){var aE=[];
+for(var aB=0;
+aB<aA.length;
+aB++){var az=aA[aB];
+var aH=az.type;
+var aD=g[aH].type;
+var aG={};
+aG.type=aD;
+aG.name=az.name;
+try{var aF=this["get"+q[aD]]()
+}catch(aC){throw (new Error("type codec failed for type "+aD+" for domain "+aH))
+}this.bitCount=(aD==="bit")?this.bitCount+1:0;
+aG.value=aF;
+aE.push(aG)
+}return aE
 };
-_411.prototype.putArgument=function(_472,arg){
-var _474=_40d[_472];
-if(_474){
-var type=_474.type;
-}else{
-throw (new Error("Unknown AMQP domain "+dtype));
-}
-this["put"+_416[type]](arg);
+ap.prototype.putArgument=function(aA,az){var aC=g[aA];
+if(aC){var aB=aC.type
+}else{throw (new Error("Unknown AMQP domain "+dtype))
+}this["put"+q[aB]](az)
 };
-_411.prototype.getArgument=function(type){
-try{
-return this["get"+_416[type]]();
-}
-catch(e){
-throw (new Error("type codec failed for type "+type+" for domain "+dtype));
-}
+ap.prototype.getArgument=function(az){try{return this["get"+q[az]]()
+}catch(aA){throw (new Error("type codec failed for type "+az+" for domain "+dtype))
+}};
+ap.prototype.getContentProperties=function(){var aH={};
+var aG=[];
+var aB=this.getUnsignedShort();
+for(var aD=0;
+aD<=16;
+aD++){var aF=(aB>>(aD))&1;
+if(aF){aG.unshift(aD+1)
+}}for(var aD=0;
+aD<aG.length;
+aD++){var aC=16-aG[aD];
+var aE=_basicProperties[aC].name;
+var aA=_basicProperties[aC].domain;
+var az=g[aA];
+aH[aE]=this.getArgument(az.type)
+}return aH
 };
-_411.prototype.getContentProperties=function(){
-var _477={};
-var _478=[];
-var _479=this.getUnsignedShort();
-for(var i=0;i<=16;i++){
-var bit=(_479>>(i))&1;
-if(bit){
-_478.unshift(i+1);
-}
-}
-for(var i=0;i<_478.length;i++){
-var k=16-_478[i];
-var _47d=_basicProperties[k].name;
-var _47e=_basicProperties[k].domain;
-var _47f=_40d[_47e];
-_477[_47d]=this.getArgument(_47f.type);
-}
-return _477;
+ap.prototype.putContentProperties=function(aG){if(!aG){return this.putUnsignedShort(0)
+}var aA=0;
+var aF=[];
+for(var aD=0;
+aD<_basicProperties.length;
+aD++){var aE=_basicProperties[aD].name;
+var aC=_basicProperties[aD].domain;
+var aB=aG[aE];
+if(typeof(aB)!=="undefined"){aF.push({propertyName:aE,propertyValue:aB,domain:aC});
+aA=aA<<1|1
+}else{aA=aA<<1
+}}aA=aA<<2;
+this.putUnsignedShort(aA);
+for(var aD=0;
+aD<aF.length;
+aD++){var aH=aF[aD];
+var az=aH.domain;
+this.putArgument(az,aH.propertyValue)
+}return this
 };
-_411.prototype.putContentProperties=function(_480){
-if(!_480){
-return this.putUnsignedShort(0);
-}
-var _481=0;
-var _482=[];
-for(var i=0;i<_basicProperties.length;i++){
-var _484=_basicProperties[i].name;
-var _485=_basicProperties[i].domain;
-var _486=_480[_484];
-if(typeof (_486)!=="undefined"){
-_482.push({"propertyName":_484,"propertyValue":_486,"domain":_485});
-_481=_481<<1|1;
-}else{
-_481=_481<<1;
-}
-}
-_481=_481<<2;
-this.putUnsignedShort(_481);
-for(var i=0;i<_482.length;i++){
-var _487=_482[i];
-var _488=_487.domain;
-this.putArgument(_488,_487.propertyValue);
-}
-return this;
+AmqpClient.prototype=new e();
+var ai=AmqpClient.prototype;
+ai.CLOSED=0;
+ai.OPEN=1;
+ai.CONNECTING=2;
+ai.getReadyState=function(){return this._readyState
 };
-AmqpClient.prototype=new _3fc();
-var _489=AmqpClient.prototype;
-_489.CLOSED=0;
-_489.OPEN=1;
-_489.CONNECTING=2;
-_489.getReadyState=function(){
-return this._readyState;
+ai.setReadyState=function(az){this._readyState=az
 };
-_489.setReadyState=function(_48a){
-this._readyState=_48a;
-};
-_489.onopen=function(e){
-};
-_489.onclose=function(e){
-};
-_489.onerror=function(e){
-};
-var _413=function(_48e,_48f){
-if(!_48e){
-throw (new Error(_48f));
-}
-};
-_489._init=function(){
-this._initAsyncClient();
-this._buffer=new _411();
+ai.onopen=function(az){};
+ai.onclose=function(az){};
+ai.onerror=function(az){};
+var w=function(aA,az){if(!aA){throw (new Error(az))
+}};
+ai._init=function(){this._initAsyncClient();
+this._buffer=new ap();
 this._channels={};
 this._channelCount=0;
-this._stateMachine.addState("handshaking",[{"inputs":["startConnectionFrame"],"targetState":"starting"},{"inputs":["closeConnectionFrame"],"targetState":"closing"}],_490);
-this._stateMachine.addState("starting",[{"inputs":["startOkConnectionAction"],"targetState":"started"}],_491);
-this._stateMachine.addState("started",[{"inputs":["tuneConnectionFrame"],"targetState":"tuning"}]);
-this._stateMachine.addState("tuning",[{"inputs":["tuneOkConnectionAction"],"targetState":"tuned"}],_492,_493);
-this._stateMachine.addState("tuned",[{"inputs":["openConnectionAction"],"targetState":"opening"}]);
-this._stateMachine.addState("opening",[{"inputs":["openOkConnectionFrame"],"targetState":"ready"}],_494,_495);
-this._stateMachine.addState("ready",[{"inputs":["openOkChannelFrame","closeChannelFrame","closeOkChannelFrame","flowOkChannelFrame","flowChannelFrame","declareOkExchangeFrame","declareOkQueueFrame","bindOkQueueFrame","unbindOkQueueFrame","deleteOkQueueFrame","deleteOkExchangeFrame","commitOkTxFrame","rollbackOkTxFrame","selectOkTxFrame","purgeOkQueueFrame","cancelOkBasicFrame","getOkBasicFrame","getEmptyBasicFrame","consumeOkBasicFrame","recoverOkBasicFrame","rejectOkBasicFrame","deliverBasicFrame","bodyFrame","headerFrame"],"targetState":"ready"},{"inputs":["closeConnectionFrame","closeConnectionAction"],"targetState":"closing"}],_496);
-this._stateMachine.addState("closing",[{"inputs":["closeOkConnectionFrame","closeOkConnectionAction"],"targetState":"closed"}],_495,null);
-this._stateMachine.addState("closed",[],_497,null);
+this._stateMachine.addState("handshaking",[{inputs:["startConnectionFrame"],targetState:"starting"},{inputs:["closeConnectionFrame"],targetState:"closing"}],ad);
+this._stateMachine.addState("starting",[{inputs:["startOkConnectionAction"],targetState:"started"}],B);
+this._stateMachine.addState("started",[{inputs:["tuneConnectionFrame"],targetState:"tuning"}]);
+this._stateMachine.addState("tuning",[{inputs:["tuneOkConnectionAction"],targetState:"tuned"}],N,o);
+this._stateMachine.addState("tuned",[{inputs:["openConnectionAction"],targetState:"opening"}]);
+this._stateMachine.addState("opening",[{inputs:["openOkConnectionFrame"],targetState:"ready"}],n,au);
+this._stateMachine.addState("ready",[{inputs:["openOkChannelFrame","closeChannelFrame","closeOkChannelFrame","flowOkChannelFrame","flowChannelFrame","declareOkExchangeFrame","declareOkQueueFrame","bindOkQueueFrame","unbindOkQueueFrame","deleteOkQueueFrame","deleteOkExchangeFrame","commitOkTxFrame","rollbackOkTxFrame","selectOkTxFrame","purgeOkQueueFrame","cancelOkBasicFrame","getOkBasicFrame","getEmptyBasicFrame","consumeOkBasicFrame","recoverOkBasicFrame","rejectOkBasicFrame","deliverBasicFrame","bodyFrame","headerFrame"],targetState:"ready"},{inputs:["closeConnectionFrame","closeConnectionAction"],targetState:"closing"}],aw);
+this._stateMachine.addState("closing",[{inputs:["closeOkConnectionFrame","closeOkConnectionAction"],targetState:"closed"}],au,null);
+this._stateMachine.addState("closed",[],y,null)
 };
-var _498={"0-9-1":[65,77,81,80,0,0,9,1]};
-_489.connect=function connect(url,_49a,_49b,_49c){
-if(this._socket){
-throw (new Error("AmqpClient already connected."));
-}
-var url0;
-if(typeof (url)==="string"){
-url0=[url];
-}else{
-url0=url;
-}
-this.setReadyState(this.CONNECTING);
-var args={"url":url0[0],"virtualHost":_49a,"credentials":_49b};
-this._openContinuation=_49c;
+var J={"0-9-1":[65,77,81,80,0,0,9,1]};
+ai.connect=function at(aB,az,aC,aE){if(this._socket){throw (new Error("AmqpClient already connected."))
+}var aD;
+if(typeof(aB)==="string"){aD=[aB]
+}else{aD=aB
+}this.setReadyState(this.CONNECTING);
+var aA={url:aD[0],virtualHost:az,credentials:aC};
+this._openContinuation=aE;
 this._hasNegotiated=false;
-_reconnect(this,url0[0],_49a,_49b);
-};
-var _49f=_489.connect;
-_489.connect=function(_4a0,_4a1){
-if(typeof _4a0=="object"){
-myConfig=_4a0||{};
-var url=myConfig.url;
-var _4a3=myConfig.virtualHost;
-var _4a4=myConfig.credentials;
-if(!url||typeof url!="string"){
-throw new Error("AmqpClient.connect(): Parameter 'url' is required");
-}
-if(!_4a3||typeof url!="string"){
-throw new Error("AmqpClient.connect(): Parameter 'virtualHost' is required");
-}
-if(!_4a4||!_4a4.username||!_4a4.password||typeof _4a4.username!="string"||typeof _4a4.password!="string"){
-throw new Error("AmqpClient.connect(): credentials are required");
-}
-_49f.call(this,url,_4a3,_4a4,_4a1);
-}else{
-_49f.apply(this,arguments);
-}
-};
-_489.disconnect=function disconnect(){
-if(this.getReadyState()==this.OPEN){
-_4a5(this,0,"",0,0);
-}
-if(this.getReadyState()==this.CONNECTING){
-var _4a6={};
-_4a6.methodName="closeConnection";
-_4a6.type="closeConnection";
-_4a6.args="";
-var e=new AmqpEvent(this,_4a6);
-this.dispatchEvent(e);
-}
-this.setReadyState(this.CLOSED);
-};
-_489.openChannel=function _4a8(_4a9){
-var id=++this._channelCount;
-var _4ab=new _4ac();
-_4ad(_4ab,id,this,_4a9);
-this._channels[id]=_4ab;
-return _4ab;
-};
-var _4ae=function(_4af){
-var _4b0=new ByteBuffer(_498["0-9-1"]);
-_4af._socket.send(_4b0);
-};
-var _4b1=function(_4b2){
-_497(_4b2);
-};
-var _4b3=function(s,b){
-if(b.remaining()<s.length){
-return false;
-}else{
-var lim=b.limit;
-b.limit=s.length;
-var _4b7=b.getString(Charset.UTF8);
-b.limit=lim;
-return s===_4b7;
-}
-};
-var _4b8=function(_4b9,e){
-var buf=_4b9._buffer;
-buf.mark();
-buf.position=buf.limit;
-buf.putBuffer(e.data);
-buf.reset();
-if(!_4b9._hasNegotiated&&buf.remaining()>7){
-if(_4b3("AMQP",buf)){
-var _4bc=[buf.get(),buf.get(),buf.get(),buf.get()];
-var _4bd={"args":[{"name":"replyText","value":"Server does not support AMQP protocol versions after "+_4bc[2]+"-"+_4bc[3]}],"methodName":"closeOkConnection"};
-var _4be={};
-_4be.methodName="error";
-_4be.args=_4bd.args;
-_4b9.dispatchEvent(new AmqpEvent(_4b9,_4be));
-_497(_4b9,"",_4bd);
-return;
-}else{
-buf.reset();
-_4b9._hasNegotiated=true;
-}
-}
-var _4bf=null;
-while(_4bf=buf.getFrame()){
-var f=_4bf;
-_4b9._stateMachine.feedInput(f.methodName+"Frame",f);
-}
-buf.compact();
-};
-var _4c1=function(_4c2,_4c3){
-_4c2._socket.send(_4c3);
-};
-var _4c4=function write(_4c5,_4c6,_4c7,args){
-var buf=new _411();
-var _4ca=_4c6.classIndex;
-buf.putMethodFrame(_4c6,_4c7,args);
-buf.flip();
-_4c1(_4c5,buf);
-};
-var _490=function _490(_4cb,_4cc,args,_4ce){
-var _4cf=new ByteSocket(args.url);
-_4cf.onopen=function(){
-_4ae(_4cb);
-};
-_4cf.onclose=function(){
-_4b1(_4cb);
-};
-_4cf.onmessage=function(e){
-_4b8(_4cb,e);
-};
-_4cb._socket=_4cf;
-_4cb._virtualHost=args.virtualHost;
-_4cb._credentialsOrKey=args.credentials;
-};
-var _4d1=null;
-var _491=function(_4d2,_4d3,_4d4){
-_413((_4d4.channel===0),_40c.UNEXPECTED_FRAME.message);
-var buf=new _411();
-var _4d6=new AmqpArguments();
-_4d6.addLongString("library","KaazingAmqpClient");
-_4d6.addLongString("library_version","3.2.0");
-_4d6.addLongString("library_platform","JavaScript");
-var _4d7=_4d2._locale||"en_US";
-var _4d8="AMQPLAIN";
-var _4d9=_4d2._credentialsOrKey;
-if(typeof (_4d9.resolve)!="function"){
-var _4da=_419(_4d9.username,_4d9.password);
-_4d1(_4d2,_4d6,_4d8,_4da,_4d7);
-}else{
-_4d9.resolve(function(_4db){
-var _4dc=_419(_4db.username,_4db.password);
-_4d1(_4d2,_4d6,_4d8,_4dc,_4d7);
-});
-}
-};
-var _492=function(_4dd,_4de,_4df){
-_413((_4df.channel===0),_40c.UNEXPECTED_FRAME.message);
-var _4e0=_4df.args[0].value;
-var _4e1=_4df.args[1].value;
-var _4e2=0;
-_4e3(_4dd,_4e0,_4e1,_4e2);
-_4e4(_4dd,_4dd._virtualHost,_4dd._openContinuation,_4dd._openErrorCb);
-};
-var _495=function _495(_4e5,_4e6,_4e7){
-if(_4e7){
-if(_4e7.actionName&&(_4e7.actionName=="closeConnection")){
-return;
-}
-}
-if(_4e6==="nowaitAction"){
-_4e5._waitingAction=null;
-return;
-}
-var _4e8={};
-if(!_4e8._connection){
-_4e8=_4e5;
-}else{
-_4e8=_4e5._connection;
-}
-var e=new AmqpEvent(_4e5,_4e7);
-if(_4e5._waitingAction){
-if(_4e6==="closeChannelFrame"){
-_4e5._waitingAction.error(e);
-}else{
-if(_4e7.methodName=="closeConnection"){
-var _4ea={};
-_4ea.methodName="error";
-_4ea.args=_4e7.args;
-_4e8.dispatchEvent(new AmqpEvent(_4e8,_4ea));
-_497(_4e8,"",_4e7);
-return;
-}else{
-if(_4e7.methodName=="openOkConnection"){
-_4e8.setReadyState(_4e8.OPEN);
-}else{
-_4e5._waitingAction.continuation(e);
-}
-}
-}
-}else{
-throw (new Error("AmqpClient not in waiting state: protocol violation"));
-}
-_4e5.dispatchEvent(e);
-if(_4e7.methodName=="openOkConnection"){
-_4e8._openContinuation();
-}
-};
-var _493=function _493(_4eb,_4ec,_4ed){
-var _4ee=_4eb;
-setTimeout(function(){
-_4ee._processActions();
-},0);
-};
-var _496=function openHandler(_4ef,_4f0,_4f1){
-if(_4f1.channel===0){
-}else{
-if(_4ef._channels[_4f1.channel]){
-var _4f2=_4ef._channels[_4f1.channel];
-_4f3(_4f2,_4f0,_4f1);
-}else{
-}
-}
-};
-var _4f4=function _4f4(_4f5,_4f6,_4f7){
-};
-var _497=function _497(_4f8,_4f9,_4fa){
-if(!(_4f8.getReadyState()==_4f8.CONNECTING)){
-var e;
-if(typeof (_4fa)==="undefined"){
-e=new AmqpEvent(_4f8,{"args":[],"methodName":"closeOkConnection"});
-}else{
-_4fa.methodName="closeOkConnection";
-e=new AmqpEvent(_4f8,_4fa);
-}
-_4f8.dispatchEvent(e);
-}
-_4f8.setReadyState(_4f8.CLOSED);
-if(typeof (_4f8._channels)!=="undefined"){
-for(var i in _4f8._channels){
-var _4fd=_4f8._channels[i];
-_4fd.dispatchEvent(e);
-}
-_4f8._socket.onclose=function(){
-};
-_4f8._socket.close();
-}
-if(typeof (_4f8._openErrorCb)!=="undefined"){
-_4f8._openErrorCb(e);
-}
-};
-function _reconnect(_4fe,url,_500,_501){
-var args={"url":url,"virtualHost":_500,"credentials":_501};
-_4fe._stateMachine.enterState("handshaking","",args);
-};
-var _4ad=function _4ad(_503,id,_505,cb){
-_503._id=id;
-_503._callbacks=cb;
-_503._connection=_505;
-_503._transacted=false;
-_503._waitingAction=null;
-_503._initAsyncClient();
-_503._stateMachine.addState("channelReady",[{"inputs":["openChannelAction","closeChannelAction","consumeBasicAction","flowChannelAction","declareExchangeAction","declareQueueAction","bindQueueAction","unbindQueueAction","deleteQueueAction","deleteExchangeAction","purgeQueueAction","cancelBasicAction","recoverBasicAction","rejectBasicAction","selectTxAction","commitTxAction","rollbackTxAction",],"targetState":"waiting"},{"inputs":["publishBasicAction","ackBasicAction"],"targetState":"channelReady"},{"inputs":["getBasicAction"],"targetState":"getting"},{"inputs":["deliverBasicFrame"],"targetState":"readingContentHeader"}],_493);
-_503._stateMachine.addState("getting",[{"inputs":["getOkBasicFrame"],"targetState":"readingContentHeader"},{"inputs":["getEmptyBasicFrame"],"targetState":"channelReady"},{"inputs":["closeChannelFrame"],"targetState":"closing"}],_494,_507);
-_503._stateMachine.addState("waiting",[{"inputs":["openOkChannelFrame","closeOkChannelFrame","flowOkChannelFrame","declareOkExchangeFrame","declareOkQueueFrame","bindOkQueueFrame","unbindOkQueueFrame","deleteOkQueueFrame","deleteOkExchangeFrame","purgeOkQueueFrame","cancelOkBasicFrame","recoverOkBasicFrame","rejectOkBasicFrame","commitOkTxFrame","rollbackOkTxFrame","selectOkTxFrame","getOkBasicFrame","getEmptyBasicFrame","consumeOkBasicFrame","nowaitAction"],"targetState":"channelReady"},{"inputs":["closeChannelFrame"],"targetState":"closing"}],_494,_495);
-_503._stateMachine.addState("readingContentHeader",[{"inputs":["headerFrame"],"targetState":"readingContentBody"}],_508,_509);
-_503._stateMachine.addState("readingContentBody",[{"inputs":["bodyFrame"],"targetState":"channelReady"}],null,_50a);
-_503._stateMachine.addState("closing",[{"inputs":["closeOkChannelAction"],"targetState":"closed"}],null);
-_503._stateMachine.addState("closed",null,null);
-if(_505.getReadyState()==_505.OPEN){
-_4a8(_503,[cb]);
-}
-};
-var _4ac=function(){
-};
-_4ac.prototype=new _3fc();
-var _489=_4ac.prototype;
-_489._init=function(_50b){
-};
-var _50c=function _50c(_50d,_50e,_50f,args,body,_512){
-var buf=new _411();
-var _514=_50e.classIndex;
-buf.putMethodFrame(_50e,_50f,args);
-if(_50e.hasContent){
-var _515=0;
-buf.putHeaderFrame(_50f,_514,_515,body.remaining(),_512);
-if(body.remaining()>0){
-buf.putBodyFrame(_50f,body);
-}
-}
-buf.flip();
-_4c1(_50d._connection,buf);
-};
-var _4f3=function _4f3(_516,_517,_518){
-if(_518){
-var _519=_518.methodName||"";
-if(_519=="closeChannel"){
-var _51a={};
-_51a.methodName="error";
-_51a.type="error";
-_51a.args=_518.args;
-_516.dispatchEvent(new AmqpEvent(_516,_51a));
-_516.dispatchEvent(new AmqpEvent(_516,_518));
-return;
-}
-}
-_516._stateMachine.feedInput(_517,_518);
-};
-var _50a=function _50a(_51b,_51c,_51d){
-_51d.args=_51b._headerFrame.args;
-_51d.methodName=_51b._headerFrame.methodName;
-var e=new AmqpEvent(_51b,_51d,_51b._headerFrame.contentProperties);
-if(_51d.methodName==="getOkBasic"){
-_51b._waitingAction.continuation(e);
-}
-_51b.dispatchEvent(e);
-};
-var _508=function _508(_51f,_520,_521){
-_51f._headerFrame=_521;
-};
-var _509=function _509(_522,_523,_524){
-_522._headerFrame.contentProperties=_524.contentProperties;
-};
-var _507=function(_525,_526,_527){
-var e=new AmqpEvent(_525,_527);
-if(_525._waitingAction){
-if(_526==="closeChannelFrame"){
-_525._waitingAction.error(e);
-_525.dispatchEvent(e);
-_525._waitingAction=null;
-}else{
-if(_526==="getEmptyBasicFrame"){
-_525._waitingAction.continuation(e);
-_525.dispatchEvent(e);
-_525._waitingAction=null;
-}
-}
-}else{
-throw new Error("AmqpClient not in waiting state: protocol violation");
-}
-};
-var _494=function _494(_529,_52a,_52b){
-var _52c=_52b.args[1];
-if(_52c.synchronous){
-_529._waitingAction=_52b;
-}else{
-throw (new Error("AMQP: trying to enter wait state for method that is not sychronous"));
-}
-};
-_4ac.prototype.flowFlag=true;
-_4ac.prototype.onmessage=function(e){
-};
-_4ac.prototype.onclose=function(e){
-};
-_4ac.prototype.onerror=function(e){
-};
-_4ac.prototype.onopen=function(e){
-};
-_4ac.prototype.ondeclarequeue=function(e){
-};
-_4ac.prototype.ondeclareexchange=function(e){
-};
-_4ac.prototype.onflow=function(e){
-};
-_4ac.prototype.onbindqueue=function(e){
-};
-_4ac.prototype.onunbindqueue=function(e){
-};
-_4ac.prototype.ondeletequeue=function(e){
-};
-_4ac.prototype.ondeleteexchange=function(e){
-};
-_4ac.prototype.onconsume=function(e){
-};
-_4ac.prototype.oncancel=function(e){
-};
-_4ac.prototype.oncommittransaction=function(e){
-};
-_4ac.prototype.onrollbacktransaction=function(e){
-};
-_4ac.prototype.onselecttransaction=function(e){
-};
-_4ac.prototype.onget=function(e){
-};
-_4ac.prototype.onpurgequeue=function(e){
-};
-_4ac.prototype.onrecover=function(e){
-};
-_4ac.prototype.onreject=function(e){
-};
-var _4d1=function(_541,_542,_543,_544,_545,_546){
-var args=[_542,_543,_544,_545];
-var _548="startOkConnection";
-_541._enqueueAction(_548,_4c4,[_541,_410[_548],0,args],_546);
-return _541;
-};
-var _549=function(_54a,_54b,_54c){
-var args=[_54b];
-var _54e="secureOkConnection";
-_54a._enqueueAction(_54e,_4c4,[_54a,_410[_54e],0,args],_54c);
-return _54a;
-};
-var _4e3=function(_54f,_550,_551,_552,_553){
-var args=[_550,_551,_552];
-var _555="tuneOkConnection";
-_54f._enqueueAction(_555,_4c4,[_54f,_410[_555],0,args],_553);
-return _54f;
-};
-var _4e4=function(_556,_557,_558){
-var args=[_557,0,0];
-var _55a="openConnection";
-_556._enqueueAction(_55a,_4c4,[_556,_410[_55a],0,args],_558);
-return _556;
-};
-var _4a5=function(_55b,_55c,_55d,_55e,_55f,_560){
-var args=[_55c,_55d,_55e,_55f];
-var _562="closeConnection";
-_55b._enqueueAction(_562,_4c4,[_55b,_410[_562],0,args],_560);
-return _55b;
-};
-var _563=function(_564,_565){
-var args=[];
-var _567="closeOkConnection";
-_564._enqueueAction(_567,_4c4,[_564,_410[_567],0,args],_565);
-return _564;
-};
-_4ac.prototype.openChannel=function(_568){
-var args=[0];
-var _56a="openChannel";
-var _56b=_410[_56a];
-var _56c=false;
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_56a,_50c,[this,_56b,this._id,args],_568);
-}
-if(_56a=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_56c){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.flowChannel=function(_56d,_56e){
-var args=[_56d];
-var _570="flowChannel";
-var _571=_410[_570];
-var _572=false;
-for(var i=0;i<_571.allParameters.length;i++){
-var _574=_571.allParameters[i].name;
-if(_574="noWait"){
-_572=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_570,_50c,[this,_571,this._id,args],_56e);
-}
-if(_570=="flowChannel"){
-_4ac.prototype.flowFlag=_56d;
-}
-if(_572){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.flowOkChannel=function(_575,_576){
-var args=[_575];
-var _578="flowOkChannel";
-var _579=_410[_578];
-var _57a=false;
-for(var i=0;i<_579.allParameters.length;i++){
-var _57c=_579.allParameters[i].name;
-if(_57c="noWait"){
-_57a=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_578,_50c,[this,_579,this._id,args],_576);
-}
-if(_578=="flowChannel"){
-_4ac.prototype.flowFlag=_575;
-}
-if(_57a){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.closeChannel=function(_57d,_57e,_57f,_580,_581){
-var args=[_57d,_57e,_57f,_580];
-var _583="closeChannel";
-var _584=_410[_583];
-var _585=false;
-for(var i=0;i<_584.allParameters.length;i++){
-var _587=_584.allParameters[i].name;
-if(_587="noWait"){
-_585=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_583,_50c,[this,_584,this._id,args],_581);
-}
-if(_583=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_585){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.closeOkChannel=function(_588){
-var args=[];
-var _58a="closeOkChannel";
-var _58b=_410[_58a];
-var _58c=false;
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_58a,_50c,[this,_58b,this._id,args],_588);
-}
-if(_58a=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_58c){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.declareExchange=function(_58d,type,_58f,_590,_591,_592,_593){
-var args=[0,_58d,type,_58f,_590,0,0,_591,_592];
-var _595="declareExchange";
-var _596=_410[_595];
-var _597=false;
-for(var i=0;i<_596.allParameters.length;i++){
-var _599=_596.allParameters[i].name;
-if(_599="noWait"){
-_597=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_595,_50c,[this,_596,this._id,args],_593);
-}
-if(_595=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_597){
-if(typeof (_591)!=="undefined"&&_591){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.deleteExchange=function(_59a,_59b,_59c,_59d){
-var args=[0,_59a,_59b,_59c];
-var _59f="deleteExchange";
-var _5a0=_410[_59f];
-var _5a1=false;
-for(var i=0;i<_5a0.allParameters.length;i++){
-var _5a3=_5a0.allParameters[i].name;
-if(_5a3="noWait"){
-_5a1=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_59f,_50c,[this,_5a0,this._id,args],_59d);
-}
-if(_59f=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5a1){
-if(typeof (_59c)!=="undefined"&&_59c){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.declareQueue=function(_5a4,_5a5,_5a6,_5a7,_5a8,_5a9,_5aa,_5ab){
-var args=[0,_5a4,_5a5,_5a6,_5a7,_5a8,_5a9,_5aa];
-var _5ad="declareQueue";
-var _5ae=_410[_5ad];
-var _5af=false;
-for(var i=0;i<_5ae.allParameters.length;i++){
-var _5b1=_5ae.allParameters[i].name;
-if(_5b1="noWait"){
-_5af=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5ad,_50c,[this,_5ae,this._id,args],_5ab);
-}
-if(_5ad=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5af){
-if(typeof (_5a9)!=="undefined"&&_5a9){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.bindQueue=function(_5b2,_5b3,_5b4,_5b5,_5b6,_5b7){
-var args=[0,_5b2,_5b3,_5b4,_5b5,_5b6];
-var _5b9="bindQueue";
-var _5ba=_410[_5b9];
-var _5bb=false;
-for(var i=0;i<_5ba.allParameters.length;i++){
-var _5bd=_5ba.allParameters[i].name;
-if(_5bd="noWait"){
-_5bb=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5b9,_50c,[this,_5ba,this._id,args],_5b7);
-}
-if(_5b9=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5bb){
-if(typeof (_5b5)!=="undefined"&&_5b5){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.unbindQueue=function(_5be,_5bf,_5c0,_5c1,_5c2){
-var args=[0,_5be,_5bf,_5c0,_5c1];
-var _5c4="unbindQueue";
-var _5c5=_410[_5c4];
-var _5c6=false;
-for(var i=0;i<_5c5.allParameters.length;i++){
-var _5c8=_5c5.allParameters[i].name;
-if(_5c8="noWait"){
-_5c6=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5c4,_50c,[this,_5c5,this._id,args],_5c2);
-}
-if(_5c4=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5c6){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.purgeQueue=function(_5c9,_5ca,_5cb){
-var args=[0,_5c9,_5ca];
-var _5cd="purgeQueue";
-var _5ce=_410[_5cd];
-var _5cf=false;
-for(var i=0;i<_5ce.allParameters.length;i++){
-var _5d1=_5ce.allParameters[i].name;
-if(_5d1="noWait"){
-_5cf=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5cd,_50c,[this,_5ce,this._id,args],_5cb);
-}
-if(_5cd=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5cf){
-if(typeof (_5ca)!=="undefined"&&_5ca){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.deleteQueue=function(_5d2,_5d3,_5d4,_5d5,_5d6){
-var args=[0,_5d2,_5d3,_5d4,_5d5];
-var _5d8="deleteQueue";
-var _5d9=_410[_5d8];
-var _5da=false;
-for(var i=0;i<_5d9.allParameters.length;i++){
-var _5dc=_5d9.allParameters[i].name;
-if(_5dc="noWait"){
-_5da=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5d8,_50c,[this,_5d9,this._id,args],_5d6);
-}
-if(_5d8=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5da){
-if(typeof (_5d5)!=="undefined"&&_5d5){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.qosBasic=function(_5dd,_5de,_5df,_5e0){
-var args=[_5dd,_5de,_5df];
-var _5e2="qosBasic";
-var _5e3=_410[_5e2];
-var _5e4=false;
-for(var i=0;i<_5e3.allParameters.length;i++){
-var _5e6=_5e3.allParameters[i].name;
-if(_5e6="noWait"){
-_5e4=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5e2,_50c,[this,_5e3,this._id,args],_5e0);
-}
-if(_5e2=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5e4){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.consumeBasic=function(_5e7,_5e8,_5e9,_5ea,_5eb,_5ec,_5ed,_5ee){
-var args=[0,_5e7,_5e8,_5e9,_5ea,_5eb,_5ec,_5ed];
-var _5f0="consumeBasic";
-var _5f1=_410[_5f0];
-var _5f2=false;
-for(var i=0;i<_5f1.allParameters.length;i++){
-var _5f4=_5f1.allParameters[i].name;
-if(_5f4="noWait"){
-_5f2=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5f0,_50c,[this,_5f1,this._id,args],_5ee);
-}
-if(_5f0=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5f2){
-if(typeof (_5ec)!=="undefined"&&_5ec){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.cancelBasic=function(_5f5,_5f6,_5f7){
-var args=[_5f5,_5f6];
-var _5f9="cancelBasic";
-var _5fa=_410[_5f9];
-var _5fb=false;
-for(var i=0;i<_5fa.allParameters.length;i++){
-var _5fd=_5fa.allParameters[i].name;
-if(_5fd="noWait"){
-_5fb=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_5f9,_50c,[this,_5fa,this._id,args],_5f7);
-}
-if(_5f9=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_5fb){
-if(typeof (_5f6)!=="undefined"&&_5f6){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.publishBasic=function(body,_5ff,_600,_601,_602,_603,_604){
-var args=[0,_600,_601,_602,_603];
-var _606="publishBasic";
-var _607=_410[_606];
-var _608=false;
-for(var i=0;i<_607.allParameters.length;i++){
-var _60a=_607.allParameters[i].name;
-if(_60a="noWait"){
-_608=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_606,_50c,[this,_607,this._id,args,body,_5ff],_604);
-}
-if(_606=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_608){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.getBasic=function(_60b,_60c,_60d){
-var args=[0,_60b,_60c];
-var _60f="getBasic";
-var _610=_410[_60f];
-var _611=false;
-for(var i=0;i<_610.allParameters.length;i++){
-var _613=_610.allParameters[i].name;
-if(_613="noWait"){
-_611=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_60f,_50c,[this,_610,this._id,args],_60d);
-}
-if(_60f=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_611){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.ackBasic=function(_614,_615,_616){
-var args=[_614,_615];
-var _618="ackBasic";
-var _619=_410[_618];
-var _61a=false;
-for(var i=0;i<_619.allParameters.length;i++){
-var _61c=_619.allParameters[i].name;
-if(_61c="noWait"){
-_61a=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_618,_50c,[this,_619,this._id,args],_616);
-}
-if(_618=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_61a){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.rejectBasic=function(_61d,_61e,_61f){
-var args=[_61d,_61e];
-var _621="rejectBasic";
-var _622=_410[_621];
-var _623=false;
-for(var i=0;i<_622.allParameters.length;i++){
-var _625=_622.allParameters[i].name;
-if(_625="noWait"){
-_623=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_621,_50c,[this,_622,this._id,args],_61f);
-}
-if(_621=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_623){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.recoverBasic=function(_626,_627){
-var args=[_626];
-var _629="recoverBasic";
-var _62a=_410[_629];
-var _62b=false;
-for(var i=0;i<_62a.allParameters.length;i++){
-var _62d=_62a.allParameters[i].name;
-if(_62d="noWait"){
-_62b=true;
-break;
-}
-}
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_629,_50c,[this,_62a,this._id,args],_627);
-}
-if(_629=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_62b){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_basicProperties=[{"name":"contentType","domain":"Shortstr","label":"MIME content type"},{"name":"contentEncoding","domain":"Shortstr","label":"MIME content encoding"},{"name":"headers","domain":"Table","label":"message header field table"},{"name":"deliveryMode","domain":"Octet","label":"non-persistent (1) or persistent (2)"},{"name":"priority","domain":"Octet","label":"message priority, 0 to 9"},{"name":"correlationId","domain":"Shortstr","label":"application correlation identifier"},{"name":"replyTo","domain":"Shortstr","label":"address to reply to"},{"name":"expiration","domain":"Shortstr","label":"message expiration specification"},{"name":"messageId","domain":"Shortstr","label":"application message identifier"},{"name":"timestamp","domain":"Timestamp","label":"message timestamp"},{"name":"type","domain":"Shortstr","label":"message type name"},{"name":"userId","domain":"Shortstr","label":"creating user id"},{"name":"appId","domain":"Shortstr","label":"creating application id"},{"name":"reserved","domain":"Shortstr","label":"reserved, must be empty"}];
-_4ac.prototype.selectTx=function(_62e){
-var args=[];
-var _630="selectTx";
-var _631=_410[_630];
-var _632=false;
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_630,_50c,[this,_631,this._id,args],_62e);
-}
-if(_630=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_632){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.commitTx=function(_633){
-var args=[];
-var _635="commitTx";
-var _636=_410[_635];
-var _637=false;
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_635,_50c,[this,_636,this._id,args],_633);
-}
-if(_635=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_637){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-_4ac.prototype.rollbackTx=function(_638){
-var args=[];
-var _63a="rollbackTx";
-var _63b=_410[_63a];
-var _63c=false;
-if(this._connection._readyState==this._connection.OPEN){
-this._enqueueAction(_63a,_50c,[this,_63b,this._id,args],_638);
-}
-if(_63a=="flowChannel"){
-_4ac.prototype.flowFlag=active;
-}
-if(_63c){
-if(typeof (noWait)!=="undefined"&&noWait){
-this._enqueueAction("nowait");
-}
-}
-return this;
-};
-var func=_4ac.prototype.openChannel;
-var _4a8=function(_63e,args){
-_63e._stateMachine.enterState("channelReady","",null);
-func.apply(_63e,args);
-};
-delete _4ac.prototype.openChannel;
-var _640=_4ac.prototype.closeOkChannel;
-var _641=function(_642,args){
-_640.apply(_642,args);
-};
-delete _4ac.prototype.closeOkChannel;
-var _644=_4ac.prototype.closeChannel;
-_4ac.prototype.closeChannel=function(_645,_646){
-if(typeof _645=="object"){
-myConfig=_645||{};
-var _647=myConfig.replyCode||0;
-var _648=myConfig.replyText||"";
-var _649=myConfig.classId||0;
-var _64a=myConfig.methodId||0;
-if(typeof _647!="number"){
-throw new Error("AmqpChannel.closeChannel(): Parameter 'replyCode' is expected to be of numeric type");
-}
-if(typeof _648!="string"){
-throw new Error("AmqpChannel.closeChannel(): Parameter 'replyText' is expected to be a string");
-}
-if(typeof _649!="number"){
-throw new Error("AmqpChannel.closeChannel(): Parameter 'classId' is expected to be of numeric type");
-}
-if(typeof _64a!="number"){
-throw new Error("AmqpChannel.closeChannel(): Parameter 'methodId' is expected to be of numeric type");
-}
-return _644.call(this,_647,_648,_649,_64a,_646);
-}else{
-return _644.apply(this,arguments);
-}
-};
-var _64b=_4ac.prototype.declareExchange;
-_4ac.prototype.declareExchange=function(_64c,_64d){
-if(typeof _64c=="object"){
-myConfig=_64c||{};
-var _64e=myConfig.exchange;
-var type=myConfig.type;
-var _650=myConfig.passive||false;
-var _651=myConfig.durable||false;
-var _652=myConfig.noWait||false;
-var args=myConfig.args||null;
-if(!_64e||typeof _64e!="string"){
-throw new Error("AmqpChannel.declareExchange(): String parameter 'exchange' is required");
-}
-if(!type||typeof type!="string"||((type!="fanout")&&(type!="direct")&&(type!="topic")&&(type!="headers"))){
-throw new Error("AmqpChannel.declareExchange(): Legal values of parameter 'type' are direct | fanout | headers | topic");
-}
-if(typeof _650!="boolean"){
-throw new Error("AmqpChannel.declareExchange(): Parameter 'passive' only accepts boolean values");
-}
-if(typeof _651!="boolean"){
-throw new Error("AmqpChannel.declareExchange(): Parameter 'durable' only accepts boolean values");
-}
-if(typeof _652!="boolean"){
-throw new Error("AmqpChannel.declareExchange(): Parameter 'noWait' only accepts boolean values");
-}
-return _64b.call(this,_64e,type,_650,_651,_652,args,_64d);
-}else{
-return _64b.apply(this,arguments);
-}
-};
-var _654=_4ac.prototype.deleteExchange;
-_4ac.prototype.deleteExchange=function(_655,_656){
-if(typeof _655=="object"){
-myConfig=_655||{};
-var _657=myConfig.exchange;
-var _658=myConfig.ifUnused||false;
-var _659=myConfig.noWait||false;
-if(!_657||typeof _657!="string"){
-throw new Error("AmqpChannel.deleteExchange(): String parameter 'exchange' is required");
-}
-if(typeof _658!="boolean"){
-throw new Error("AmqpChannel.deleteExchange(): Parameter 'ifUnused' only accepts boolean values");
-}
-if(typeof _659!="boolean"){
-throw new Error("AmqpChannel.deleteExchange(): Parameter 'noWait' only accepts boolean values");
-}
-return _654.call(this,_657,_658,_659,_656);
-}else{
-return _654.apply(this,arguments);
-}
-};
-var _65a=_4ac.prototype.declareQueue;
-_4ac.prototype.declareQueue=function(_65b,_65c){
-if(typeof _65b=="object"){
-myConfig=_65b||{};
-var _65d=myConfig.queue;
-var _65e=myConfig.passive||false;
-var _65f=myConfig.durable||false;
-var _660=myConfig.exclusive||false;
-var _661=myConfig.autoDelete||false;
-var _662=myConfig.noWait||false;
-var args=myConfig.args||null;
-if(!_65d||typeof _65d!="string"){
-throw new Error("AmqpChannel.declareQueue(): String parameter 'queue' is required");
-}
-if(typeof _65e!="boolean"){
-throw new Error("AmqpChannel.declareQueue(): Parameter 'passive' only accepts boolean values");
-}
-if(typeof _65f!="boolean"){
-throw new Error("AmqpChannel.declareQueue(): Parameter 'durable' only accepts boolean values");
-}
-if(typeof _660!="boolean"){
-throw new Error("AmqpChannel.declareQueue(): Parameter 'exclusive' only accepts boolean values");
-}
-if(typeof _661!="boolean"){
-throw new Error("AmqpChannel.declareQueue(): Parameter 'autoDelete' only accepts boolean values");
-}
-if(typeof _662!="boolean"){
-throw new Error("AmqpChannel.declareQueue(): Parameter 'noWait' only accepts boolean values");
-}
-return _65a.call(this,_65d,_65e,_65f,_660,_661,_662,args,_65c);
-}else{
-return _65a.apply(this,arguments);
-}
-};
-var _664=_4ac.prototype.bindQueue;
-_4ac.prototype.bindQueue=function(_665,_666){
-if(typeof _665=="object"){
-myConfig=_665||{};
-var _667=myConfig.queue;
-var _668=myConfig.exchange;
-var _669=myConfig.routingKey;
-var _66a=myConfig.noWait||false;
-var args=myConfig.args||null;
-if(!_667||typeof _667!="string"){
-throw new Error("AmqpChannel.bindQueue(): String parameter 'queue' is required");
-}
-if(!_668||typeof _668!="string"){
-throw new Error("AmqpChannel.bindQueue(): String parameter 'exchange' is required");
-}
-if(!_669||typeof _669!="string"){
-throw new Error("AmqpChannel.bindQueue(): String parameter 'routingKey' is required");
-}
-if(typeof _66a!="boolean"){
-throw new Error("AmqpChannel.bindQueue(): Parameter 'noWait' only accepts boolean values");
-}
-return _664.call(this,_667,_668,_669,_66a,args,_666);
-}else{
-return _664.apply(this,arguments);
-}
-};
-var _66c=_4ac.prototype.unbindQueue;
-_4ac.prototype.unbindQueue=function(_66d,_66e){
-if(typeof _66d=="object"){
-myConfig=_66d||{};
-var _66f=myConfig.queue;
-var _670=myConfig.exchange;
-var _671=myConfig.routingKey;
-var args=myConfig.args||null;
-if(!_66f||typeof _66f!="string"){
-throw new Error("AmqpChannel.unbindQueue(): String parameter 'queue' is required");
-}
-if(!_670||typeof _670!="string"){
-throw new Error("AmqpChannel.unbindQueue(): String parameter 'exchange' is required");
-}
-if(!_671||typeof _671!="string"){
-throw new Error("AmqpChannel.unbindQueue(): String parameter 'routingKey' is required");
-}
-return _66c.call(this,_66f,_670,_671,args,_66e);
-}else{
-return _66c.apply(this,arguments);
-}
-};
-var _673=_4ac.prototype.purgeQueue;
-_4ac.prototype.purgeQueue=function(_674,_675){
-if(typeof _674=="object"){
-myConfig=_674||{};
-var _676=myConfig.queue;
-var _677=myConfig.noWait||false;
-if(!_676||typeof _676!="string"){
-throw new Error("AmqpChannel.purgeQueue(): String parameter 'queue' is required");
-}
-if(typeof _677!="boolean"){
-throw new Error("AmqpChannel.purgeQueue(): Parameter 'noWait' only accepts boolean values");
-}
-return _673.call(this,_676,_677,_675);
-}else{
-return _673.apply(this,arguments);
-}
-};
-var _678=_4ac.prototype.deleteQueue;
-_4ac.prototype.deleteQueue=function(_679,_67a){
-if(typeof _679=="object"){
-myConfig=_679||{};
-var _67b=myConfig.queue;
-var _67c=myConfig.ifUnused||false;
-var _67d=myConfig.ifEmpty||false;
-var _67e=myConfig.noWait||false;
-if(!_67b||typeof _67b!="string"){
-throw new Error("AmqpChannel.deleteQueue(): String parameter 'queue' is required");
-}
-if(typeof _67c!="boolean"){
-throw new Error("AmqpChannel.deleteQueue(): Parameter 'ifUnused' only accepts boolean values");
-}
-if(typeof _67d!="boolean"){
-throw new Error("AmqpChannel.deleteQueue(): Parameter 'ifEmpty' only accepts boolean values");
-}
-if(typeof _67e!="boolean"){
-throw new Error("AmqpChannel.deleteQueue(): Parameter 'noWait' only accepts boolean values");
-}
-return _678.call(this,_67b,_67c,_67d,_67e,_67a);
-}else{
-return _678.apply(this,arguments);
-}
-};
-var _67f=_4ac.prototype.qosBasic;
-_4ac.prototype.qosBasic=function(_680,_681){
-if(typeof _680=="object"){
-myConfig=_680||{};
-var _682=myConfig.prefetchSize||0;
-var _683=myConfig.prefetchCount||0;
-var _684=myConfig.global||false;
-if(typeof _682!="number"){
-throw new Error("AmqpChannel.qosBasic(): Parameter 'prefetchSize' is expected to be of numeric type");
-}
-if(typeof _683!="number"){
-throw new Error("AmqpChannel.qosBasic(): Parameter 'prefetchCount' is expected to be of numeric type");
-}
-if(typeof _684!="boolean"){
-throw new Error("AmqpChannel.qosBasic(): Parameter 'global' only accepts boolean values");
-}
-return _67f.call(this,_682,_683,_684,_681);
-}else{
-return _67f.apply(this,arguments);
-}
-};
-var _685=_4ac.prototype.consumeBasic;
-_4ac.prototype.consumeBasic=function(_686,_687){
-if(typeof _686=="object"){
-myConfig=_686||{};
-var _688=myConfig.queue;
-var _689=myConfig.consumerTag;
-var _68a=myConfig.noLocal||false;
-var _68b=myConfig.noAck||false;
-var _68c=myConfig.exclusive||false;
-var _68d=myConfig.noWait||false;
-var args=myConfig.args||null;
-if(!_688||typeof _688!="string"){
-throw new Error("AmqpChannel.consumeBasic(): String parameter 'queue' is required");
-}
-if(!_689||typeof _689!="string"){
-throw new Error("AmqpChannel.consumeBasic(): String parameter 'consumerTag' is required");
-}
-if(typeof _68a!="boolean"){
-throw new Error("AmqpChannel.consumeBasic(): Parameter 'noLocal' only accepts boolean values");
-}
-if(typeof _68b!="boolean"){
-throw new Error("AmqpChannel.consumeBasic(): Parameter 'noAck' only accepts boolean values");
-}
-if(typeof _68c!="boolean"){
-throw new Error("AmqpChannel.consumeBasic(): Parameter 'exclusive' only accepts boolean values");
-}
-if(typeof _68d!="boolean"){
-throw new Error("AmqpChannel.consumeBasic(): Parameter 'noWait' only accepts boolean values");
-}
-return _685.call(this,_688,_689,_68a,_68b,_68c,_68d,args,_687);
-}else{
-return _685.apply(this,arguments);
-}
-};
-var _68f=_4ac.prototype.cancelBasic;
-_4ac.prototype.cancelBasic=function(_690,_691){
-if(typeof _690=="object"){
-myConfig=_690||{};
-var _692=myConfig.consumerTag;
-var _693=myConfig.noWait||false;
-if(!_692||typeof _692!="string"){
-throw new Error("AmqpChannel.cancelBasic(): String parameter 'consumerTag' is required");
-}
-if(typeof _693!="boolean"){
-throw new Error("AmqpChannel.cancelBasic(): Parameter 'noWait' only accepts boolean values");
-}
-return _68f.call(this,_692,_693,_691);
-}else{
-return _68f.apply(this,arguments);
-}
-};
-var _694=_4ac.prototype.publishBasic;
-_4ac.prototype.publishBasic=function(_695,_696){
-if(typeof _695=="object"&&_695.body){
-myConfig=_695||{};
-var body=myConfig.body;
-var _698=myConfig.headers||{};
-var _699=myConfig.exchange;
-var _69a=myConfig.routingKey;
-var _69b=myConfig.mandatory||false;
-var _69c=myConfig.immediate||false;
-if(!body){
-throw new Error("AmqpChannel.publishBasic(): ByteBuffer parameter 'body' is required");
-}
-if(!_699||typeof _699!="string"){
-throw new Error("AmqpChannel.publishBasic(): String parameter 'exchange' is required");
-}
-if(!_69a||typeof _69a!="string"){
-throw new Error("AmqpChannel.publishBasic(): String parameter 'routingKey' is required");
-}
-if(typeof _69b!="boolean"){
-throw new Error("AmqpChannel.publishBasic(): Parameter 'mandatory' only accepts boolean values");
-}
-if(typeof _69c!="boolean"){
-throw new Error("AmqpChannel.publishBasic(): Parameter 'immediate' only accepts boolean values");
-}
-return _694.call(this,body,_698,_699,_69a,_69b,_69c,_696);
-}else{
-return _694.apply(this,arguments);
-}
-};
-var _69d=_4ac.prototype.getBasic;
-_4ac.prototype.getBasic=function(_69e,_69f){
-if(typeof _69e=="object"){
-myConfig=_69e||{};
-var _6a0=myConfig.queue;
-var _6a1=myConfig.noAck||false;
-if(!_6a0||typeof _6a0!="string"){
-throw new Error("AmqpChannel.getBasic(): String parameter 'queue' is required");
-}
-if(typeof _6a1!="boolean"){
-throw new Error("AmqpChannel.getBasic(): Parameter 'noAck' only accepts boolean values");
-}
-return _69d.call(this,_6a0,_6a1,_69f);
-}else{
-return _69d.apply(this,arguments);
-}
-};
-var _6a2=_4ac.prototype.ackBasic;
-_4ac.prototype.ackBasic=function(_6a3,_6a4){
-if(typeof _6a3=="object"){
-myConfig=_6a3||{};
-var _6a5=myConfig.deliveryTag;
-var _6a6=myConfig.multiple||false;
-if(!_6a5||typeof _6a5!="string"){
-throw new Error("AmqpChannel.ackBasic(): String parameter 'deliveryTag' is required");
-}
-if(typeof _6a6!="boolean"){
-throw new Error("AmqpChannel.ackBasic(): Parameter 'multiple' only accepts boolean values");
-}
-return _6a2.call(this,_6a5,_6a6,_6a4);
-}else{
-return _6a2.apply(this,arguments);
-}
-};
-var _6a7=_4ac.prototype.rejectBasic;
-_4ac.prototype.rejectBasic=function(_6a8,_6a9){
-if(typeof _6a8=="object"){
-myConfig=_6a8||{};
-var _6aa=myConfig.deliveryTag;
-var _6ab=myConfig.requeue||false;
-if(!_6aa||typeof _6aa!="string"){
-throw new Error("AmqpChannel.rejectBasic(): String parameter 'deliveryTag' is required");
-}
-if(typeof _6ab!="boolean"){
-throw new Error("AmqpChannel.rejectBasic(): Parameter 'requeue' only accepts boolean values");
-}
-return _6a7.call(this,_6aa,_6ab,_6a9);
-}else{
-return _6a7.apply(this,arguments);
-}
-};
-var _6ac=function(){
-this._actionList=new Array();
+ak(this,aD[0],az,aC)
+};
+var E=ai.connect;
+ai.connect=function(aB,aD){if(typeof aB=="object"){myConfig=aB||{};
+var aA=myConfig.url;
+var az=myConfig.virtualHost;
+var aC=myConfig.credentials;
+if(!aA||typeof aA!="string"){throw new Error("AmqpClient.connect(): Parameter 'url' is required")
+}if(!az||typeof aA!="string"){throw new Error("AmqpClient.connect(): Parameter 'virtualHost' is required")
+}if(!aC||!aC.username||!aC.password||typeof aC.username!="string"||typeof aC.password!="string"){throw new Error("AmqpClient.connect(): credentials are required")
+}E.call(this,aA,az,aC,aD)
+}else{E.apply(this,arguments)
+}};
+ai.disconnect=function Y(){if(this.getReadyState()==this.OPEN){p(this,0,"",0,0)
+}if(this.getReadyState()==this.CONNECTING){var aA={};
+aA.methodName="closeConnection";
+aA.type="closeConnection";
+aA.args="";
+var az=new AmqpEvent(this,aA);
+this.dispatchEvent(az)
+}this.setReadyState(this.CLOSED)
+};
+ai.openChannel=function m(aB){var aA=++this._channelCount;
+var az=new ay();
+K(az,aA,this,aB);
+this._channels[aA]=az;
+return az
+};
+var h=function(az){var aA=new ByteBuffer(J["0-9-1"]);
+az._socket.send(aA)
+};
+var t=function(az){y(az)
+};
+var al=function(aB,az){if(az.remaining()<aB.length){return false
+}else{var aC=az.limit;
+az.limit=aB.length;
+var aA=az.getString(Charset.UTF8);
+az.limit=aC;
+return aB===aA
+}};
+var ag=function(aB,aF){var aD=aB._buffer;
+aD.mark();
+aD.position=aD.limit;
+aD.putBuffer(aF.data);
+aD.reset();
+if(!aB._hasNegotiated&&aD.remaining()>7){if(al("AMQP",aD)){var aA=[aD.get(),aD.get(),aD.get(),aD.get()];
+var aC={args:[{name:"replyText",value:"Server does not support AMQP protocol versions after "+aA[2]+"-"+aA[3]}],methodName:"closeOkConnection"};
+var az={};
+az.methodName="error";
+az.args=aC.args;
+aB.dispatchEvent(new AmqpEvent(aB,az));
+y(aB,"",aC);
+return
+}else{aD.reset();
+aB._hasNegotiated=true
+}}var aG=null;
+while(aG=aD.getFrame()){var aE=aG;
+aB._stateMachine.feedInput(aE.methodName+"Frame",aE)
+}aD.compact()
+};
+var af=function(aA,az){aA._socket.send(az)
+};
+var Z=function an(aA,az,aE,aC){var aB=new ap();
+var aD=az.classIndex;
+aB.putMethodFrame(az,aE,aC);
+aB.flip();
+af(aA,aB)
+};
+var ad=function ad(aB,aA,aC,aD){var az=new ByteSocket(aC.url);
+az.onopen=function(){h(aB)
+};
+az.onclose=function(){t(aB)
+};
+az.onmessage=function(aE){ag(aB,aE)
+};
+aB._socket=az;
+aB._virtualHost=aC.virtualHost;
+aB._credentialsOrKey=aC.credentials
+};
+var Q=null;
+var B=function(aD,aG,az){w((az.channel===0),M.UNEXPECTED_FRAME.message);
+var aB=new ap();
+var aC=new AmqpArguments();
+aC.addLongString("library","KaazingAmqpClient");
+aC.addLongString("library_version","3.3.0");
+aC.addLongString("library_platform","JavaScript");
+var aH=aD._locale||"en_US";
+var aF="AMQPLAIN";
+var aA=aD._credentialsOrKey;
+if(typeof(aA.resolve)!="function"){var aE=F(aA.username,aA.password);
+Q(aD,aC,aF,aE,aH)
+}else{aA.resolve(function(aJ){var aI=F(aJ.username,aJ.password);
+Q(aD,aC,aF,aI,aH)
+})
+}};
+var N=function(az,aA,aE){w((aE.channel===0),M.UNEXPECTED_FRAME.message);
+var aB=aE.args[0].value;
+var aD=aE.args[1].value;
+var aC=0;
+C(az,aB,aD,aC);
+T(az,az._virtualHost,az._openContinuation,az._openErrorCb)
+};
+var au=function au(aC,aB,aE){if(aE){if(aE.actionName&&(aE.actionName=="closeConnection")){return
+}}if(aB==="nowaitAction"){aC._waitingAction=null;
+return
+}var aA={};
+if(!aA._connection){aA=aC
+}else{aA=aC._connection
+}var aD=new AmqpEvent(aC,aE);
+if(aC._waitingAction){if(aB==="closeChannelFrame"){aC._waitingAction.error(aD)
+}else{if(aE.methodName=="closeConnection"){var az={};
+az.methodName="error";
+az.args=aE.args;
+aA.dispatchEvent(new AmqpEvent(aA,az));
+y(aA,"",aE);
+return
+}else{if(aE.methodName=="openOkConnection"){aA.setReadyState(aA.OPEN)
+}else{aC._waitingAction.continuation(aD)
+}}}}else{throw (new Error("AmqpClient not in waiting state: protocol violation"))
+}aC.dispatchEvent(aD);
+if(aE.methodName=="openOkConnection"){aA._openContinuation()
+}};
+var o=function o(az,aA,aC){var aB=az;
+setTimeout(function(){aB._processActions()
+},0)
+};
+var aw=function L(az,aA,aC){if(aC.channel===0){}else{if(az._channels[aC.channel]){var aB=az._channels[aC.channel];
+z(aB,aA,aC)
+}else{}}};
+var f=function f(aA,az,aB){};
+var y=function y(aB,az,aE){if(!(aB.getReadyState()==aB.CONNECTING)){var aD;
+if(typeof(aE)==="undefined"){aD=new AmqpEvent(aB,{args:[],methodName:"closeOkConnection"})
+}else{aE.methodName="closeOkConnection";
+aD=new AmqpEvent(aB,aE)
+}aB.dispatchEvent(aD)
+}aB.setReadyState(aB.CLOSED);
+if(typeof(aB._channels)!=="undefined"){for(var aA in aB._channels){var aC=aB._channels[aA];
+aC.dispatchEvent(aD)
+}aB._socket.onclose=function(){};
+aB._socket.close()
+}if(typeof(aB._openErrorCb)!=="undefined"){aB._openErrorCb(aD)
+}};
+function ak(aD,aB,az,aC){var aA={url:aB,virtualHost:az,credentials:aC};
+aD._stateMachine.enterState("handshaking","",aA)
+}var K=function K(aB,aC,aA,az){aB._id=aC;
+aB._callbacks=az;
+aB._connection=aA;
+aB._transacted=false;
+aB._waitingAction=null;
+aB._initAsyncClient();
+aB._stateMachine.addState("channelReady",[{inputs:["openChannelAction","closeChannelAction","consumeBasicAction","flowChannelAction","declareExchangeAction","declareQueueAction","bindQueueAction","unbindQueueAction","deleteQueueAction","deleteExchangeAction","purgeQueueAction","cancelBasicAction","recoverBasicAction","rejectBasicAction","selectTxAction","commitTxAction","rollbackTxAction",],targetState:"waiting"},{inputs:["publishBasicAction","ackBasicAction"],targetState:"channelReady"},{inputs:["getBasicAction"],targetState:"getting"},{inputs:["deliverBasicFrame"],targetState:"readingContentHeader"}],o);
+aB._stateMachine.addState("getting",[{inputs:["getOkBasicFrame"],targetState:"readingContentHeader"},{inputs:["getEmptyBasicFrame"],targetState:"channelReady"},{inputs:["closeChannelFrame"],targetState:"closing"}],n,V);
+aB._stateMachine.addState("waiting",[{inputs:["openOkChannelFrame","closeOkChannelFrame","flowOkChannelFrame","declareOkExchangeFrame","declareOkQueueFrame","bindOkQueueFrame","unbindOkQueueFrame","deleteOkQueueFrame","deleteOkExchangeFrame","purgeOkQueueFrame","cancelOkBasicFrame","recoverOkBasicFrame","rejectOkBasicFrame","commitOkTxFrame","rollbackOkTxFrame","selectOkTxFrame","getOkBasicFrame","getEmptyBasicFrame","consumeOkBasicFrame","nowaitAction"],targetState:"channelReady"},{inputs:["closeChannelFrame"],targetState:"closing"}],n,au);
+aB._stateMachine.addState("readingContentHeader",[{inputs:["headerFrame"],targetState:"readingContentBody"}],W,H);
+aB._stateMachine.addState("readingContentBody",[{inputs:["bodyFrame"],targetState:"channelReady"}],null,av);
+aB._stateMachine.addState("closing",[{inputs:["closeOkChannelAction"],targetState:"closed"}],null);
+aB._stateMachine.addState("closed",null,null);
+if(aA.getReadyState()==aA.OPEN){m(aB,[az])
+}};
+var ay=function(){};
+ay.prototype=new e();
+var ai=ay.prototype;
+ai._init=function(az){};
+var b=function b(aE,aG,aB,aF,aD,aA){var az=new ap();
+var aH=aG.classIndex;
+az.putMethodFrame(aG,aB,aF);
+if(aG.hasContent){var aC=0;
+az.putHeaderFrame(aB,aH,aC,aD.remaining(),aA);
+if(aD.remaining()>0){az.putBodyFrame(aB,aD)
+}}az.flip();
+af(aE._connection,az)
+};
+var z=function z(aC,aB,aD){if(aD){var aA=aD.methodName||"";
+if(aA=="closeChannel"){var az={};
+az.methodName="error";
+az.type="error";
+az.args=aD.args;
+aC.dispatchEvent(new AmqpEvent(aC,az));
+aC.dispatchEvent(new AmqpEvent(aC,aD));
+return
+}}aC._stateMachine.feedInput(aB,aD)
+};
+var av=function av(az,aA,aC){aC.args=az._headerFrame.args;
+aC.methodName=az._headerFrame.methodName;
+var aB=new AmqpEvent(az,aC,az._headerFrame.contentProperties);
+if(aC.methodName==="getOkBasic"){az._waitingAction.continuation(aB)
+}az.dispatchEvent(aB)
+};
+var W=function W(az,aA,aB){az._headerFrame=aB
+};
+var H=function H(az,aA,aB){az._headerFrame.contentProperties=aB.contentProperties
+};
+var V=function(aA,az,aC){var aB=new AmqpEvent(aA,aC);
+if(aA._waitingAction){if(az==="closeChannelFrame"){aA._waitingAction.error(aB);
+aA.dispatchEvent(aB);
+aA._waitingAction=null
+}else{if(az==="getEmptyBasicFrame"){aA._waitingAction.continuation(aB);
+aA.dispatchEvent(aB);
+aA._waitingAction=null
+}}}else{throw new Error("AmqpClient not in waiting state: protocol violation")
+}};
+var n=function n(aA,az,aB){var aC=aB.args[1];
+if(aC.synchronous){aA._waitingAction=aB
+}else{throw (new Error("AMQP: trying to enter wait state for method that is not sychronous"))
+}};
+ay.prototype.flowFlag=true;
+ay.prototype.onmessage=function(az){};
+ay.prototype.onclose=function(az){};
+ay.prototype.onerror=function(az){};
+ay.prototype.onopen=function(az){};
+ay.prototype.ondeclarequeue=function(az){};
+ay.prototype.ondeclareexchange=function(az){};
+ay.prototype.onflow=function(az){};
+ay.prototype.onbindqueue=function(az){};
+ay.prototype.onunbindqueue=function(az){};
+ay.prototype.ondeletequeue=function(az){};
+ay.prototype.ondeleteexchange=function(az){};
+ay.prototype.onconsume=function(az){};
+ay.prototype.oncancel=function(az){};
+ay.prototype.oncommittransaction=function(az){};
+ay.prototype.onrollbacktransaction=function(az){};
+ay.prototype.onselecttransaction=function(az){};
+ay.prototype.onget=function(az){};
+ay.prototype.onpurgequeue=function(az){};
+ay.prototype.onrecover=function(az){};
+ay.prototype.onreject=function(az){};
+var Q=function(aG,aF,aD,aB,az,aE){var aC=[aF,aD,aB,az];
+var aA="startOkConnection";
+aG._enqueueAction(aA,Z,[aG,X[aA],0,aC],aE);
+return aG
+};
+var A=function(aD,aA,aC){var aB=[aA];
+var az="secureOkConnection";
+aD._enqueueAction(az,Z,[aD,X[az],0,aB],aC);
+return aD
+};
+var C=function(aF,aB,aD,aC,aE){var aA=[aB,aD,aC];
+var az="tuneOkConnection";
+aF._enqueueAction(az,Z,[aF,X[az],0,aA],aE);
+return aF
+};
+var T=function(aD,az,aC){var aB=[az,0,0];
+var aA="openConnection";
+aD._enqueueAction(aA,Z,[aD,X[aA],0,aB],aC);
+return aD
+};
+var p=function(aG,aE,aA,aD,az,aF){var aC=[aE,aA,aD,az];
+var aB="closeConnection";
+aG._enqueueAction(aB,Z,[aG,X[aB],0,aC],aF);
+return aG
+};
+var u=function(aC,aB){var aA=[];
+var az="closeOkConnection";
+aC._enqueueAction(az,Z,[aC,X[az],0,aA],aB);
+return aC
+};
+ay.prototype.openChannel=function(aD){var aC=[0];
+var aA="openChannel";
+var az=X[aA];
+var aB=false;
+if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aA,b,[this,az,this._id,aC],aD)
+}if(aA=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.flowChannel=function(aF,aG){var aD=[aF];
+var aB="flowChannel";
+var az=X[aB];
+var aC=false;
+for(var aE=0;
+aE<az.allParameters.length;
+aE++){var aA=az.allParameters[aE].name;
+if(aA="noWait"){aC=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aB,b,[this,az,this._id,aD],aG)
+}if(aB=="flowChannel"){ay.prototype.flowFlag=aF
+}if(aC){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.flowOkChannel=function(aF,aG){var aD=[aF];
+var aB="flowOkChannel";
+var az=X[aB];
+var aC=false;
+for(var aE=0;
+aE<az.allParameters.length;
+aE++){var aA=az.allParameters[aE].name;
+if(aA="noWait"){aC=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aB,b,[this,az,this._id,aD],aG)
+}if(aB=="flowChannel"){ay.prototype.flowFlag=aF
+}if(aC){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.closeChannel=function(aJ,aF,aD,aG,aI){var aB=[aJ,aF,aD,aG];
+var aH="closeChannel";
+var aE=X[aH];
+var aA=false;
+for(var az=0;
+az<aE.allParameters.length;
+az++){var aC=aE.allParameters[az].name;
+if(aC="noWait"){aA=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aH,b,[this,aE,this._id,aB],aI)
+}if(aH=="flowChannel"){ay.prototype.flowFlag=active
+}if(aA){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.closeOkChannel=function(aD){var aC=[];
+var aA="closeOkChannel";
+var az=X[aA];
+var aB=false;
+if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aA,b,[this,az,this._id,aC],aD)
+}if(aA=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.declareExchange=function(aC,aH,aJ,aA,aL,az,aK){var aE=[0,aC,aH,aJ,aA,0,0,aL,az];
+var aI="declareExchange";
+var aG=X[aI];
+var aD=false;
+for(var aB=0;
+aB<aG.allParameters.length;
+aB++){var aF=aG.allParameters[aB].name;
+if(aF="noWait"){aD=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aI,b,[this,aG,this._id,aE],aK)
+}if(aI=="flowChannel"){ay.prototype.flowFlag=active
+}if(aD){if(typeof(aL)!=="undefined"&&aL){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.deleteExchange=function(aA,aI,aH,aG){var aC=[0,aA,aI,aH];
+var aF="deleteExchange";
+var aE=X[aF];
+var aB=false;
+for(var az=0;
+az<aE.allParameters.length;
+az++){var aD=aE.allParameters[az].name;
+if(aD="noWait"){aB=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aF,b,[this,aE,this._id,aC],aG)
+}if(aF=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(aH)!=="undefined"&&aH){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.declareQueue=function(aD,aJ,aB,az,aM,aL,aA,aK){var aF=[0,aD,aJ,aB,az,aM,aL,aA];
+var aI="declareQueue";
+var aH=X[aI];
+var aE=false;
+for(var aC=0;
+aC<aH.allParameters.length;
+aC++){var aG=aH.allParameters[aC].name;
+if(aG="noWait"){aE=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aI,b,[this,aH,this._id,aF],aK)
+}if(aI=="flowChannel"){ay.prototype.flowFlag=active
+}if(aE){if(typeof(aL)!=="undefined"&&aL){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.bindQueue=function(aC,aD,aB,aK,az,aJ){var aF=[0,aC,aD,aB,aK,az];
+var aI="bindQueue";
+var aH=X[aI];
+var aE=false;
+for(var aA=0;
+aA<aH.allParameters.length;
+aA++){var aG=aH.allParameters[aA].name;
+if(aG="noWait"){aE=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aI,b,[this,aH,this._id,aF],aJ)
+}if(aI=="flowChannel"){ay.prototype.flowFlag=active
+}if(aE){if(typeof(aK)!=="undefined"&&aK){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.unbindQueue=function(aC,aD,aB,az,aJ){var aF=[0,aC,aD,aB,az];
+var aI="unbindQueue";
+var aH=X[aI];
+var aE=false;
+for(var aA=0;
+aA<aH.allParameters.length;
+aA++){var aG=aH.allParameters[aA].name;
+if(aG="noWait"){aE=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aI,b,[this,aH,this._id,aF],aJ)
+}if(aI=="flowChannel"){ay.prototype.flowFlag=active
+}if(aE){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.purgeQueue=function(aA,aH,aG){var aC=[0,aA,aH];
+var aF="purgeQueue";
+var aE=X[aF];
+var aB=false;
+for(var az=0;
+az<aE.allParameters.length;
+az++){var aD=aE.allParameters[az].name;
+if(aD="noWait"){aB=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aF,b,[this,aE,this._id,aC],aG)
+}if(aF=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(aH)!=="undefined"&&aH){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.deleteQueue=function(aB,aJ,aA,aI,aH){var aD=[0,aB,aJ,aA,aI];
+var aG="deleteQueue";
+var aF=X[aG];
+var aC=false;
+for(var az=0;
+az<aF.allParameters.length;
+az++){var aE=aF.allParameters[az].name;
+if(aE="noWait"){aC=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aG,b,[this,aF,this._id,aD],aH)
+}if(aG=="flowChannel"){ay.prototype.flowFlag=active
+}if(aC){if(typeof(aI)!=="undefined"&&aI){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.qosBasic=function(aA,aH,az,aI){var aD=[aA,aH,az];
+var aG="qosBasic";
+var aF=X[aG];
+var aC=false;
+for(var aB=0;
+aB<aF.allParameters.length;
+aB++){var aE=aF.allParameters[aB].name;
+if(aE="noWait"){aC=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aG,b,[this,aF,this._id,aD],aI)
+}if(aG=="flowChannel"){ay.prototype.flowFlag=active
+}if(aC){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.consumeBasic=function(aF,az,aC,aE,aA,aM,aB,aL){var aH=[0,aF,az,aC,aE,aA,aM,aB];
+var aK="consumeBasic";
+var aJ=X[aK];
+var aG=false;
+for(var aD=0;
+aD<aJ.allParameters.length;
+aD++){var aI=aJ.allParameters[aD].name;
+if(aI="noWait"){aG=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aK,b,[this,aJ,this._id,aH],aL)
+}if(aK=="flowChannel"){ay.prototype.flowFlag=active
+}if(aG){if(typeof(aM)!=="undefined"&&aM){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.cancelBasic=function(az,aH,aG){var aC=[az,aH];
+var aF="cancelBasic";
+var aE=X[aF];
+var aB=false;
+for(var aA=0;
+aA<aE.allParameters.length;
+aA++){var aD=aE.allParameters[aA].name;
+if(aD="noWait"){aB=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aF,b,[this,aE,this._id,aC],aG)
+}if(aF=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(aH)!=="undefined"&&aH){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.publishBasic=function(aE,az,aF,aC,aD,aA,aL){var aH=[0,aF,aC,aD,aA];
+var aK="publishBasic";
+var aJ=X[aK];
+var aG=false;
+for(var aB=0;
+aB<aJ.allParameters.length;
+aB++){var aI=aJ.allParameters[aB].name;
+if(aI="noWait"){aG=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aK,b,[this,aJ,this._id,aH,aE,az],aL)
+}if(aK=="flowChannel"){ay.prototype.flowFlag=active
+}if(aG){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.getBasic=function(aB,aA,aH){var aD=[0,aB,aA];
+var aG="getBasic";
+var aF=X[aG];
+var aC=false;
+for(var az=0;
+az<aF.allParameters.length;
+az++){var aE=aF.allParameters[az].name;
+if(aE="noWait"){aC=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aG,b,[this,aF,this._id,aD],aH)
+}if(aG=="flowChannel"){ay.prototype.flowFlag=active
+}if(aC){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.ackBasic=function(aE,aH,aG){var aB=[aE,aH];
+var aF="ackBasic";
+var aD=X[aF];
+var aA=false;
+for(var az=0;
+az<aD.allParameters.length;
+az++){var aC=aD.allParameters[az].name;
+if(aC="noWait"){aA=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aF,b,[this,aD,this._id,aB],aG)
+}if(aF=="flowChannel"){ay.prototype.flowFlag=active
+}if(aA){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.rejectBasic=function(aF,az,aH){var aC=[aF,az];
+var aG="rejectBasic";
+var aE=X[aG];
+var aB=false;
+for(var aA=0;
+aA<aE.allParameters.length;
+aA++){var aD=aE.allParameters[aA].name;
+if(aD="noWait"){aB=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aG,b,[this,aE,this._id,aC],aH)
+}if(aG=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.recoverBasic=function(aE,aG){var aD=[aE];
+var aB="recoverBasic";
+var az=X[aB];
+var aC=false;
+for(var aF=0;
+aF<az.allParameters.length;
+aF++){var aA=az.allParameters[aF].name;
+if(aA="noWait"){aC=true;
+break
+}}if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aB,b,[this,az,this._id,aD],aG)
+}if(aB=="flowChannel"){ay.prototype.flowFlag=active
+}if(aC){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+_basicProperties=[{name:"contentType",domain:"Shortstr",label:"MIME content type"},{name:"contentEncoding",domain:"Shortstr",label:"MIME content encoding"},{name:"headers",domain:"Table",label:"message header field table"},{name:"deliveryMode",domain:"Octet",label:"non-persistent (1) or persistent (2)"},{name:"priority",domain:"Octet",label:"message priority, 0 to 9"},{name:"correlationId",domain:"Shortstr",label:"application correlation identifier"},{name:"replyTo",domain:"Shortstr",label:"address to reply to"},{name:"expiration",domain:"Shortstr",label:"message expiration specification"},{name:"messageId",domain:"Shortstr",label:"application message identifier"},{name:"timestamp",domain:"Timestamp",label:"message timestamp"},{name:"type",domain:"Shortstr",label:"message type name"},{name:"userId",domain:"Shortstr",label:"creating user id"},{name:"appId",domain:"Shortstr",label:"creating application id"},{name:"reserved",domain:"Shortstr",label:"reserved, must be empty"}];
+ay.prototype.selectTx=function(aD){var aC=[];
+var aA="selectTx";
+var az=X[aA];
+var aB=false;
+if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aA,b,[this,az,this._id,aC],aD)
+}if(aA=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.commitTx=function(aD){var aC=[];
+var aA="commitTx";
+var az=X[aA];
+var aB=false;
+if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aA,b,[this,az,this._id,aC],aD)
+}if(aA=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+ay.prototype.rollbackTx=function(aD){var aC=[];
+var aA="rollbackTx";
+var az=X[aA];
+var aB=false;
+if(this._connection._readyState==this._connection.OPEN){this._enqueueAction(aA,b,[this,az,this._id,aC],aD)
+}if(aA=="flowChannel"){ay.prototype.flowFlag=active
+}if(aB){if(typeof(noWait)!=="undefined"&&noWait){this._enqueueAction("nowait")
+}}return this
+};
+var S=ay.prototype.openChannel;
+var m=function(aA,az){aA._stateMachine.enterState("channelReady","",null);
+S.apply(aA,az)
+};
+delete ay.prototype.openChannel;
+var d=ay.prototype.closeOkChannel;
+var ar=function(aA,az){d.apply(aA,az)
+};
+delete ay.prototype.closeOkChannel;
+var R=ay.prototype.closeChannel;
+ay.prototype.closeChannel=function(aB,aE){if(typeof aB=="object"){myConfig=aB||{};
+var aD=myConfig.replyCode||0;
+var aA=myConfig.replyText||"";
+var aC=myConfig.classId||0;
+var az=myConfig.methodId||0;
+if(typeof aD!="number"){throw new Error("AmqpChannel.closeChannel(): Parameter 'replyCode' is expected to be of numeric type")
+}if(typeof aA!="string"){throw new Error("AmqpChannel.closeChannel(): Parameter 'replyText' is expected to be a string")
+}if(typeof aC!="number"){throw new Error("AmqpChannel.closeChannel(): Parameter 'classId' is expected to be of numeric type")
+}if(typeof az!="number"){throw new Error("AmqpChannel.closeChannel(): Parameter 'methodId' is expected to be of numeric type")
+}return R.call(this,aD,aA,aC,az,aE)
+}else{return R.apply(this,arguments)
+}};
+var ah=ay.prototype.declareExchange;
+ay.prototype.declareExchange=function(aC,aG){if(typeof aC=="object"){myConfig=aC||{};
+var aA=myConfig.exchange;
+var aE=myConfig.type;
+var aD=myConfig.passive||false;
+var aF=myConfig.durable||false;
+var az=myConfig.noWait||false;
+var aB=myConfig.args||null;
+if(!aA||typeof aA!="string"){throw new Error("AmqpChannel.declareExchange(): String parameter 'exchange' is required")
+}if(!aE||typeof aE!="string"||((aE!="fanout")&&(aE!="direct")&&(aE!="topic")&&(aE!="headers"))){throw new Error("AmqpChannel.declareExchange(): Legal values of parameter 'type' are direct | fanout | headers | topic")
+}if(typeof aD!="boolean"){throw new Error("AmqpChannel.declareExchange(): Parameter 'passive' only accepts boolean values")
+}if(typeof aF!="boolean"){throw new Error("AmqpChannel.declareExchange(): Parameter 'durable' only accepts boolean values")
+}if(typeof az!="boolean"){throw new Error("AmqpChannel.declareExchange(): Parameter 'noWait' only accepts boolean values")
+}return ah.call(this,aA,aE,aD,aF,az,aB,aG)
+}else{return ah.apply(this,arguments)
+}};
+var ae=ay.prototype.deleteExchange;
+ay.prototype.deleteExchange=function(aB,aD){if(typeof aB=="object"){myConfig=aB||{};
+var aA=myConfig.exchange;
+var aC=myConfig.ifUnused||false;
+var az=myConfig.noWait||false;
+if(!aA||typeof aA!="string"){throw new Error("AmqpChannel.deleteExchange(): String parameter 'exchange' is required")
+}if(typeof aC!="boolean"){throw new Error("AmqpChannel.deleteExchange(): Parameter 'ifUnused' only accepts boolean values")
+}if(typeof az!="boolean"){throw new Error("AmqpChannel.deleteExchange(): Parameter 'noWait' only accepts boolean values")
+}return ae.call(this,aA,aC,az,aD)
+}else{return ae.apply(this,arguments)
+}};
+var x=ay.prototype.declareQueue;
+ay.prototype.declareQueue=function(aB,aF){if(typeof aB=="object"){myConfig=aB||{};
+var aC=myConfig.queue;
+var aE=myConfig.passive||false;
+var aA=myConfig.durable||false;
+var az=myConfig.exclusive||false;
+var aH=myConfig.autoDelete||false;
+var aG=myConfig.noWait||false;
+var aD=myConfig.args||null;
+if(!aC||typeof aC!="string"){throw new Error("AmqpChannel.declareQueue(): String parameter 'queue' is required")
+}if(typeof aE!="boolean"){throw new Error("AmqpChannel.declareQueue(): Parameter 'passive' only accepts boolean values")
+}if(typeof aA!="boolean"){throw new Error("AmqpChannel.declareQueue(): Parameter 'durable' only accepts boolean values")
+}if(typeof az!="boolean"){throw new Error("AmqpChannel.declareQueue(): Parameter 'exclusive' only accepts boolean values")
+}if(typeof aH!="boolean"){throw new Error("AmqpChannel.declareQueue(): Parameter 'autoDelete' only accepts boolean values")
+}if(typeof aG!="boolean"){throw new Error("AmqpChannel.declareQueue(): Parameter 'noWait' only accepts boolean values")
+}return x.call(this,aC,aE,aA,az,aH,aG,aD,aF)
+}else{return x.apply(this,arguments)
+}};
+var P=ay.prototype.bindQueue;
+ay.prototype.bindQueue=function(aD,aF){if(typeof aD=="object"){myConfig=aD||{};
+var az=myConfig.queue;
+var aB=myConfig.exchange;
+var aE=myConfig.routingKey;
+var aA=myConfig.noWait||false;
+var aC=myConfig.args||null;
+if(!az||typeof az!="string"){throw new Error("AmqpChannel.bindQueue(): String parameter 'queue' is required")
+}if(!aB||typeof aB!="string"){throw new Error("AmqpChannel.bindQueue(): String parameter 'exchange' is required")
+}if(!aE||typeof aE!="string"){throw new Error("AmqpChannel.bindQueue(): String parameter 'routingKey' is required")
+}if(typeof aA!="boolean"){throw new Error("AmqpChannel.bindQueue(): Parameter 'noWait' only accepts boolean values")
+}return P.call(this,az,aB,aE,aA,aC,aF)
+}else{return P.apply(this,arguments)
+}};
+var ab=ay.prototype.unbindQueue;
+ay.prototype.unbindQueue=function(aC,aE){if(typeof aC=="object"){myConfig=aC||{};
+var az=myConfig.queue;
+var aA=myConfig.exchange;
+var aD=myConfig.routingKey;
+var aB=myConfig.args||null;
+if(!az||typeof az!="string"){throw new Error("AmqpChannel.unbindQueue(): String parameter 'queue' is required")
+}if(!aA||typeof aA!="string"){throw new Error("AmqpChannel.unbindQueue(): String parameter 'exchange' is required")
+}if(!aD||typeof aD!="string"){throw new Error("AmqpChannel.unbindQueue(): String parameter 'routingKey' is required")
+}return ab.call(this,az,aA,aD,aB,aE)
+}else{return ab.apply(this,arguments)
+}};
+var G=ay.prototype.purgeQueue;
+ay.prototype.purgeQueue=function(aB,aC){if(typeof aB=="object"){myConfig=aB||{};
+var az=myConfig.queue;
+var aA=myConfig.noWait||false;
+if(!az||typeof az!="string"){throw new Error("AmqpChannel.purgeQueue(): String parameter 'queue' is required")
+}if(typeof aA!="boolean"){throw new Error("AmqpChannel.purgeQueue(): Parameter 'noWait' only accepts boolean values")
+}return G.call(this,az,aA,aC)
+}else{return G.apply(this,arguments)
+}};
+var aj=ay.prototype.deleteQueue;
+ay.prototype.deleteQueue=function(aC,aE){if(typeof aC=="object"){myConfig=aC||{};
+var aA=myConfig.queue;
+var aD=myConfig.ifUnused||false;
+var az=myConfig.ifEmpty||false;
+var aB=myConfig.noWait||false;
+if(!aA||typeof aA!="string"){throw new Error("AmqpChannel.deleteQueue(): String parameter 'queue' is required")
+}if(typeof aD!="boolean"){throw new Error("AmqpChannel.deleteQueue(): Parameter 'ifUnused' only accepts boolean values")
+}if(typeof az!="boolean"){throw new Error("AmqpChannel.deleteQueue(): Parameter 'ifEmpty' only accepts boolean values")
+}if(typeof aB!="boolean"){throw new Error("AmqpChannel.deleteQueue(): Parameter 'noWait' only accepts boolean values")
+}return aj.call(this,aA,aD,az,aB,aE)
+}else{return aj.apply(this,arguments)
+}};
+var am=ay.prototype.qosBasic;
+ay.prototype.qosBasic=function(az,aD){if(typeof az=="object"){myConfig=az||{};
+var aC=myConfig.prefetchSize||0;
+var aA=myConfig.prefetchCount||0;
+var aB=myConfig.global||false;
+if(typeof aC!="number"){throw new Error("AmqpChannel.qosBasic(): Parameter 'prefetchSize' is expected to be of numeric type")
+}if(typeof aA!="number"){throw new Error("AmqpChannel.qosBasic(): Parameter 'prefetchCount' is expected to be of numeric type")
+}if(typeof aB!="boolean"){throw new Error("AmqpChannel.qosBasic(): Parameter 'global' only accepts boolean values")
+}return am.call(this,aC,aA,aB,aD)
+}else{return am.apply(this,arguments)
+}};
+var aq=ay.prototype.consumeBasic;
+ay.prototype.consumeBasic=function(aC,aG){if(typeof aC=="object"){myConfig=aC||{};
+var aE=myConfig.queue;
+var az=myConfig.consumerTag;
+var aB=myConfig.noLocal||false;
+var aD=myConfig.noAck||false;
+var aA=myConfig.exclusive||false;
+var aH=myConfig.noWait||false;
+var aF=myConfig.args||null;
+if(!aE||typeof aE!="string"){throw new Error("AmqpChannel.consumeBasic(): String parameter 'queue' is required")
+}if(!az||typeof az!="string"){throw new Error("AmqpChannel.consumeBasic(): String parameter 'consumerTag' is required")
+}if(typeof aB!="boolean"){throw new Error("AmqpChannel.consumeBasic(): Parameter 'noLocal' only accepts boolean values")
+}if(typeof aD!="boolean"){throw new Error("AmqpChannel.consumeBasic(): Parameter 'noAck' only accepts boolean values")
+}if(typeof aA!="boolean"){throw new Error("AmqpChannel.consumeBasic(): Parameter 'exclusive' only accepts boolean values")
+}if(typeof aH!="boolean"){throw new Error("AmqpChannel.consumeBasic(): Parameter 'noWait' only accepts boolean values")
+}return aq.call(this,aE,az,aB,aD,aA,aH,aF,aG)
+}else{return aq.apply(this,arguments)
+}};
+var aa=ay.prototype.cancelBasic;
+ay.prototype.cancelBasic=function(aA,aC){if(typeof aA=="object"){myConfig=aA||{};
+var aB=myConfig.consumerTag;
+var az=myConfig.noWait||false;
+if(!aB||typeof aB!="string"){throw new Error("AmqpChannel.cancelBasic(): String parameter 'consumerTag' is required")
+}if(typeof az!="boolean"){throw new Error("AmqpChannel.cancelBasic(): Parameter 'noWait' only accepts boolean values")
+}return aa.call(this,aB,az,aC)
+}else{return aa.apply(this,arguments)
+}};
+var l=ay.prototype.publishBasic;
+ay.prototype.publishBasic=function(aC,aG){if(typeof aC=="object"&&aC.body){myConfig=aC||{};
+var az=myConfig.body;
+var aE=myConfig.headers||{};
+var aB=myConfig.exchange;
+var aF=myConfig.routingKey;
+var aD=myConfig.mandatory||false;
+var aA=myConfig.immediate||false;
+if(!az){throw new Error("AmqpChannel.publishBasic(): ByteBuffer parameter 'body' is required")
+}if(!aB||typeof aB!="string"){throw new Error("AmqpChannel.publishBasic(): String parameter 'exchange' is required")
+}if(!aF||typeof aF!="string"){throw new Error("AmqpChannel.publishBasic(): String parameter 'routingKey' is required")
+}if(typeof aD!="boolean"){throw new Error("AmqpChannel.publishBasic(): Parameter 'mandatory' only accepts boolean values")
+}if(typeof aA!="boolean"){throw new Error("AmqpChannel.publishBasic(): Parameter 'immediate' only accepts boolean values")
+}return l.call(this,az,aE,aB,aF,aD,aA,aG)
+}else{return l.apply(this,arguments)
+}};
+var a=ay.prototype.getBasic;
+ay.prototype.getBasic=function(aB,aC){if(typeof aB=="object"){myConfig=aB||{};
+var az=myConfig.queue;
+var aA=myConfig.noAck||false;
+if(!az||typeof az!="string"){throw new Error("AmqpChannel.getBasic(): String parameter 'queue' is required")
+}if(typeof aA!="boolean"){throw new Error("AmqpChannel.getBasic(): Parameter 'noAck' only accepts boolean values")
+}return a.call(this,az,aA,aC)
+}else{return a.apply(this,arguments)
+}};
+var c=ay.prototype.ackBasic;
+ay.prototype.ackBasic=function(aA,aC){if(typeof aA=="object"){myConfig=aA||{};
+var aB=myConfig.deliveryTag;
+var az=myConfig.multiple||false;
+if(!aB||typeof aB!="string"){throw new Error("AmqpChannel.ackBasic(): String parameter 'deliveryTag' is required")
+}if(typeof az!="boolean"){throw new Error("AmqpChannel.ackBasic(): Parameter 'multiple' only accepts boolean values")
+}return c.call(this,aB,az,aC)
+}else{return c.apply(this,arguments)
+}};
+var ax=ay.prototype.rejectBasic;
+ay.prototype.rejectBasic=function(aA,aC){if(typeof aA=="object"){myConfig=aA||{};
+var aB=myConfig.deliveryTag;
+var az=myConfig.requeue||false;
+if(!aB||typeof aB!="string"){throw new Error("AmqpChannel.rejectBasic(): String parameter 'deliveryTag' is required")
+}if(typeof az!="boolean"){throw new Error("AmqpChannel.rejectBasic(): Parameter 'requeue' only accepts boolean values")
+}return ax.call(this,aB,az,aC)
+}else{return ax.apply(this,arguments)
+}};
+var s=function(){this._actionList=new Array();
 this.currentAction=0;
-this._replayLength=0;
+this._replayLength=0
 };
-_6ac.prototype.getActionList=function(){
-return this._actionList;
+s.prototype.getActionList=function(){return this._actionList
 };
-_6ac.prototype.setReplayLength=function(l){
-this._replayLength=l;
+s.prototype.setReplayLength=function(az){this._replayLength=az
 };
-_6ac.prototype._processActions=function _processActions(){
-if(!this._actionList.length){
-return;
-}
-if(this.currentAction==this._actionList.length){
-this.currentAction=0;
-}
-var _6ae=this._actionList[this.currentAction];
+s.prototype._processActions=function r(){if(!this._actionList.length){return
+}if(this.currentAction==this._actionList.length){this.currentAction=0
+}var az=this._actionList[this.currentAction];
 this.currentAction++;
-_6ae.func.apply(_6ae.object,_6ae.args);
+az.func.apply(az.object,az.args)
 };
-_6ac.prototype._processAllActions=function _processAllActions(){
-for(i=0;i<this._replayLength;i++){
-var _6af=this._actionList[i];
-_6af.func.apply(_6af.object,_6af.args);
+s.prototype._processAllActions=function k(){for(i=0;
+i<this._replayLength;
+i++){var az=this._actionList[i];
+az.func.apply(az.object,az.args)
+}};
+s.prototype._processAllNewActions=function ao(){for(i=this._replayLength;
+i<this._actionList.length;
+i++){var az=this._actionList[i];
+az.func.apply(az.object,az.args)
+}};
+s.prototype._addAction=function j(aA,aC,aD,aB){switch(aA){case"declareExchange":break;
+case"declareQueue":break;
+case"bindQueue":break;
+case"consumeBasic":break;
+default:return
+}var az=function az(){};
+var aE={};
+aE.object=aC;
+aE.func=aD||az;
+aE.args=aB||null;
+this._actionList.push(aE)
 }
-};
-_6ac.prototype._processAllNewActions=function _processAllNewActions(){
-for(i=this._replayLength;i<this._actionList.length;i++){
-var _6b0=this._actionList[i];
-_6b0.func.apply(_6b0.object,_6b0.args);
-}
-};
-_6ac.prototype._addAction=function _addAction(_6b1,_6b2,func,args){
-switch(_6b1){
-case "declareExchange":
-break;
-case "declareQueue":
-break;
-case "bindQueue":
-break;
-case "consumeBasic":
-break;
-default:
-return;
-}
-var _6b5=function _6b5(){
-};
-var _6b6={};
-_6b6.object=_6b2;
-_6b6.func=func||_6b5;
-_6b6.args=args||null;
-this._actionList.push(_6b6);
-};
 })();
-var AmqpArguments=function(){
-};
+var AmqpArguments=function(){};
 AmqpArguments.prototype=new Array();
-(function(){
-var _6b7=AmqpArguments.prototype;
-var _add=function(_6b9,key,_6bb,type){
-var _6bd={};
-_6bd.key=key;
-_6bd.value=_6bb;
-_6bd.type=type;
-_6b9.push(_6bd);
+(function(){var a=AmqpArguments.prototype;
+var b=function(g,c,f,d){var e={};
+e.key=c;
+e.value=f;
+e.type=d;
+g.push(e)
 };
-_6b7.addLongString=function(key,_6bf){
-_add(this,key,_6bf,"longstr");
-return this;
+a.addLongString=function(c,d){b(this,c,d,"longstr");
+return this
 };
-_6b7.addInteger=function(key,_6c1){
-_add(this,key,_6c1,"int");
-return this;
-};
+a.addInteger=function(c,d){b(this,c,d,"int");
+return this
+}
 })();
-(function(){
-var _6c2=function(type){
-switch(type){
-case "deliverBasic":
-return "message";
-case "closeOkChannel":
-case "closeChannel":
-case "closeOkConnection":
-case "closeConnection":
-return "close";
-case "getOkBasic":
-case "getEmptyBasic":
-return "get";
-case "consumeOkBasic":
-return "consume";
-case "cancelOkBasic":
-return "cancel";
-case "openOkConnection":
-case "openOkChannel":
-return "open";
-case "declareOkQueue":
-return "declarequeue";
-case "declareOkExchange":
-return "declareexchange";
-case "flowOkChannel":
-return "flow";
-case "bindOkQueue":
-return "bindqueue";
-case "unbindOkQueue":
-return "unbindqueue";
-case "deleteOkQueue":
-return "deletequeue";
-case "deleteOkExchange":
-return "deleteexchange";
-case "commitOkTx":
-return "committransaction";
-case "rollbackOkTx":
-return "rollbacktransaction";
-case "selectOkTx":
-return "selecttransaction";
-case "purgeOkQueue":
-return "purgequeue";
-case "recoverOkBasic":
-return "recover";
-case "rejectOkBasic":
-return "reject";
-case "error":
-return "error";
-default:
-throw (new Error("AMQP: unknown event name "+type));
-}
-};
-AmqpEvent=function(_6c4,_6c5,_6c6){
-this.type=_6c5.methodName;
-this.type=_6c2(this.type);
+(function(){var b=function(c){switch(c){case"deliverBasic":return"message";
+case"closeOkChannel":case"closeChannel":case"closeOkConnection":case"closeConnection":return"close";
+case"getOkBasic":case"getEmptyBasic":return"get";
+case"consumeOkBasic":return"consume";
+case"cancelOkBasic":return"cancel";
+case"openOkConnection":case"openOkChannel":return"open";
+case"declareOkQueue":return"declarequeue";
+case"declareOkExchange":return"declareexchange";
+case"flowOkChannel":return"flow";
+case"bindOkQueue":return"bindqueue";
+case"unbindOkQueue":return"unbindqueue";
+case"deleteOkQueue":return"deletequeue";
+case"deleteOkExchange":return"deleteexchange";
+case"commitOkTx":return"committransaction";
+case"rollbackOkTx":return"rollbacktransaction";
+case"selectOkTx":return"selecttransaction";
+case"purgeOkQueue":return"purgequeue";
+case"recoverOkBasic":return"recover";
+case"rejectOkBasic":return"reject";
+case"error":return"error";
+default:throw (new Error("AMQP: unknown event name "+c))
+}};
+AmqpEvent=function(d,f,e){this.type=f.methodName;
+this.type=b(this.type);
 this.args={};
-for(var i=0;i<_6c5.args.length;i++){
-this.args[_6c5.args[i].name]=_6c5.args[i].value;
-}
-this.headers=_6c6;
-this.body=_6c5.body;
-this.target=_6c4;
-if(this.type=="error"){
-this.message=this.args["replyText"];
-}
-};
-var _6c8=AmqpEvent.prototype;
-_6c8.type;
-_6c8.message;
-_6c8.body;
-_6c8.headers;
-_6c8.target;
+for(var c=0;
+c<f.args.length;
+c++){this.args[f.args[c].name]=f.args[c].value
+}this.headers=e;
+this.body=f.body;
+this.target=d;
+if(this.type=="error"){this.message=this.args.replyText
+}};
+var a=AmqpEvent.prototype;
+a.type;
+a.message;
+a.body;
+a.headers;
+a.target
 })();
