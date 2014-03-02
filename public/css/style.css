@@ -3,6 +3,7 @@ body {
   text-rendering: optimizeLegibility;
   margin-top: 1em;
   overflow-y: scroll;
+  overflow-x: scroll;
 }
 
 a {
@@ -15,7 +16,7 @@ a:hover {
 }
 
 .body {
-  width: 960px;
+  width: 700px;
   margin: auto;
 }
 
@@ -35,9 +36,9 @@ a:hover {
 
 .sidebar {
   position: absolute;
-  left: -240px;
-  width: 230px;
-  font-weight: 300;
+  left: -160px;
+  width: 140px;
+  font-weight: 100;
 }
 
 .gallery {
@@ -82,7 +83,7 @@ h1 {
 
 .sidebar li {
   white-space: nowrap;
-  width: 230px;
+  width: 190px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -96,7 +97,7 @@ h1 {
   font-weight: 300;
   margin-left: 40px;
   padding-top: 3em;
-  width: 920px;
+  width: 1100px;
 /*  clear: left; */
 }
 

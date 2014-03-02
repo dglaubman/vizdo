@@ -1,16 +1,16 @@
-presets.qa1 =
-  cluster: "qa1"
+presets.dev4 =
+  cluster: "dev4"
 
   journal:
-    host: "ec2-23-23-49-22.compute-1.amazonaws.com"
+    host: "ec2-54-225-26-11.compute-1.amazonaws.com:27017"
 
   amqp:
-    host: "ec2-107-21-184-64.compute-1.amazonaws.com:55672"
+    host: "ec2-54-234-111-183.compute-1.amazonaws.com:55672"
 
   kaazing:
 
     connect:
-      url: "ws://cadt0734.rms.com:8003/amqp"
+      url: "ws://cadt0734.rms.com:8004/amqp"
       credentials:
         username: "guest"
         password: "guest"
@@ -25,23 +25,20 @@ presets.qa1 =
       desc: "Config used by declareExchange"
 
     queue:
-      queue: 'vizdoconsumer'
       passive: false
-      durable: false
+      durable: true
       exclusive: false
       autoDelete: true
       noWait: false
       desc: "Config used by declareQueue"
 
     bind:
-      queue: "vizdoconsumer"
       exchange: "DOSignalX"
       routingKey: "#"
       noWait: false
       desc: "Config used by doBind"
 
     consume:
-      queue: "vizdoconsumer"
       consumerTag: "vizdo"
       noLocal: false
       noAck: true
@@ -52,5 +49,6 @@ presets.qa1 =
   mongoose:
     baseUri: "http://cadt0734.rms.com:27080/DODatabase"
     skip: 0
-    limit: 30
-    batchsize: 30
+    limit: 40
+    batchsize: 40
+

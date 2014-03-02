@@ -1,5 +1,7 @@
-DO.signalsource = (settings, callback) ->
+amqp = null
 
+DO.signalsource = (settings, callback) ->
+  amqp.disconnect() unless amqp is null
   amqp = new AmqpClient()
   log = settings.log
   xname = settings.kaazing.exchange.exchange
