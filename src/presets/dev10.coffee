@@ -2,7 +2,7 @@ presets.dev10 =
   cluster: "dev10"
 
   journal:
-    host: "ec2-54-242-99-1.compute-1.amazonaws.com:27017"
+    host: "mgcrpl102be2b1.lab.rmsonecloud.net:27017"
 
   amqp:
     host: "haa-msg-vip-dev10-151d7e30.lab.rmsonecloud.net:55672"
